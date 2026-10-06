@@ -6,7 +6,7 @@ argument-hint: "[arquivo ou escopo]"
 
 # Sem comentário explicativo
 
-**Regra**: o código diz **o quê** pelos nomes e pela estrutura. O **porquê** de uma decisão vai na mensagem de commit, na descrição do MR ou na documentação. Comentário que explica o que o código faz é um nome ou uma função que faltou.
+**Regra**: o código diz **o quê** pelos nomes e pela estrutura. O **porquê** de uma decisão vai na mensagem de commit, na descrição do PR/MR ou na documentação. Comentário que explica o que o código faz é um nome ou uma função que faltou.
 
 ## Por quê
 

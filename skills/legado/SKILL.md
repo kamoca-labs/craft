@@ -27,7 +27,7 @@ Sem teste, a rede de segurança é **saber o que o código faz hoje** antes de m
 
 ## Entrega
 
-- O roteiro manual (ou os comandos da sonda) vai para a seção `## Como testar` do MR. É ele que o revisor e a homologação vão seguir.
+- O roteiro manual (ou os comandos da sonda) vai para a descrição do PR/MR, numa seção `## Como testar`. É ele que o revisor e a homologação vão seguir.
 - A sonda e as saídas ficam **fora do commit**. Se valer a pena manter, vire teste de verdade quando o projeto tiver executor.
 - Ao fim de cada passo, diga qual terminou e o resultado. Ex.: "Passo 5: diff só nas 2 linhas de mediadores com `ra_hrsmes` nulo, demais idênticas".
 

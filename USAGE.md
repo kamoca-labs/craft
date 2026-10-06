@@ -80,10 +80,10 @@ Para um princípio só, chame a skill dele:
 ```
 /craft:atdd recusar anexo acima de 10 MB
 ... passos 1 a 7 ...
-/git:commit /git:chamado 19738 /gitlab:mr @fulano
+/git:commit
 ```
 
-O body do commit e a descrição do MR aproveitam a especificação do passo 1 como "Por quê".
+O body do commit (e a descrição do PR/MR, se você abrir um) aproveita a especificação do passo 1 como "Por quê".
 
 ## Quando o hook erra
 
