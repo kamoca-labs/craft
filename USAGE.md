@@ -2,12 +2,21 @@
 
 ## Sumário
 
+- [Projeto novo](#projeto-novo)
 - [Feature nova com ATDD](#feature-nova-com-atdd)
 - [Correção de bug com ATDD](#correção-de-bug-com-atdd)
 - [Refactor automático depois do verde](#refactor-automático-depois-do-verde)
 - [Refactor sob demanda](#refactor-sob-demanda)
 - [Combinar com o plugin git](#combinar-com-o-plugin-git)
 - [Quando o hook erra](#quando-o-hook-erra)
+
+## Projeto novo
+
+```
+/craft:setup
+```
+
+O Claude detecta a stack, mostra o plano (dependências, configs, limites) e **espera o seu ok**. Depois instala o linter com os limites do craft, cria os scripts `test` e `lint` e escreve no CLAUDE.md só a linha que manda seguir o `/craft:atdd` e os comandos de teste e lint, sem listar as demais skills nem os limites, que já chegam por conta própria. Violações em código que já existe só são contadas, não corrigidas. Dali em diante, o `/craft:craft` roda esse lint antes da triagem.
 
 ## Feature nova com ATDD
 

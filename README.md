@@ -30,7 +30,9 @@ Cada princípio é uma skill própria, com regra, porquê, sinais de violação,
 | Comando | Argumentos | O que faz |
 |---|---|---|
 | `/craft:craft` | `[arquivo ou escopo]` | Triagem do código contra todos os princípios; carrega e aplica só as skills com sinal, e roda os testes dos domínios tocados no fim |
+| `/craft:setup` | `[stack]` | Prepara o projeto: executor de teste, linter com limites de função (20 linhas), arquivo (200), parâmetros (3), aninhamento (2) e complexidade (10). O `/craft:craft` passa a rodar esse lint na triagem |
 | `/craft:atdd` | `<o que deve mudar>` | Conduz os 7 passos: especificação Given/When/Then, teste, red, green, passing, refactor (via `/craft:craft`), passing again |
+| `/craft:legado` | `<o que deve mudar>` | Os mesmos 7 passos para sistema sem teste automatizado (ex.: alfa): caracterização por sonda só de leitura ou roteiro manual, mudança isolada em código novo, `diff` do antes e depois, refactor só no que foi tocado |
 
 Os comandos dos plugins sempre levam o prefixo, então o hub é `/craft:craft`, não `/craft` sozinho.
 
