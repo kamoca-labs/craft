@@ -1,4 +1,4 @@
-# Uso do plugin `practices`
+# Uso do plugin `craft`
 
 ## Sumário
 
@@ -12,7 +12,7 @@
 ## Feature nova com ATDD
 
 ```
-/practices:atdd recusar anexo acima de 10 MB no protocolo
+/craft:atdd recusar anexo acima de 10 MB no protocolo
 ```
 
 1. O Claude escreve os cenários e **espera o seu ok**:
@@ -27,20 +27,20 @@
 
 2. Escreve o teste e roda: `Passo 3 (Red): 1 falhando, expected 422 got 201`.
 3. Escreve o mínimo de código: `Passo 5 (Passing): 1 passando`.
-4. O hook injeta os princípios e ele refatora: `Passo 6 (Refactor): extraído MAX_ATTACHMENT_SIZE`.
-5. Roda a suíte completa: `Passo 7 (Passing again): 48 passando`.
+4. O hook injeta a triagem, ele carrega só o que tem sinal e refatora: `Passo 6 (Refactor): craft:dry, limite unificado em MAX_ATTACHMENT_SIZE; sem sinal nos demais`.
+5. Roda os testes dos domínios tocados: `Passo 7 (Passing again): 34 passando em tests/Feature/Protocol e tests/Unit/Attachment`.
 
 ## Correção de bug com ATDD
 
 ```
-/practices:atdd setor sem dono quebra a listagem
+/craft:atdd setor sem dono quebra a listagem
 ```
 
 O passo 1 vira o cenário que reproduz o bug. O passo 3 prova que o teste pega o bug **antes** da correção.
 
 ## Refactor automático depois do verde
 
-Não precisa de comando. Sempre que o Claude roda testes e a saída vem sem falha, o hook `refactor-on-green` injeta os princípios de refactor como contexto:
+Não precisa de comando. Sempre que o Claude roda testes e a saída vem sem falha, o hook `refactor-on-green` injeta a triagem do `craft` como contexto:
 
 | Comando rodado | Saída | Injeta? |
 |---|---|---|
@@ -53,16 +53,23 @@ Não precisa de comando. Sempre que o Claude roda testes e a saída vem sem falh
 ## Refactor sob demanda
 
 ```
-/practices:refactor app/Actions/UploadAttachment.php
-/practices:refactor o que mudou nesta branch
+/craft:craft app/Actions/UploadAttachment.php
+/craft:craft o que mudou nesta branch
 ```
 
-O Claude passa cada princípio e o checklist sobre o escopo, sem mudar comportamento, e roda a suíte no fim.
+O Claude faz a triagem de todos os princípios, carrega só as skills com sinal, aplica uma de cada vez sem mudar comportamento e, no fim, roda os testes dos domínios tocados. O relatório diz o que mudou por princípio e quais não tiveram sinal.
+
+Para um princípio só, chame a skill dele:
+
+```
+/craft:errors app/Services/PaymentGateway.php
+/craft:clean-tests tests/Feature/UploadTest.php
+```
 
 ## Combinar com o plugin git
 
 ```
-/practices:atdd recusar anexo acima de 10 MB
+/craft:atdd recusar anexo acima de 10 MB
 ... passos 1 a 7 ...
 /git:commit /git:chamado 19738 /gitlab:mr @fulano
 ```

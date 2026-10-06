@@ -1,4 +1,4 @@
-# Plugin `practices`
+# Plugin `craft`
 
 ## Sumário
 
@@ -14,52 +14,34 @@
 
 ```bash
 claude plugin marketplace add ~/Development/claude-plugins
-claude plugin install practices@kauan
+claude plugin install craft@kauan
 ```
 
 Requer Node 22.18+. Os comandos aparecem na próxima sessão. Clone e atualização estão no [README do repo](../../README.md#instalação).
 
 ## Visão geral
 
-Boas práticas de programação para qualquer projeto: o fluxo **ATDD** em 7 passos e os princípios de **refactor** (SOLID, KISS, YAGNI, DRY, Clean Code). Um hook lembra o refactor no momento certo, logo depois que a suíte fica verde, sem você precisar pedir.
+Boas práticas de programação para qualquer projeto: o fluxo **ATDD** em 7 passos e o **refactor guiado por princípios** (SOLID, KISS, YAGNI, DRY, Clean Code).
+
+Cada princípio é uma skill própria, com regra, porquê, sinais de violação, como aplicar, exemplo antes/depois, limites e uma pergunta de verificação. Você não carrega uma por uma: o `/craft:craft` faz a triagem do código e carrega só as que têm sinal. Um hook dispara essa triagem sozinho logo depois que a suíte fica verde.
 
 ## Comandos
 
 | Comando | Argumentos | O que faz |
 |---|---|---|
-| `/practices:atdd` | `<o que deve mudar>` | Conduz os 7 passos: especificação Given/When/Then, teste, red, green, passing, refactor, passing again |
-| `/practices:refactor` | `[arquivo ou escopo]` | Aplica os princípios e o checklist do passo 6 ao código indicado ou ao que mudou |
+| `/craft:craft` | `[arquivo ou escopo]` | Triagem do código contra todos os princípios; carrega e aplica só as skills com sinal, e roda os testes dos domínios tocados no fim |
+| `/craft:atdd` | `<o que deve mudar>` | Conduz os 7 passos: especificação Given/When/Then, teste, red, green, passing, refactor (via `/craft:craft`), passing again |
 
-As duas skills também são escolhidas pelo Claude quando a tarefa casa com a descrição delas (feature nova, correção de bug, pedido de refactor).
+Os comandos dos plugins sempre levam o prefixo, então o hub é `/craft:craft`, não `/craft` sozinho.
 
-## Hooks
+### Uma skill por princípio
 
-| Hook (`hooks/rules/`) | Evento | Quando dispara | O que faz |
-|---|---|---|---|
-| `refactor-on-green` | depois de um comando Bash | o comando roda testes e a saída não mostra falha | injeta o conteúdo da skill `refactor` como contexto (passo 6 do ATDD) |
+Dá para chamar direto quando você já sabe o que quer (`/craft:dry src/upload.ts`), e o Claude também escolhe sozinho pela descrição de cada uma.
 
-Executores reconhecidos: vitest, jest, pest, phpunit, pytest, `artisan test`, `node --test`, `npm`/`pnpm`/`yarn`/`bun test`, `go test`, `cargo test`, `mvn test`, `gradle test`.
-
-A falha é lida da **saída**, não só do exit code, porque um pipe (`pnpm test | tail`) esconde o código de saída. Padrões de falha: `N failed`, `FAIL`, `FAILED`, `FAILURES!`, `ERRORS!`, `ELIFECYCLE`, `No test files found`, `# fail N`, `not ok N`.
-
-Os princípios moram só em `skills/refactor/SKILL.md`. O hook lê esse arquivo, então editar a skill muda também o que é injetado.
-
-## Origem
-
-Adaptado das regras do projeto `huginn` (`.claude/rules/atdd.md`, `.claude/principles/refactor.md`, `.claude/hooks/load-refactor-principles.sh`), sem as partes específicas de lá (Nuxt, i18n, ESLint em container).
-
-## Arquivos
-
-| Caminho | Papel |
+| Grupo | Skills |
 |---|---|
-| `skills/atdd/SKILL.md` | os 7 passos e as regras do ATDD |
-| `skills/refactor/SKILL.md` | os princípios e o checklist; fonte única do que o hook injeta |
-| `hooks/hooks.json` | um hook por regra |
-| `hooks/lib.ts` | leitura do payload, leitura da skill, injeção de contexto e captura de caso real |
-| `hooks/rules/<regra>.ts` | uma regra por arquivo |
-| `hooks/tests/<regra>.test.ts` | os casos de cada regra, isolada |
-| `hooks/tests/cases.json` | casos de uso de ponta a ponta: cada um declara quais hooks injetam |
-| `hooks/tests/cases.test.ts` | roda o `cases.json` contra o `hooks.json` |
-| `hooks/tests/structure.test.ts` | garante que toda regra tem hook dedicado e teste próprio |
+| SOLID | `single-responsibility`, `open-closed`, `liskov-substitution`, `interface-segregation`, `dependency-inversion` |
+| Simplicidade | `kiss`, `yagni`, `dry` |
+| Clean Code | `naming`, `functions`, `arguments`, `guard-clauses`, `side-effects`, `comments`, `errors`, `clean-tests` |
 
-Rodar: `node --test 'hooks/tests/*.test.ts'`. Cada injeção em uso real vai para `~/.claude/hook-cases.jsonl` com `inject` no lugar de `deny`; veja [transformar caso real em teste](../../USAGE.md#transformar-caso-real-em-teste).
+Quando os princípios brigam (DRY × KISS, inversão de dependência × YAGNI), a ordem de prioridade está em `skills/craft/SKILL.md`.
