@@ -1,0 +1,6 @@
+{
+  "name": "craft",
+  "description": "/craft:craft faz a triagem de SOLID, KISS, YAGNI, DRY e Clean Code e carrega só a skill de cada princípio com sinal; /craft:atdd conduz o fluxo de 7 passos. Hook injeta a triagem quando a suíte fica verde.",
+  "version": "0.1.0",
+  "author": { "name": "Kauan Morinel Calheiro" }
+}

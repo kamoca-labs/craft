@@ -1,0 +1,50 @@
+[
+  {
+    "description": "vitest verde depois do green do ATDD pede o refactor",
+    "origin": "usage",
+    "tool_name": "Bash",
+    "tool_input": { "command": "docker compose exec -T app pnpm vitest run" },
+    "tool_response": { "stdout": " Test Files  4 passed (4)\n      Tests  21 passed (21)", "stderr": "" },
+    "inject": ["refactor-on-green"]
+  },
+  {
+    "description": "pest verde no backend pede o refactor",
+    "origin": "usage",
+    "tool_name": "Bash",
+    "tool_input": { "command": "docker compose exec -T backend php artisan test --compact" },
+    "tool_response": { "stdout": "  Tests:    48 passed (112 assertions)", "stderr": "" },
+    "inject": ["refactor-on-green"]
+  },
+  {
+    "description": "red do ATDD com pipe escondendo o exit code não pede refactor",
+    "origin": "usage",
+    "tool_name": "Bash",
+    "tool_input": { "command": "pnpm vitest run 2>&1 | tail -20" },
+    "tool_response": { "stdout": " FAIL  tests/ticket.test.ts\n      Tests  1 failed | 20 passed (21)", "stderr": "" },
+    "inject": []
+  },
+  {
+    "description": "node --test com falha não pede refactor",
+    "origin": "usage",
+    "tool_name": "Bash",
+    "tool_input": { "command": "node --test 'plugins/**/hooks/tests/*.test.ts' | grep -E '^# (pass|fail)'" },
+    "tool_response": { "stdout": "# pass 80\n# fail 1", "stderr": "" },
+    "inject": []
+  },
+  {
+    "description": "node --test verde pede refactor",
+    "origin": "usage",
+    "tool_name": "Bash",
+    "tool_input": { "command": "node --test 'plugins/**/hooks/tests/*.test.ts' | grep -E '^# (pass|fail)'" },
+    "tool_response": { "stdout": "# pass 81\n# fail 0", "stderr": "" },
+    "inject": ["refactor-on-green"]
+  },
+  {
+    "description": "comando comum que cita teste não pede refactor",
+    "origin": "usage",
+    "tool_name": "Bash",
+    "tool_input": { "command": "grep -rn 'describe(' tests/" },
+    "tool_response": { "stdout": "tests/a.test.ts:1:describe('a')", "stderr": "" },
+    "inject": []
+  }
+]

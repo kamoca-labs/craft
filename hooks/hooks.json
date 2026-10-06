@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/refactor-on-green.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:refactor-on-green: suíte verde?"
+          }
+        ]
+      }
+    ]
+  }
+}
