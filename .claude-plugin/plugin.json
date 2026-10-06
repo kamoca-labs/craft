@@ -2,5 +2,5 @@
   "name": "craft",
   "description": "/craft:setup prepara lint com limites; /craft:craft faz a triagem de SOLID, KISS, YAGNI, DRY e Clean Code e carrega só a skill de cada princípio com sinal; /craft:atdd conduz o fluxo de 7 passos e /craft:legado o adapta para sistema sem teste. Hook injeta a triagem quando a suíte fica verde.",
   "version": "0.1.1",
-  "author": { "name": "Kauan Morinel Calheiro" }
+  "author": { "name": "kamoca" }
 }
