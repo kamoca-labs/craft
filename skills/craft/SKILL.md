@@ -11,10 +11,11 @@ Os testes estão verdes. Se você acabou de fazê-los passar (passo 5 do ATDD), 
 ## Como conduzir
 
 1. **Escopo**: o argumento, se houver; senão, o que mudou (`git diff` da branch contra a main).
-2. **Triagem**: leia o código do escopo e faça a pergunta de cada linha da tabela abaixo.
-3. **Aprofunde só onde há sinal**: para cada princípio com sinal, carregue a skill dele com a ferramenta `Skill` (`craft:<skill>`) e siga o que ela diz. Não carregue a skill de um princípio sem sinal.
-4. **Um refactor por vez**: mude, rode os testes do módulo refatorado, siga. Nunca edite um teste para fazê-lo passar.
-5. **Reporte**: uma linha por princípio com sinal (`craft:dry: regra do limite de anexo unificada em MAX_ATTACHMENT_SIZE`) e diga quais não tiveram sinal.
+2. **Lint**: se o projeto tem script de lint (o `craft:setup` cria um), rode nos arquivos do escopo. Violação de tamanho ou complexidade já é sinal: `max-lines-per-function` e `complexity` → `craft:functions`, `max-params` → `craft:arguments`, `max-depth` → `craft:guard-clauses`, `max-lines` → `craft:single-responsibility`. Nunca desligue nem afrouxe a regra para passar.
+3. **Triagem**: leia o código do escopo e faça a pergunta de cada linha da tabela abaixo.
+4. **Aprofunde só onde há sinal**: para cada princípio com sinal, carregue a skill dele com a ferramenta `Skill` (`craft:<skill>`) e siga o que ela diz. Não carregue a skill de um princípio sem sinal.
+5. **Um refactor por vez**: mude, rode os testes do módulo refatorado, siga. Nunca edite um teste para fazê-lo passar.
+6. **Reporte**: uma linha por princípio com sinal (`craft:dry: regra do limite de anexo unificada em MAX_ATTACHMENT_SIZE`) e diga quais não tiveram sinal.
 
 ## Triagem
 
@@ -55,6 +56,7 @@ Conflitos comuns:
 
 ## Checklist antes de sair do passo 6
 
+- [ ] Lint do escopo sem violação (quando o projeto tem lint).
 - [ ] Triagem feita em todas as linhas da tabela.
 - [ ] Skill carregada e aplicada para cada princípio com sinal.
 - [ ] Comportamento igual (nenhum teste foi editado para passar).
