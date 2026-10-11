@@ -27,7 +27,7 @@ test('toda regra tem teste próprio', () => {
 
 test('a triagem do craft lista exatamente as skills de princípio', () => {
   const skillsDir = path.join(HOOKS_DIR, '..', 'skills')
-  const principles = fs.readdirSync(skillsDir).filter((skill) => !['craft', 'atdd', 'setup', 'legado'].includes(skill)).sort()
+  const principles = fs.readdirSync(skillsDir).filter((skill) => !['craft', 'atdd', 'setup'].includes(skill)).sort()
   const hub = fs.readFileSync(path.join(skillsDir, 'craft', 'SKILL.md'), 'utf8')
   const listed = [...hub.matchAll(/^\| `craft:([\w-]+)`/gm)].map((match) => match[1]).sort()
   assert.deepStrictEqual(listed, principles)

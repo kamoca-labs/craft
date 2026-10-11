@@ -8,8 +8,6 @@ argument-hint: "<o que deve mudar>"
 
 Toda mudança de comportamento segue estes passos, nesta ordem. Nunca pule, junte ou reordene.
 
-Projeto sem executor de teste e sem como criar um (sistema legado, como o alfa): use a skill `craft:legado`, que troca o teste por sonda e roteiro manual.
-
 1. **Especificação**: escreva os critérios de aceite como cenários Given/When/Then. Mostre ao usuário e espere o ok antes de seguir.
 2. **Teste**: escreva os testes de aceite que expressam a especificação. Nenhum código de produção ainda.
 3. **Red**: rode **só os testes novos** e confirme que falham **pelo motivo esperado** (comportamento ausente), não por erro de sintaxe, import ou setup.
