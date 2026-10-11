@@ -46,3 +46,10 @@ Ficam fora do menu de `/` (`user-invocable: false`): a entrada é o `/craft:craf
 | Clean Code | `naming`, `functions`, `arguments`, `guard-clauses`, `side-effects`, `comments`, `errors`, `clean-tests` |
 
 Quando os princípios brigam (DRY × KISS, inversão de dependência × YAGNI), a ordem de prioridade está em `skills/craft/SKILL.md`.
+
+## Hooks
+
+| Regra | Quando | O que faz |
+|---|---|---|
+| `atdd-first` | antes de `Edit`/`Write` em arquivo de código | **Nega** a edição se `craft:atdd` não foi carregada na sessão. Arquivo que não é código (`.md`, `.json`, `.yml`, `.env`) passa direto |
+| `refactor-on-green` | depois de rodar testes com saída sem falha | Injeta a triagem do `craft:craft` (passo 6 do ATDD) |

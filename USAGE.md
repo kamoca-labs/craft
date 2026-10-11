@@ -90,6 +90,7 @@ O body do commit (e a descrição do PR/MR, se você abrir um) aproveita a espec
 | Erro | Exemplo | O que fazer |
 |---|---|---|
 | Injetou com a suíte vermelha | executor novo com formato de falha não reconhecido | pegue a linha em `~/.claude/hook-cases.jsonl`, cole no `hooks/tests/cases.json` com `"inject": []` e adicione o padrão em `FAILURE` |
+| `atdd-first` negou edição que não muda comportamento | ajuste de config numa extensão de código | carregue `/craft:atdd` mesmo assim; se o arquivo não é código, adicione a exceção em `CODE_FILE` com um teste em `atdd-first.test.ts` |
 | Não injetou com a suíte verde | executor de teste não reconhecido | escreva o caso no `cases.json` com `"inject": ["refactor-on-green"]` e adicione o executor em `TEST_RUNNER` |
 
 O passo a passo completo está em [transformar caso real em teste](../../USAGE.md#transformar-caso-real-em-teste).

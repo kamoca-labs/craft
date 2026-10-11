@@ -4,7 +4,8 @@ import path from 'node:path'
 
 export type HookInput = {
   tool_name?: string
-  tool_input: { command?: string }
+  tool_input: { command?: string, file_path?: string }
+  transcript_path?: string
   tool_response?: { stdout?: string, stderr?: string }
 }
 
@@ -23,18 +24,25 @@ export function skillBody(skill: string): string {
   return fs.readFileSync(file, 'utf8').replace(/^---\n[\s\S]*?\n---\n+/, '')
 }
 
+function capture(useCase: object) {
+  try {
+    fs.appendFileSync(CASES_LOG, `${JSON.stringify({ plugin: 'craft', origin: 'real', ...useCase })}\n`)
+  } catch {}
+}
+
+export function deny(rule: string, input: HookInput, reason: string): never {
+  capture({ description: reason, tool_name: input.tool_name, tool_input: input.tool_input, deny: [rule] })
+  process.stderr.write(`[craft:${rule}] ${reason}\n`)
+  process.exit(2)
+}
+
 export function inject(rule: string, input: HookInput, context: string) {
-  const useCase = {
-    plugin: 'craft',
+  capture({
     description: `${rule} injetou contexto`,
-    origin: 'real',
     tool_name: input.tool_name,
     tool_input: input.tool_input,
     tool_response: input.tool_response,
     inject: [rule],
-  }
-  try {
-    fs.appendFileSync(CASES_LOG, `${JSON.stringify(useCase)}\n`)
-  } catch {}
+  })
   process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PostToolUse', additionalContext: context } }))
 }
