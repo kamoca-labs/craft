@@ -2,6 +2,7 @@
 name: side-effects
 description: Clean Code, nenhum efeito colateral escondido. Use quando uma função grava, envia, altera estado global, muta o argumento recebido ou faz I/O que o nome não anuncia, como um get que cria, um validate que salva ou um format que loga.
 argument-hint: "[arquivo ou escopo]"
+user-invocable: false
 ---
 
 # Nenhum efeito colateral escondido

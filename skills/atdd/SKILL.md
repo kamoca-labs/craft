@@ -8,8 +8,6 @@ argument-hint: "<o que deve mudar>"
 
 Toda mudança de comportamento segue estes passos, nesta ordem. Nunca pule, junte ou reordene.
 
-Projeto sem executor de teste e sem como criar um (sistema legado, como o alfa): use a skill `craft:legado`, que troca o teste por sonda e roteiro manual.
-
 1. **Especificação**: escreva os critérios de aceite como cenários Given/When/Then. Mostre ao usuário e espere o ok antes de seguir.
 2. **Teste**: escreva os testes de aceite que expressam a especificação. Nenhum código de produção ainda.
 3. **Red**: rode **só os testes novos** e confirme que falham **pelo motivo esperado** (comportamento ausente), não por erro de sintaxe, import ou setup.
@@ -23,6 +21,9 @@ Projeto sem executor de teste e sem como criar um (sistema legado, como o alfa):
 - Nunca escreva código de produção sem um teste falhando que o exija.
 - Ao fim de cada passo, diga qual passo terminou e o resultado. Ex.: "Passo 3 (Red): 2 falhando, `expected 'error' got undefined`".
 - Se um teste falhar no passo 5 ou 7, volte ao passo 4 ou corrija o refactor. Nunca altere o teste para passar, a não ser que a especificação tenha mudado.
+- Código só em inglês, inclusive os identificadores dos testes. O nome e o dado de teste podem estar na língua do projeto. Texto que o usuário vê vai para o arquivo de tradução, na língua dele, pelo i18n da stack. Veja `craft:i18n`; o hook `english-code` nega o que fugir disso.
+- Se o usuário corrigir algo que você fez, avalie com `craft:hook` se a correção vira hook do projeto.
+- Decisão ou escolha tomada no caminho (biblioteca, formato, regra de negócio) fica registrada no repo: no CLAUDE.md se é contexto para o modelo, em `docs/` se é para o time, sempre com caminho relativo. Nunca na memória local do Claude nem em caminho absoluto.
 - Siga o executor de teste e o ambiente do projeto (container, script do `package.json`, `artisan test`).
 
 ## Execução filtrada

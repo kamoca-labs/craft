@@ -2,6 +2,7 @@
 name: single-responsibility
 description: S do SOLID, responsabilidade única. Use quando um módulo, classe, componente ou função muda por mais de um motivo, mistura regra de negócio com I/O ou apresentação, ou cresce acumulando assuntos diferentes.
 argument-hint: "[arquivo ou escopo]"
+user-invocable: false
 ---
 
 # S: responsabilidade única

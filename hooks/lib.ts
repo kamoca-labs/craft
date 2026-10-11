@@ -4,11 +4,25 @@ import path from 'node:path'
 
 export type HookInput = {
   tool_name?: string
-  tool_input: { command?: string }
+  tool_input: {
+    command?: string
+    file_path?: string
+    content?: string
+    new_string?: string
+    edits?: { new_string: string }[]
+  }
+  transcript_path?: string
   tool_response?: { stdout?: string, stderr?: string }
 }
 
 const CASES_LOG = process.env.HOOK_CASES_LOG || path.join(os.homedir(), '.claude', 'hook-cases.jsonl')
+const MESSAGES: Record<string, string> = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, 'locales', 'pt-BR.json'), 'utf8'))
+
+export const CODE_FILE = /\.(ts|tsx|js|jsx|mjs|cjs|vue|svelte|php|py|go|rs|java|kt|rb|cs)$/
+
+export function message(key: string, params: Record<string, string> = {}): string {
+  return MESSAGES[key].replace(/\{(\w+)\}/g, (_, name) => params[name])
+}
 
 export function readInput(): HookInput {
   return JSON.parse(fs.readFileSync(0, 'utf8'))
@@ -23,18 +37,30 @@ export function skillBody(skill: string): string {
   return fs.readFileSync(file, 'utf8').replace(/^---\n[\s\S]*?\n---\n+/, '')
 }
 
+function capture(useCase: object) {
+  try {
+    fs.appendFileSync(CASES_LOG, `${JSON.stringify({ plugin: 'craft', origin: 'real', ...useCase })}\n`)
+  } catch {}
+}
+
+export function deny(rule: string, input: HookInput): never {
+  const reason = message(`deny.${rule}`)
+  capture({ description: reason, tool_name: input.tool_name, tool_input: input.tool_input, deny: [rule] })
+  process.stderr.write(`[craft:${rule}] ${reason}\n`)
+  process.exit(2)
+}
+
 export function inject(rule: string, input: HookInput, context: string) {
-  const useCase = {
-    plugin: 'craft',
-    description: `${rule} injetou contexto`,
-    origin: 'real',
+  capture({
+    description: message('capture.injected', { rule }),
     tool_name: input.tool_name,
     tool_input: input.tool_input,
     tool_response: input.tool_response,
     inject: [rule],
-  }
-  try {
-    fs.appendFileSync(CASES_LOG, `${JSON.stringify(useCase)}\n`)
-  } catch {}
-  process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PostToolUse', additionalContext: context } }))
+  })
+  addContext('PostToolUse', context)
+}
+
+export function addContext(hookEventName: string, context: string) {
+  process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName, additionalContext: context } }))
 }

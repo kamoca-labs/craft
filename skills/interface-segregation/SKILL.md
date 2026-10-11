@@ -2,6 +2,7 @@
 name: interface-segregation
 description: I do SOLID, segregação de interface. Use quando uma função, classe ou componente recebe um tipo, objeto ou props grande e usa só uma fração dele, ou quando uma interface obriga implementações a cumprir métodos que não fazem sentido para elas.
 argument-hint: "[arquivo ou escopo]"
+user-invocable: false
 ---
 
 # I: segregação de interface

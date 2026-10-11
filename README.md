@@ -32,18 +32,29 @@ Cada princípio é uma skill própria, com regra, porquê, sinais de violação,
 | `/craft:craft` | `[arquivo ou escopo]` | Triagem do código contra todos os princípios; carrega e aplica só as skills com sinal, e roda os testes dos domínios tocados no fim |
 | `/craft:setup` | `[stack]` | Prepara o projeto: executor de teste, linter com limites de função (20 linhas), arquivo (200), parâmetros (3), aninhamento (2) e complexidade (10). O `/craft:craft` passa a rodar esse lint na triagem |
 | `/craft:atdd` | `<o que deve mudar>` | Conduz os 7 passos: especificação Given/When/Then, teste, red, green, passing, refactor (via `/craft:craft`), passing again |
-| `/craft:legado` | `<o que deve mudar>` | Os mesmos 7 passos para sistema sem teste automatizado (ex.: alfa): caracterização por sonda só de leitura ou roteiro manual, mudança isolada em código novo, `diff` do antes e depois, refactor só no que foi tocado |
+| `/craft:hook` | `<comportamento que não pode se repetir>` | Depois de uma correção sua, avalia se ela vira hook do projeto; se sim, propõe e, com o ok, escreve em TypeScript (`.claude/hooks/`, teste com `node:test`, mensagem pelo arquivo de tradução) e liga no `.claude/settings.json` |
 
 Os comandos dos plugins sempre levam o prefixo, então o hub é `/craft:craft`, não `/craft` sozinho.
 
 ### Uma skill por princípio
 
-Dá para chamar direto quando você já sabe o que quer (`/craft:dry src/upload.ts`), e o Claude também escolhe sozinho pela descrição de cada uma.
+Ficam fora do menu de `/` (`user-invocable: false`): a entrada é o `/craft:craft`, que carrega só as que têm sinal. Quando você já sabe o princípio, peça pelo nome ("aplica DRY em src/upload.ts"), e o Claude carrega a skill dele.
 
 | Grupo | Skills |
 |---|---|
 | SOLID | `single-responsibility`, `open-closed`, `liskov-substitution`, `interface-segregation`, `dependency-inversion` |
 | Simplicidade | `kiss`, `yagni`, `dry` |
+| Idioma | `i18n` (código em inglês, texto do usuário pelo i18n da stack) |
+| Escrita | `ste` (respostas e textos no padrão ASD-STE100; carregada pelo hook em toda sessão, fora da triagem) |
 | Clean Code | `naming`, `functions`, `arguments`, `guard-clauses`, `side-effects`, `comments`, `errors`, `clean-tests` |
 
 Quando os princípios brigam (DRY × KISS, inversão de dependência × YAGNI), a ordem de prioridade está em `skills/craft/SKILL.md`.
+
+## Hooks
+
+| Regra | Quando | O que faz |
+|---|---|---|
+| `ste` | no início, na retomada, no `/clear` e depois da compactação da sessão | Injeta a skill `craft:ste`: respostas e textos no padrão ASD-STE100 (frases curtas, voz ativa, uma instrução por frase, um termo por conceito). Em inglês vale a norma completa; em português, as regras que valem para qualquer língua |
+| `atdd-first` | antes de `Edit`/`Write` em arquivo de código | **Nega** a edição se `craft:atdd` não foi carregada na sessão. Arquivo que não é código (`.md`, `.json`, `.yml`, `.env`) passa direto |
+| `english-code` | antes de `Edit`/`Write` em arquivo de código | **Nega** texto novo com letra fora do ASCII (acento, outro alfabeto) em identificador, comentário ou string. Pastas de tradução (`lang/`, `locales/`, `i18n/`, `l10n/`, `translations/`), arquivos de teste e arquivos que não são código passam direto. Só o texto novo é checado, então editar arquivo legado não trava |
+| `refactor-on-green` | depois de rodar testes com saída sem falha | Injeta a triagem do `craft:craft` (passo 6 do ATDD) |

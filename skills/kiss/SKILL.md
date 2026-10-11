@@ -2,6 +2,7 @@
 name: kiss
 description: KISS (keep it simple). Use quando uma solução parece engenhosa demais para o problema, usa padrão, biblioteca ou camada onde uma construção simples resolve, ou exige explicação para ser entendida.
 argument-hint: "[arquivo ou escopo]"
+user-invocable: false
 ---
 
 # KISS: o mais simples que passa nos testes

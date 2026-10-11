@@ -49,6 +49,7 @@ Crie ou complete um CLAUDE.md mínimo com o contexto do projeto que o setup leva
 
 ```markdown
 Toda mudança de comportamento segue `/craft:atdd`.
+Referência, decisão ou escolha sobre o projeto mora no repo (CLAUDE.md, `docs/`), com caminho relativo. Nunca na memória local do Claude (`~/.claude/`) nem com caminho absoluto: só valeria nesta máquina e o time não veria.
 
 ## Comandos
 
@@ -57,6 +58,8 @@ Toda mudança de comportamento segue `/craft:atdd`.
 ```
 
 Mais uma linha só se algo foge do padrão da stack (testes dentro de container, serviço que precisa estar de pé).
+
+A linha da referência existe porque, sem ela, o modelo grava decisões do projeto na memória local dele, que não vai para o repo nem para o time.
 
 A linha do ATDD é a única referência a skill: sem ela, o modelo só carrega o `craft:atdd` quando lembra, e o fluxo precisa valer desde o primeiro código. Não liste as demais skills, agents, hooks, princípios nem os limites do lint: o `craft:atdd` já leva ao `craft:craft`, o hook dispara a triagem e os limites estão no arquivo de config. Repetir gasta contexto em toda sessão e desatualiza.
 

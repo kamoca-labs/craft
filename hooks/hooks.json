@@ -1,5 +1,36 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/ste.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:ste: escrita no padrão ASD-STE100"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/atdd-first.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:atdd-first: fluxo carregado antes do código?"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/english-code.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:english-code: código em inglês?"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Bash",
