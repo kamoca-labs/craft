@@ -20,32 +20,32 @@ function edit(file: string, transcript: string | null) {
 
 const SKILL_CALL = (skill: string) => JSON.stringify({ type: 'assistant', message: { content: [{ type: 'tool_use', name: 'Skill', input: { skill } }] } })
 const SLASH = (command: string) => JSON.stringify({ type: 'user', message: { content: `<command-name>/${command}</command-name>` } })
-const MENTION = JSON.stringify({ type: 'user', message: { content: 'segue o craft:atdd, "skill":"craft:atdd"' } })
+const MENTION = JSON.stringify({ type: 'user', message: { content: 'follow craft:atdd, "skill":"craft:atdd"' } })
 
-test('nega editar código sem o fluxo carregado', () => {
+test('denies editing code without the flow loaded', () => {
   const result = edit('src/upload.ts', '')
   assert.strictEqual(result.status, 2)
   assert.match(result.stderr, /\[craft:atdd-first\].*\/craft:atdd/)
 })
 
-test('libera depois que o modelo carregou craft:atdd', () => {
+test('allows after the model loaded craft:atdd', () => {
   assert.strictEqual(edit('src/upload.ts', SKILL_CALL('craft:atdd')).status, 0)
 })
 
-test('libera depois que o usuário digitou o comando', () => {
+test('allows after the user typed the command', () => {
   assert.strictEqual(edit('src/upload.ts', SLASH('craft:atdd')).status, 0)
 })
 
-test('só citar a skill no texto não libera', () => {
+test('merely mentioning the skill in text does not allow', () => {
   assert.strictEqual(edit('src/upload.ts', MENTION).status, 2)
 })
 
-test('arquivo que não é código não exige o fluxo', () => {
+test('non-code file does not require the flow', () => {
   for (const file of ['README.md', 'package.json', '.env', 'docker-compose.yml', 'CLAUDE.md']) {
     assert.strictEqual(edit(file, '').status, 0, file)
   }
 })
 
-test('sem transcript legível não bloqueia', () => {
+test('unreadable transcript does not block', () => {
   assert.strictEqual(edit('src/upload.ts', null).status, 0)
 })

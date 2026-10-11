@@ -10,30 +10,30 @@ const wired = [...hooksJson.matchAll(/rules\/([\w-]+)\.ts/g)].map((match) => mat
 const SKILLS_DIR = path.join(HOOKS_DIR, '..', 'skills')
 const PRINCIPLES = fs.readdirSync(SKILLS_DIR).filter((skill) => !['craft', 'atdd', 'setup'].includes(skill)).sort()
 
-test('toda regra tem hook dedicado no hooks.json', () => {
+test('every rule has a dedicated hook in hooks.json', () => {
   assert.deepStrictEqual(rules.filter((rule) => !wired.includes(rule)), [])
 })
 
-test('todo hook do hooks.json aponta para uma regra que existe', () => {
+test('every hook in hooks.json points to an existing rule', () => {
   assert.deepStrictEqual(wired.filter((rule) => !rules.includes(rule)), [])
 })
 
-test('cada regra aparece uma vez só no hooks.json', () => {
+test('each rule appears only once in hooks.json', () => {
   assert.strictEqual(new Set(wired).size, wired.length)
 })
 
-test('toda regra tem teste próprio', () => {
+test('every rule has its own test', () => {
   const missing = rules.filter((rule) => !fs.existsSync(path.join(import.meta.dirname, `${rule}.test.ts`)))
   assert.deepStrictEqual(missing, [])
 })
 
-test('a triagem do craft lista exatamente as skills de princípio', () => {
+test('the craft triage lists exactly the principle skills', () => {
   const hub = fs.readFileSync(path.join(SKILLS_DIR, 'craft', 'SKILL.md'), 'utf8')
   const listed = [...hub.matchAll(/^\| `craft:([\w-]+)`/gm)].map((match) => match[1]).sort()
   assert.deepStrictEqual(listed, PRINCIPLES)
 })
 
-test('as skills de princípio ficam fora do menu de /; só o hub e os fluxos aparecem', () => {
+test('principle skills stay out of the / menu; only the hub and the flows show up', () => {
   const hidden = fs.readdirSync(SKILLS_DIR)
     .filter((skill) => /^user-invocable: false$/m.test(fs.readFileSync(path.join(SKILLS_DIR, skill, 'SKILL.md'), 'utf8')))
     .sort()
