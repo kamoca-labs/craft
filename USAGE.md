@@ -96,6 +96,7 @@ O hook `english-code` nega texto fora do inglês em arquivo de código:
 | `function calcularPreço()` em `app/Price.php` | negado: `calculatePrice` |
 | `'tooLarge' => 'Arquivo maior que :max MB'` em `lang/pt_BR/attachment.php` | liberado (pasta de tradução) |
 | texto em português num `.md`, `.json` ou `.po` | liberado (não é código) |
+| `it('recusa anexo acima do limite')` em `tests/Feature/AttachmentTest.php` | liberado (arquivo de teste: `tests/`, `test/`, `__tests__/`, `spec/`, `*.test.*`, `*.spec.*`, `*_test.*`, `test_*.py`) |
 
 Texto em inglês escrito direto no código para o usuário (`<button>Save</button>`) o hook não detecta; a triagem do `/craft:craft` pega pela skill `craft:i18n`. Projeto sem i18n recebe a proposta da biblioteca padrão da stack, com o seu ok antes de instalar.
 

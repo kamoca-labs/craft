@@ -1,5 +1,5 @@
 {
   "deny.atdd-first": "carregue /craft:atdd antes de editar código. Se a mudança não altera comportamento, carregue a skill mesmo assim: ela diz quando o fluxo não se aplica.",
-  "deny.english-code": "código só em inglês: identificadores, comentários, logs e nomes de teste. Texto para o usuário na língua dele vai para o arquivo de tradução (lang/, locales/, i18n/) e o código usa a chave pelo i18n da stack. Carregue craft:i18n para o padrão de cada linguagem.",
+  "deny.english-code": "código só em inglês: identificadores, comentários e logs. Arquivo de teste fica de fora: nome de teste e dado de teste podem estar na língua do projeto. Texto para o usuário na língua dele vai para o arquivo de tradução (lang/, locales/, i18n/) e o código usa a chave pelo i18n da stack. Carregue craft:i18n para o padrão de cada linguagem.",
   "capture.injected": "{rule} injetou contexto"
 }

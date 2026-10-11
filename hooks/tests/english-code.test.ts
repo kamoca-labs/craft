@@ -56,6 +56,28 @@ test('allows native-language text in files that are not code', () => {
   }
 })
 
+test('allows native-language test names and test data in test files', () => {
+  const testFiles = [
+    'backend/tests/Feature/V1/FeedbackTest.php',
+    'frontend/test/feedback-form.spec.ts',
+    'src/user.test.ts',
+    'src/__tests__/user.ts',
+    'app/src/test/java/UserTest.java',
+    'tests/test_user.py',
+    'pkg/user_test.go',
+    'spec/models/user_spec.rb',
+  ]
+  for (const file of testFiles) {
+    assert.strictEqual(write(file, PORTUGUESE_LABEL).status, 0, file)
+  }
+})
+
+test('still denies non-English text in source files whose name only mentions a test', () => {
+  for (const file of ['src/testing.ts', 'app/Support/TestData.php', 'src/latest.ts']) {
+    assert.strictEqual(write(file, PORTUGUESE_LABEL).status, 2, file)
+  }
+})
+
 test('only the new text is checked, so editing a legacy file in English passes', () => {
   const result = runTool('Edit', { file_path: 'src/legacy.ts', old_string: PORTUGUESE_LABEL, new_string: ENGLISH_CODE })
   assert.strictEqual(result.status, 0)

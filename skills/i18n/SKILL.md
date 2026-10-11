@@ -1,13 +1,13 @@
 ---
 name: i18n
-description: Código só em inglês e texto do usuário pela internacionalização da stack. Use quando há identificador, comentário, log ou nome de teste em outra língua, ou texto que o usuário vê (mensagem, label, botão, e-mail, erro de validação) escrito direto no código, em qualquer língua.
+description: Código só em inglês e texto do usuário pela internacionalização da stack. Use quando há identificador, comentário ou log em outra língua, ou texto que o usuário vê (mensagem, label, botão, e-mail, erro de validação) escrito direto no código, em qualquer língua.
 argument-hint: "[arquivo ou escopo]"
 user-invocable: false
 ---
 
 # Inglês no código, língua do usuário na tradução
 
-**Regra**: todo código é em inglês, sem exceção: identificadores, comentários, logs, mensagens de exceção interna, nomes de teste e de commit no código. Texto que o usuário vê é escrito na língua nativa dele, mas **nunca no código**: fica no arquivo de tradução, e o código referencia a chave pelo i18n da stack.
+**Regra**: todo código é em inglês: identificadores, comentários, logs, mensagens de exceção interna e commit. A exceção é o arquivo de teste: o nome do teste e o dado de teste podem estar na língua do projeto, porque o teste descreve o comportamento para quem o especificou. Os identificadores do teste continuam em inglês. Texto que o usuário vê é escrito na língua nativa dele, mas **nunca no código**: fica no arquivo de tradução, e o código referencia a chave pelo i18n da stack.
 
 ## Por quê
 
@@ -17,7 +17,7 @@ user-invocable: false
 
 ## Sinais de violação
 
-- Letra acentuada ou de outro alfabeto num arquivo de código fora da pasta de tradução (o hook `english-code` já nega).
+- Letra acentuada ou de outro alfabeto num arquivo de código fora da pasta de tradução e fora dos testes (o hook `english-code` já nega).
 - Identificador em português sem acento: `usuario`, `calcularValor`, `salvarProtocolo`.
 - String literal que chega ao usuário: `throw new ValidationError('File too large')`, `<button>Save</button>`, `flash('Saved!')`, `'Hello ' + name`.
 - Frase montada por concatenação, com plural feito por `if` (`count === 1 ? 'item' : 'items'`).
