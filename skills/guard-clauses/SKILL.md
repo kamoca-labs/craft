@@ -2,6 +2,7 @@
 name: guard-clauses
 description: Clean Code, guard clause em vez de condicional aninhada. Use quando há if dentro de if, else depois de return/throw, o caminho principal da função fica indentado no fim, ou validações envolvem o código útil.
 argument-hint: "[arquivo ou escopo]"
+user-invocable: false
 ---
 
 # Guard clause em vez de condicional aninhada

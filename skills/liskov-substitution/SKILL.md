@@ -2,6 +2,7 @@
 name: liskov-substitution
 description: L do SOLID, substituição de Liskov. Use quando há várias implementações de um mesmo contrato (interface, classe base, tipo de função) e alguma delas lança "não suportado", ignora parâmetros, muda o formato de retorno ou obriga quem chama a checar o tipo concreto.
 argument-hint: "[arquivo ou escopo]"
+user-invocable: false
 ---
 
 # L: substituição de Liskov

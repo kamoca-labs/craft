@@ -2,6 +2,7 @@
 name: dependency-inversion
 description: D do SOLID, inversão de dependência. Use quando regra de negócio importa direto banco, HTTP, LLM, storage, fila, relógio ou aleatoriedade, quando o teste precisa de mock de módulo para isolar, ou quando trocar um fornecedor exigiria mexer na regra.
 argument-hint: "[arquivo ou escopo]"
+user-invocable: false
 ---
 
 # D: inversão de dependência

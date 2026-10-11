@@ -2,6 +2,7 @@
 name: errors
 description: Clean Code, erros tratados de forma explícita e nunca engolidos. Use quando há catch vazio, catch que só loga e segue, erro convertido em null/false silencioso, retorno de código de erro, mensagem genérica, ou falha que some sem chegar a quem pode agir.
 argument-hint: "[arquivo ou escopo]"
+user-invocable: false
 ---
 
 # Erros explícitos, nunca engolidos

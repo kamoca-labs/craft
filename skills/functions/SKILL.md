@@ -2,6 +2,7 @@
 name: functions
 description: Clean Code, funções pequenas que fazem uma coisa num nível de abstração só. Use quando uma função é longa, tem seções separadas por linha em branco ou comentário, mistura regra de negócio com detalhe técnico, ou tem nome com "e"/"and".
 argument-hint: "[arquivo ou escopo]"
+user-invocable: false
 ---
 
 # Funções pequenas, uma coisa, um nível

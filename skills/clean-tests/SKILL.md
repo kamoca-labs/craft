@@ -2,6 +2,7 @@
 name: clean-tests
 description: Clean Code aplicado a testes. Use ao escrever ou revisar testes que têm lógica (if, laço, cálculo), testam vários comportamentos de uma vez, têm nome vago, setup gigante, dependem de ordem ou de tempo real, ou verificam implementação em vez de comportamento.
 argument-hint: "[arquivo ou escopo]"
+user-invocable: false
 ---
 
 # Teste também é código

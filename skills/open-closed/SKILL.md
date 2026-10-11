@@ -2,6 +2,7 @@
 name: open-closed
 description: O do SOLID, aberto/fechado. Use quando adicionar um caso novo (tipo, formato, canal, regra) obriga a editar um if/switch que já existe, ou quando a mesma cadeia de condicionais por tipo se repete em vários lugares.
 argument-hint: "[arquivo ou escopo]"
+user-invocable: false
 ---
 
 # O: aberto para extensão, fechado para modificação

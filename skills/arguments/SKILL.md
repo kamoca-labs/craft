@@ -2,6 +2,7 @@
 name: arguments
 description: Clean Code, poucos argumentos e sem flag booleana. Use quando uma função tem mais de três parâmetros, parâmetros do mesmo tipo em sequência fáceis de trocar, um booleano que muda o comportamento, ou argumento de saída que a função modifica.
 argument-hint: "[arquivo ou escopo]"
+user-invocable: false
 ---
 
 # Poucos argumentos, sem flag booleana

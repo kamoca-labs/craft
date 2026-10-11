@@ -2,6 +2,7 @@
 name: naming
 description: Clean Code, nomes que revelam intenção. Use quando variáveis, funções, classes, arquivos ou pastas têm nome abreviado, genérico (data, info, handle, manager, utils), enganoso, ou que só se entende lendo o código ou um comentário.
 argument-hint: "[arquivo ou escopo]"
+user-invocable: false
 ---
 
 # Nomes que revelam a intenção

@@ -2,6 +2,7 @@
 name: comments
 description: Clean Code, sem comentário explicativo no código. Use quando há comentário dizendo o que o código faz, separando seções, código comentado, comentário desatualizado, ou TODO sem dono; o nome deve dizer o quê e o porquê vai no commit ou na documentação.
 argument-hint: "[arquivo ou escopo]"
+user-invocable: false
 ---
 
 # Sem comentário explicativo

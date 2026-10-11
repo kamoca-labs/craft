@@ -37,7 +37,7 @@ Os comandos dos plugins sempre levam o prefixo, então o hub é `/craft:craft`, 
 
 ### Uma skill por princípio
 
-Dá para chamar direto quando você já sabe o que quer (`/craft:dry src/upload.ts`), e o Claude também escolhe sozinho pela descrição de cada uma.
+Ficam fora do menu de `/` (`user-invocable: false`): a entrada é o `/craft:craft`, que carrega só as que têm sinal. Quando você já sabe o princípio, peça pelo nome ("aplica DRY em src/upload.ts"), e o Claude carrega a skill dele.
 
 | Grupo | Skills |
 |---|---|

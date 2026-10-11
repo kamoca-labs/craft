@@ -2,6 +2,7 @@
 name: yagni
 description: YAGNI (you aren't gonna need it). Use quando o código tem parâmetro, opção, flag, config, camada, abstração, hook de extensão ou caso tratado que nenhum uso atual exercita, ou foi escrito "para quando precisar".
 argument-hint: "[arquivo ou escopo]"
+user-invocable: false
 ---
 
 # YAGNI: você não vai precisar

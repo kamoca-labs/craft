@@ -2,6 +2,7 @@
 name: dry
 description: DRY (don't repeat yourself). Use quando a mesma regra de negócio, constante, texto, validação ou estilo aparece escrita em mais de um lugar, ou quando uma mudança de regra exige lembrar de editar vários arquivos.
 argument-hint: "[arquivo ou escopo]"
+user-invocable: false
 ---
 
 # DRY: cada conhecimento tem uma fonte só
