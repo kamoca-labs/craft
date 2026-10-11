@@ -18,7 +18,7 @@
 /craft:setup
 ```
 
-O Claude detecta a stack, mostra o plano (dependências, configs, limites) e **espera o seu ok**. Depois instala o linter com os limites do craft, cria os scripts `test` e `lint` e escreve no CLAUDE.md só a linha que manda seguir o `/craft:atdd` e os comandos de teste e lint, sem listar as demais skills nem os limites, que já chegam por conta própria. Violações em código que já existe só são contadas, não corrigidas. Dali em diante, o `/craft:craft` roda esse lint antes da triagem.
+O Claude detecta a stack, mostra o plano (dependências, configs, limites) e **espera o seu ok**. Depois instala o linter com os limites do craft, cria os scripts `test` e `lint` e escreve no CLAUDE.md só a linha que manda seguir o `/craft:atdd`, a que manda registrar decisões do projeto no repo (nunca na memória local do Claude) e os comandos de teste e lint, sem listar as demais skills nem os limites, que já chegam por conta própria. Violações em código que já existe só são contadas, não corrigidas. Dali em diante, o `/craft:craft` roda esse lint antes da triagem.
 
 ## Feature nova com ATDD
 

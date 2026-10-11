@@ -23,6 +23,7 @@ Toda mudança de comportamento segue estes passos, nesta ordem. Nunca pule, junt
 - Se um teste falhar no passo 5 ou 7, volte ao passo 4 ou corrija o refactor. Nunca altere o teste para passar, a não ser que a especificação tenha mudado.
 - Código só em inglês, inclusive os identificadores dos testes. O nome e o dado de teste podem estar na língua do projeto. Texto que o usuário vê vai para o arquivo de tradução, na língua dele, pelo i18n da stack. Veja `craft:i18n`; o hook `english-code` nega o que fugir disso.
 - Se o usuário corrigir algo que você fez, avalie com `craft:hook` se a correção vira hook do projeto.
+- Decisão ou escolha tomada no caminho (biblioteca, formato, regra de negócio) fica registrada no repo: no CLAUDE.md se é contexto para o modelo, em `docs/` se é para o time, sempre com caminho relativo. Nunca na memória local do Claude nem em caminho absoluto.
 - Siga o executor de teste e o ambiente do projeto (container, script do `package.json`, `artisan test`).
 
 ## Execução filtrada
