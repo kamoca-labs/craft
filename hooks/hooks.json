@@ -9,6 +9,12 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/atdd-first.ts\"",
             "timeout": 10,
             "statusMessage": "craft:atdd-first: fluxo carregado antes do código?"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/english-code.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:english-code: código em inglês?"
           }
         ]
       }

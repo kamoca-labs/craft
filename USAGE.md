@@ -8,6 +8,7 @@
 - [Refactor automático depois do verde](#refactor-automático-depois-do-verde)
 - [Refactor sob demanda](#refactor-sob-demanda)
 - [Combinar com o plugin git](#combinar-com-o-plugin-git)
+- [Código em inglês, texto do usuário traduzido](#código-em-inglês-texto-do-usuário-traduzido)
 - [Quando o hook erra](#quando-o-hook-erra)
 
 ## Projeto novo
@@ -85,12 +86,26 @@ Para um princípio só, chame a skill dele:
 
 O body do commit (e a descrição do PR/MR, se você abrir um) aproveita a especificação do passo 1 como "Por quê".
 
+## Código em inglês, texto do usuário traduzido
+
+O hook `english-code` nega texto fora do inglês em arquivo de código:
+
+| Edição | Resultado |
+|---|---|
+| `throw new Error('Arquivo maior que 10 MB')` em `src/upload.ts` | negado: a frase vai para `src/locales/pt-BR.json` e o código usa `t('attachment.tooLarge')` |
+| `function calcularPreço()` em `app/Price.php` | negado: `calculatePrice` |
+| `'tooLarge' => 'Arquivo maior que :max MB'` em `lang/pt_BR/attachment.php` | liberado (pasta de tradução) |
+| texto em português num `.md`, `.json` ou `.po` | liberado (não é código) |
+
+Texto em inglês escrito direto no código para o usuário (`<button>Save</button>`) o hook não detecta; a triagem do `/craft:craft` pega pela skill `craft:i18n`. Projeto sem i18n recebe a proposta da biblioteca padrão da stack, com o seu ok antes de instalar.
+
 ## Quando o hook erra
 
 | Erro | Exemplo | O que fazer |
 |---|---|---|
 | Injetou com a suíte vermelha | executor novo com formato de falha não reconhecido | pegue a linha em `~/.claude/hook-cases.jsonl`, cole no `hooks/tests/cases.json` com `"inject": []` e adicione o padrão em `FAILURE` |
 | `atdd-first` negou edição que não muda comportamento | ajuste de config numa extensão de código | carregue `/craft:atdd` mesmo assim; se o arquivo não é código, adicione a exceção em `CODE_FILE` com um teste em `atdd-first.test.ts` |
+| `english-code` negou texto que não é de usuário nem código | dado de domínio (nome de cidade num seed) | mova o dado para JSON/CSV; se é uma pasta de tradução com outro nome, adicione em `TRANSLATION_FOLDER` com um teste em `english-code.test.ts` |
 | Não injetou com a suíte verde | executor de teste não reconhecido | escreva o caso no `cases.json` com `"inject": ["refactor-on-green"]` e adicione o executor em `TEST_RUNNER` |
 
 O passo a passo completo está em [transformar caso real em teste](../../USAGE.md#transformar-caso-real-em-teste).

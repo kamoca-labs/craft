@@ -21,6 +21,7 @@ Toda mudança de comportamento segue estes passos, nesta ordem. Nunca pule, junt
 - Nunca escreva código de produção sem um teste falhando que o exija.
 - Ao fim de cada passo, diga qual passo terminou e o resultado. Ex.: "Passo 3 (Red): 2 falhando, `expected 'error' got undefined`".
 - Se um teste falhar no passo 5 ou 7, volte ao passo 4 ou corrija o refactor. Nunca altere o teste para passar, a não ser que a especificação tenha mudado.
+- Código (incluindo testes) só em inglês; texto que o usuário vê vai para o arquivo de tradução, na língua dele, pelo i18n da stack. Veja `craft:i18n`; o hook `english-code` nega o que fugir disso.
 - Siga o executor de teste e o ambiente do projeto (container, script do `package.json`, `artisan test`).
 
 ## Execução filtrada
