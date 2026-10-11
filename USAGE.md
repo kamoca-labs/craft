@@ -9,6 +9,7 @@
 - [Refactor sob demanda](#refactor-sob-demanda)
 - [Combinar com o plugin git](#combinar-com-o-plugin-git)
 - [Código em inglês, texto do usuário traduzido](#código-em-inglês-texto-do-usuário-traduzido)
+- [Correção vira hook](#correção-vira-hook)
 - [Quando o hook erra](#quando-o-hook-erra)
 
 ## Projeto novo
@@ -99,6 +100,14 @@ O hook `english-code` nega texto fora do inglês em arquivo de código:
 | `it('recusa anexo acima do limite')` em `tests/Feature/AttachmentTest.php` | liberado (arquivo de teste: `tests/`, `test/`, `__tests__/`, `spec/`, `*.test.*`, `*.spec.*`, `*_test.*`, `test_*.py`) |
 
 Texto em inglês escrito direto no código para o usuário (`<button>Save</button>`) o hook não detecta; a triagem do `/craft:craft` pega pela skill `craft:i18n`. Projeto sem i18n recebe a proposta da biblioteca padrão da stack, com o seu ok antes de instalar.
+
+## Correção vira hook
+
+Você corrige o Claude (ex.: "não roda `git add .env`"). Ele avalia se a correção repete, se dá para checar pela entrada da ferramenta e se o padrão erra pouco. Com os três sim, propõe o hook e **espera o seu ok**; depois escreve o teste, a regra em TypeScript em `.claude/hooks/rules/`, a mensagem em `.claude/hooks/locales/pt-BR.json` e liga no `.claude/settings.json`. Se a correção exige julgamento, ela vai para a skill do assunto ou o CLAUDE.md, não para hook. Para pedir direto:
+
+```
+/craft:hook nunca commitar .env
+```
 
 ## Quando o hook erra
 

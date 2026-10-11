@@ -8,7 +8,7 @@ const rules = fs.readdirSync(path.join(HOOKS_DIR, 'rules')).map((file) => path.b
 const hooksJson = fs.readFileSync(path.join(HOOKS_DIR, 'hooks.json'), 'utf8')
 const wired = [...hooksJson.matchAll(/rules\/([\w-]+)\.ts/g)].map((match) => match[1])
 const SKILLS_DIR = path.join(HOOKS_DIR, '..', 'skills')
-const PRINCIPLES = fs.readdirSync(SKILLS_DIR).filter((skill) => !['craft', 'atdd', 'setup'].includes(skill)).sort()
+const PRINCIPLES = fs.readdirSync(SKILLS_DIR).filter((skill) => !['craft', 'atdd', 'setup', 'hook'].includes(skill)).sort()
 
 test('every rule has a dedicated hook in hooks.json', () => {
   assert.deepStrictEqual(rules.filter((rule) => !wired.includes(rule)), [])
