@@ -8,7 +8,8 @@ const rules = fs.readdirSync(path.join(HOOKS_DIR, 'rules')).map((file) => path.b
 const hooksJson = fs.readFileSync(path.join(HOOKS_DIR, 'hooks.json'), 'utf8')
 const wired = [...hooksJson.matchAll(/rules\/([\w-]+)\.ts/g)].map((match) => match[1])
 const SKILLS_DIR = path.join(HOOKS_DIR, '..', 'skills')
-const PRINCIPLES = fs.readdirSync(SKILLS_DIR).filter((skill) => !['craft', 'atdd', 'setup', 'hook'].includes(skill)).sort()
+const ALWAYS_ON = ['ste']
+const PRINCIPLES = fs.readdirSync(SKILLS_DIR).filter((skill) => !['craft', 'atdd', 'setup', 'hook', ...ALWAYS_ON].includes(skill)).sort()
 
 test('every rule has a dedicated hook in hooks.json', () => {
   assert.deepStrictEqual(rules.filter((rule) => !wired.includes(rule)), [])
@@ -33,9 +34,9 @@ test('the craft triage lists exactly the principle skills', () => {
   assert.deepStrictEqual(listed, PRINCIPLES)
 })
 
-test('principle skills stay out of the / menu; only the hub and the flows show up', () => {
+test('principle and always-on skills stay out of the / menu; only the hub and the flows show up', () => {
   const hidden = fs.readdirSync(SKILLS_DIR)
     .filter((skill) => /^user-invocable: false$/m.test(fs.readFileSync(path.join(SKILLS_DIR, skill, 'SKILL.md'), 'utf8')))
     .sort()
-  assert.deepStrictEqual(hidden, PRINCIPLES)
+  assert.deepStrictEqual(hidden, [...PRINCIPLES, ...ALWAYS_ON].sort())
 })

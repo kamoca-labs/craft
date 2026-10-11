@@ -45,6 +45,7 @@ Ficam fora do menu de `/` (`user-invocable: false`): a entrada é o `/craft:craf
 | SOLID | `single-responsibility`, `open-closed`, `liskov-substitution`, `interface-segregation`, `dependency-inversion` |
 | Simplicidade | `kiss`, `yagni`, `dry` |
 | Idioma | `i18n` (código em inglês, texto do usuário pelo i18n da stack) |
+| Escrita | `ste` (respostas e textos no padrão ASD-STE100; carregada pelo hook em toda sessão, fora da triagem) |
 | Clean Code | `naming`, `functions`, `arguments`, `guard-clauses`, `side-effects`, `comments`, `errors`, `clean-tests` |
 
 Quando os princípios brigam (DRY × KISS, inversão de dependência × YAGNI), a ordem de prioridade está em `skills/craft/SKILL.md`.
@@ -53,6 +54,7 @@ Quando os princípios brigam (DRY × KISS, inversão de dependência × YAGNI), 
 
 | Regra | Quando | O que faz |
 |---|---|---|
+| `ste` | no início, na retomada, no `/clear` e depois da compactação da sessão | Injeta a skill `craft:ste`: respostas e textos no padrão ASD-STE100 (frases curtas, voz ativa, uma instrução por frase, um termo por conceito). Em inglês vale a norma completa; em português, as regras que valem para qualquer língua |
 | `atdd-first` | antes de `Edit`/`Write` em arquivo de código | **Nega** a edição se `craft:atdd` não foi carregada na sessão. Arquivo que não é código (`.md`, `.json`, `.yml`, `.env`) passa direto |
 | `english-code` | antes de `Edit`/`Write` em arquivo de código | **Nega** texto novo com letra fora do ASCII (acento, outro alfabeto) em identificador, comentário ou string. Pastas de tradução (`lang/`, `locales/`, `i18n/`, `l10n/`, `translations/`), arquivos de teste e arquivos que não são código passam direto. Só o texto novo é checado, então editar arquivo legado não trava |
 | `refactor-on-green` | depois de rodar testes com saída sem falha | Injeta a triagem do `craft:craft` (passo 6 do ATDD) |

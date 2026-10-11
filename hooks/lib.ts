@@ -58,5 +58,9 @@ export function inject(rule: string, input: HookInput, context: string) {
     tool_response: input.tool_response,
     inject: [rule],
   })
-  process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PostToolUse', additionalContext: context } }))
+  addContext('PostToolUse', context)
+}
+
+export function addContext(hookEventName: string, context: string) {
+  process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName, additionalContext: context } }))
 }

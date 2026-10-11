@@ -9,6 +9,7 @@
 - [Refactor sob demanda](#refactor-sob-demanda)
 - [Combinar com o plugin git](#combinar-com-o-plugin-git)
 - [Código em inglês, texto do usuário traduzido](#código-em-inglês-texto-do-usuário-traduzido)
+- [Escrita no padrão ASD-STE100](#escrita-no-padrão-asd-ste100)
 - [Correção vira hook](#correção-vira-hook)
 - [Quando o hook erra](#quando-o-hook-erra)
 
@@ -100,6 +101,18 @@ O hook `english-code` nega texto fora do inglês em arquivo de código:
 | `it('recusa anexo acima do limite')` em `tests/Feature/AttachmentTest.php` | liberado (arquivo de teste: `tests/`, `test/`, `__tests__/`, `spec/`, `*.test.*`, `*.spec.*`, `*_test.*`, `test_*.py`) |
 
 Texto em inglês escrito direto no código para o usuário (`<button>Save</button>`) o hook não detecta; a triagem do `/craft:craft` pega pela skill `craft:i18n`. Projeto sem i18n recebe a proposta da biblioteca padrão da stack, com o seu ok antes de instalar.
+
+## Escrita no padrão ASD-STE100
+
+Não há comando. O hook `ste` injeta a skill `craft:ste` em toda sessão, e de novo depois do `/clear` e da compactação. Daí em diante, respostas, docs, commits e PRs/MRs seguem o ASD-STE100 (Simplified Technical English, Issue 9):
+
+| Antes | Depois |
+|---|---|
+| "A verificação da config deve ser feita pelo usuário antes de rodar o deploy; caso contrário, pode haver falha." | "Verifique a config antes do deploy. Se a config está errada, o deploy falha." |
+| "Hook config file path override" | "the path that overrides the hook configuration" |
+| "You might wanna take out the old file" | "Remove the old file." |
+
+Texto em inglês segue a norma completa. Texto em português segue as regras que valem para qualquer língua: frase de no máximo 20 palavras em procedimento e 25 em descrição, voz ativa, uma instrução por frase no imperativo, um termo por conceito e nada de ponto e vírgula. Código, comando e texto colado pelo usuário ficam como estão.
 
 ## Correção vira hook
 
