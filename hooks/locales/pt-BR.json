@@ -1,0 +1,4 @@
+{
+  "deny.atdd-first": "carregue /craft:atdd antes de editar código. Se a mudança não altera comportamento, carregue a skill mesmo assim: ela diz quando o fluxo não se aplica.",
+  "capture.injected": "{rule} injetou contexto"
+}
