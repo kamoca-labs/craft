@@ -8,11 +8,28 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/ste.ts\"",
             "timeout": 10,
             "statusMessage": "craft:ste: escrita no padrão ASD-STE100"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/memory.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:memory: memória do projeto"
           }
         ]
       }
     ],
     "PreToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/memory-outside-project.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:memory-outside-project: memória no projeto?"
+          }
+        ]
+      },
       {
         "matcher": "Edit|MultiEdit|Write",
         "hooks": [

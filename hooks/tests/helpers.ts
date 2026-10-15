@@ -10,22 +10,33 @@ export type ToolRun = { command: string, stdout?: string, stderr?: string }
 
 export type Sandbox = {
   casesLog: string
+  projectDir: string
   run: (rule: string, toolRun: ToolRun) => SpawnSyncReturns<string>
   start: (rule: string, source: string) => SpawnSyncReturns<string>
+  pre: (rule: string, toolName: string, toolInput: object) => SpawnSyncReturns<string>
 }
 
 export function sandbox(): Sandbox {
-  const casesLog = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'craft-hooks-')), 'cases.jsonl')
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'craft-hooks-'))
+  const casesLog = path.join(dir, 'cases.jsonl')
+  const projectDir = path.join(dir, 'project')
   const execute = (rule: string, input: object) =>
     spawnSync('node', [path.join(RULES, `${rule}.ts`)], {
       input: JSON.stringify(input),
       encoding: 'utf8',
-      env: { ...process.env, HOOK_CASES_LOG: casesLog, CLAUDE_PLUGIN_ROOT: path.join(import.meta.dirname, '..', '..') },
+      env: {
+        ...process.env,
+        HOOK_CASES_LOG: casesLog,
+        CLAUDE_PLUGIN_ROOT: path.join(import.meta.dirname, '..', '..'),
+        CLAUDE_PROJECT_DIR: projectDir,
+      },
     })
   const run = (rule: string, { command, stdout = '', stderr = '' }: ToolRun) =>
     execute(rule, { hook_event_name: 'PostToolUse', tool_name: 'Bash', tool_input: { command }, tool_response: { stdout, stderr } })
   const start = (rule: string, source: string) => execute(rule, { hook_event_name: 'SessionStart', source })
-  return { casesLog, run, start }
+  const pre = (rule: string, toolName: string, toolInput: object) =>
+    execute(rule, { hook_event_name: 'PreToolUse', tool_name: toolName, tool_input: toolInput })
+  return { casesLog, projectDir, run, start, pre }
 }
 
 export function injected(result: SpawnSyncReturns<string>): string | null {
