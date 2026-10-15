@@ -1,6 +1,6 @@
 ---
 name: dry
-description: DRY (don't repeat yourself). Use quando a mesma regra de negócio, constante, texto, validação ou estilo aparece escrita em mais de um lugar, ou quando uma mudança de regra exige lembrar de editar vários arquivos.
+description: DRY (don't repeat yourself). Use quando a mesma regra de negócio, constante, texto, validação ou estilo aparece escrita em mais de um lugar, ou quando uma mudança de regra exige lembrar de editar vários arquivos, ou quando código genérico (formatar, converter, calcular data) nasce preso a um caso específico.
 argument-hint: "[arquivo ou escopo]"
 user-invocable: false
 ---
@@ -42,6 +42,35 @@ if (file.size > MAX_ATTACHMENT_MB * 1024 * 1024) throw new TooLarge()
 const hint = `Máximo de ${MAX_ATTACHMENT_MB} MB`
 ```
 
+## Código genérico nasce reutilizável
+
+Código que não é específico da implementação (formatar, converter, validar formato, repetir chamada, calcular data) não espera a repetição. Ele nasce como função própria, num módulo do assunto (`date.ts`, `retry.ts`), onde o próximo caso a encontra:
+
+- tem nome genérico;
+- recebe só o que usa;
+- não importa nada do caso atual.
+
+Escrita assim, a função custa as mesmas linhas, e a próxima feature a importa em vez de escrever de novo. A regra de negócio do caso fica com o caso.
+
+```ts
+// antes: o cálculo genérico preso à regra do ticket
+function isOverdue(ticket: Ticket) {
+  const days = Math.floor((Date.now() - ticket.openedAt.getTime()) / 86_400_000)
+  return days > ticket.slaDays
+}
+
+// depois: o cálculo genérico mora em date.ts e serve a qualquer caso
+export function daysSince(date: Date) {
+  return Math.floor((Date.now() - date.getTime()) / 86_400_000)
+}
+
+function isOverdue(ticket: Ticket) {
+  return daysSince(ticket.openedAt) > ticket.slaDays
+}
+```
+
+Se o projeto já tem `date-fns`, use o `differenceInDays`, e não escreva o `daysSince` (`craft:kiss`).
+
 ## Duplicação acidental: não extraia
 
 ```ts
@@ -53,7 +82,7 @@ Parecem iguais hoje, mas são regras diferentes: se o contrato passar a contar a
 
 ## Limites
 
-- **Regra de três**: na segunda repetição, anote; na terceira, extraia. Duplicação é mais barata que a abstração errada.
+- **Regra de três**: na segunda repetição, anote; na terceira, extraia. Duplicação é mais barata que a abstração errada. A regra vale para juntar conhecimento que já está duplicado, não para o código genérico novo.
 - Teste pode repetir dados de forma explícita: legibilidade do teste vale mais que DRY (veja `craft:clean-tests`).
 - Extração que precisa de flag para tratar "o caso de um e o caso do outro" é sinal de que não era o mesmo conhecimento.
 

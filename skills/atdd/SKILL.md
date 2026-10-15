@@ -11,7 +11,7 @@ Toda mudança de comportamento segue estes passos, nesta ordem. Nunca pule, junt
 1. **Especificação**: escreva os critérios de aceite como cenários Given/When/Then. Mostre ao usuário e espere o ok antes de seguir.
 2. **Teste**: escreva os testes de aceite que expressam a especificação. Nenhum código de produção ainda.
 3. **Red**: rode **só os testes novos** e confirme que falham **pelo motivo esperado** (comportamento ausente), não por erro de sintaxe, import ou setup.
-4. **Green**: escreva o mínimo de código de produção que faz os testes passarem.
+4. **Green**: escreva o mínimo de código de produção que faz os testes passarem. Menos código é melhor do que mais código: reutilize o que já existe, e o código genérico nasce reutilizável (regra raiz do `craft:craft`).
 5. **Passing**: rode **só os testes novos** e confirme que passam.
 6. **Refactor**: melhore o código com a skill `craft:craft`, que faz a triagem dos princípios e carrega só os que se aplicam. O hook `refactor-on-green` injeta essa triagem automaticamente quando a suíte fica verde. O comportamento não muda.
 7. **Passing again**: rode os testes **dos domínios tocados** e confirme que tudo continua passando. Veja [execução filtrada](#execução-filtrada).

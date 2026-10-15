@@ -7,7 +7,7 @@ user-invocable: false
 
 # YAGNI: você não vai precisar
 
-**Regra**: escreva só o que um **teste ou uso atual** exige. Nenhuma opção, camada, generalização ou caso tratado "para o futuro". O futuro escreve o próprio código, com a informação que você não tem hoje.
+**Regra**: **menos código é melhor do que mais código**. Escreva só o que um **teste ou uso atual** exige. Nenhuma opção, camada, generalização ou caso tratado "para o futuro". O futuro escreve o próprio código, com a informação que você não tem hoje.
 
 ## Por quê
 
@@ -50,6 +50,7 @@ function formatPrice(value: number) {
 
 - YAGNI não vale para: validação de entrada em fronteira, tratamento de erro que evita perda de dado, segurança, acessibilidade. Isso é necessidade atual, mesmo que nenhum teste peça.
 - Fronteira de I/O com dublê de teste já é "uso atual" de uma abstração (veja `craft:dependency-inversion`).
+- Código genérico reutilizável (`craft:dry`) não é configurável: ele não ganha opção, parâmetro ou modo para um uso imaginado.
 - Decisão cara de reverter (schema de banco, contrato público de API) merece pensar no futuro próximo; código interno, não.
 
 ## Pergunta de verificação
