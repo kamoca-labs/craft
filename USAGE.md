@@ -11,6 +11,7 @@
 - [Código em inglês, texto do usuário traduzido](#código-em-inglês-texto-do-usuário-traduzido)
 - [Escrita no padrão ASD-STE100](#escrita-no-padrão-asd-ste100)
 - [Correção vira hook](#correção-vira-hook)
+- [Memória do projeto](#memória-do-projeto)
 - [Quando o hook erra](#quando-o-hook-erra)
 
 ## Projeto novo
@@ -121,6 +122,30 @@ Você corrige o Claude (ex.: "não roda `git add .env`"). Ele avalia se a corre�
 ```
 /craft:hook nunca commitar .env
 ```
+
+## Memória do projeto
+
+Não há comando obrigatório. O hook `memory` carrega a skill `craft:memory` e o catálogo em toda sessão. Quando uma conversa traz algo que vale para a próxima, o Claude grava no projeto:
+
+```
+.claude/memory/
+├── MEMORY.md                      só o catálogo, uma linha por memória
+├── feedback_testes-no-container.md
+└── project_congelamento-deploy.md
+```
+
+```markdown
+- [Testes no container](feedback_testes-no-container.md): rode os testes com docker compose exec, nunca no host
+```
+
+Para pedir direto:
+
+```
+/craft:memory os testes de integração precisam do Redis local
+/craft:memory esquece a regra do congelamento de deploy
+```
+
+Se o Claude tentar gravar na auto memory local (`~/.claude/projects/<projeto>/memory/`), o hook `memory-outside-project` nega e manda gravar em `.claude/memory/`.
 
 ## Quando o hook erra
 

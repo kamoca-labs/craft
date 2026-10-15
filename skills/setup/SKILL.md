@@ -49,7 +49,7 @@ Crie ou complete um CLAUDE.md mínimo com o contexto do projeto que o setup leva
 
 ```markdown
 Toda mudança de comportamento segue `/craft:atdd`.
-Referência, decisão ou escolha sobre o projeto mora no repo (CLAUDE.md, `docs/`), com caminho relativo. Nunca na memória local do Claude (`~/.claude/`) nem com caminho absoluto: só valeria nesta máquina e o time não veria.
+Referência, decisão ou escolha sobre o projeto mora no repo (CLAUDE.md, `docs/`, `.claude/memory/`), com caminho relativo. Nunca na memória local do Claude (`~/.claude/`) nem com caminho absoluto: só valeria nesta máquina e o time não veria.
 
 ## Comandos
 
