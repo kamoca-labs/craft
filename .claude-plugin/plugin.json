@@ -1,6 +1,6 @@
 {
   "name": "craft",
-  "description": "/craft:setup prepara lint com limites; /craft:craft faz a triagem de SOLID, KISS, YAGNI, DRY e Clean Code e carrega só a skill de cada princípio com sinal; /craft:atdd conduz o fluxo de 7 passos; /craft:hook transforma correção em hook do projeto. Hooks exigem o fluxo antes do código, código em inglês com texto do usuário via i18n, injetam a triagem quando a suíte fica verde e carregam em toda sessão a escrita no padrão ASD-STE100.",
-  "version": "0.6.0",
+  "description": "/craft:setup prepara lint com limites; /craft:craft reforça a regra raiz (menos código é melhor do que mais código) e faz a triagem de SOLID, KISS, YAGNI, DRY e Clean Code e carrega só a skill de cada princípio com sinal; /craft:atdd conduz o fluxo de 7 passos; /craft:hook transforma correção em hook do projeto. Hooks exigem o fluxo antes do código, código em inglês com texto do usuário via i18n, injetam a triagem quando a suíte fica verde e carregam em toda sessão a escrita no padrão ASD-STE100.",
+  "version": "0.7.0",
   "author": { "name": "kamoca" }
 }
