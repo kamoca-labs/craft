@@ -26,7 +26,7 @@ user-invocable: false
 ## Como aplicar
 
 1. Pergunte: qual é a forma mais direta de cumprir **estes** testes?
-2. Prefira, nesta ordem: recurso da linguagem, recurso da plataforma/framework, dependência já instalada, código próprio.
+2. Reutilize antes de escrever. Prefira, nesta ordem: código que o projeto já tem, recurso da linguagem, recurso da plataforma/framework, dependência já instalada, código próprio.
 3. Troque o engenhoso pelo explícito, mesmo que fique uma ou duas linhas maior.
 4. Elimine estado derivado: calcule na hora.
 

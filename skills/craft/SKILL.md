@@ -1,6 +1,6 @@
 ---
 name: craft
-description: Ponto de entrada do refactor (passo 6 do ATDD). Faz a triagem do código alterado contra SOLID, KISS, YAGNI, DRY e Clean Code e carrega só as skills dos princípios que têm sinal de violação. Use logo depois de deixar os testes verdes, ou quando pedirem para refatorar ou revisar a qualidade de um código.
+description: Ponto de entrada do refactor (passo 6 do ATDD). Reforça a regra raiz (menos código é melhor do que mais código), faz a triagem do código alterado contra SOLID, KISS, YAGNI, DRY e Clean Code e carrega só as skills dos princípios que têm sinal de violação. Use logo depois de deixar os testes verdes, ou quando pedirem para refatorar ou revisar a qualidade de um código.
 argument-hint: "[arquivo ou escopo]"
 ---
 
@@ -8,14 +8,23 @@ argument-hint: "[arquivo ou escopo]"
 
 Os testes estão verdes. Se você acabou de fazê-los passar (passo 5 do ATDD), faça agora o passo 6: refatore o código que tocou e rode de novo os testes dos domínios tocados (passo 7). Se já terminou o refactor, este é o passo 7: confirme que tudo passa e reporte.
 
+## Regra raiz: menos código
+
+**Menos código é melhor do que mais código.** Esta regra não é um princípio novo. Ela é o que KISS, YAGNI e DRY têm em comum, e vale para todo código que você escreve, não só no refactor:
+
+- Reutilize o que já existe antes de escrever (`craft:kiss`).
+- Escreva só o que um teste ou um uso atual exige (`craft:yagni`).
+- O código genérico nasce reutilizável, fora do caso específico (`craft:dry`).
+
 ## Como conduzir
 
 1. **Escopo**: o argumento, se houver; senão, o que mudou (`git diff` da branch contra a main).
 2. **Lint**: se o projeto tem script de lint (o `craft:setup` cria um), rode nos arquivos do escopo. Violação de tamanho ou complexidade já é sinal: `max-lines-per-function` e `complexity` → `craft:functions`, `max-params` → `craft:arguments`, `max-depth` → `craft:guard-clauses`, `max-lines` → `craft:single-responsibility`. Nunca desligue nem afrouxe a regra para passar.
-3. **Triagem**: leia o código do escopo e faça a pergunta de cada linha da tabela abaixo.
-4. **Aprofunde só onde há sinal**: para cada princípio com sinal, carregue a skill dele com a ferramenta `Skill` (`craft:<skill>`) e siga o que ela diz. Não carregue a skill de um princípio sem sinal.
-5. **Um refactor por vez**: mude, rode os testes do módulo refatorado, siga. Nunca edite um teste para fazê-lo passar.
-6. **Reporte**: uma linha por princípio com sinal (`craft:dry: regra do limite de anexo unificada em MAX_ATTACHMENT_SIZE`) e diga quais não tiveram sinal.
+3. **Regra raiz**: antes da triagem, procure no escopo o código que dá para apagar. Apagar vale mais que adicionar.
+4. **Triagem**: leia o código do escopo e faça a pergunta de cada linha da tabela abaixo.
+5. **Aprofunde só onde há sinal**: para cada princípio com sinal, carregue a skill dele com a ferramenta `Skill` (`craft:<skill>`) e siga o que ela diz. Não carregue a skill de um princípio sem sinal.
+6. **Um refactor por vez**: mude, rode os testes do módulo refatorado, siga. Nunca edite um teste para fazê-lo passar.
+7. **Reporte**: uma linha para a regra raiz e uma por princípio com sinal (`craft:dry: regra do limite de anexo unificada em MAX_ATTACHMENT_SIZE`). Diga quais não tiveram sinal.
 
 ## Triagem
 
@@ -28,7 +37,7 @@ Os testes estão verdes. Se você acabou de fazê-los passar (passo 5 do ATDD), 
 | `craft:dependency-inversion` | D do SOLID | A regra de negócio importa direto banco, HTTP, LLM, relógio ou storage? |
 | `craft:kiss` | KISS | Existe uma forma mais simples que passa nos mesmos testes? |
 | `craft:yagni` | YAGNI | Há opção, parâmetro, camada ou abstração sem uso atual? |
-| `craft:dry` | DRY | A mesma regra de negócio, texto ou estilo está escrita em dois lugares? |
+| `craft:dry` | DRY | A mesma regra de negócio, texto ou estilo está escrita em dois lugares, ou há código genérico preso ao caso? |
 | `craft:i18n` | Inglês e i18n | Há código fora do inglês, ou texto que o usuário vê escrito direto no código? |
 | `craft:naming` | Nomes | Algum nome precisa do código (ou de um comentário) para ser entendido? |
 | `craft:functions` | Funções | Alguma função faz mais de uma coisa ou mistura níveis de abstração? |
@@ -45,7 +54,7 @@ Princípios são ferramentas, não metas. Quando um puxa contra o outro, vale es
 
 1. **Comportamento correto** (testes verdes, erros tratados).
 2. **Legibilidade** (nomes, funções, guard clauses): o próximo leitor entende sem ajuda.
-3. **KISS e YAGNI**: menos código, menos conceito.
+3. **Regra raiz, KISS e YAGNI**: menos código, menos conceito.
 4. **DRY**: só quando a duplicação é do mesmo conhecimento.
 5. **Extensibilidade (O, D, I do SOLID)**: só quando a variação já existe, não quando é imaginada.
 
@@ -58,6 +67,7 @@ Conflitos comuns:
 ## Checklist antes de sair do passo 6
 
 - [ ] Lint do escopo sem violação (quando o projeto tem lint).
+- [ ] Regra raiz aplicada: nada no escopo que dá para apagar.
 - [ ] Triagem feita em todas as linhas da tabela.
 - [ ] Skill carregada e aplicada para cada princípio com sinal.
 - [ ] Comportamento igual (nenhum teste foi editado para passar).

@@ -23,13 +23,15 @@ Requer Node 22.18+. Os comandos aparecem na próxima sessão. Clone e atualizaç
 
 Boas práticas de programação para qualquer projeto: o fluxo **ATDD** em 7 passos e o **refactor guiado por princípios** (SOLID, KISS, YAGNI, DRY, Clean Code).
 
+Na raiz de tudo está uma regra: **menos código é melhor do que mais código**. Ela não é uma skill própria. Ela é o que `kiss` (reutilizar antes de escrever), `yagni` (só o que um uso atual exige) e `dry` (o código genérico nasce reutilizável) têm em comum. O `/craft:craft` e o passo 4 do `/craft:atdd` reforçam essa regra.
+
 Cada princípio é uma skill própria, com regra, porquê, sinais de violação, como aplicar, exemplo antes/depois, limites e uma pergunta de verificação. Você não carrega uma por uma: o `/craft:craft` faz a triagem do código e carrega só as que têm sinal. Um hook dispara essa triagem sozinho logo depois que a suíte fica verde.
 
 ## Comandos
 
 | Comando | Argumentos | O que faz |
 |---|---|---|
-| `/craft:craft` | `[arquivo ou escopo]` | Triagem do código contra todos os princípios; carrega e aplica só as skills com sinal, e roda os testes dos domínios tocados no fim |
+| `/craft:craft` | `[arquivo ou escopo]` | Reforça a regra raiz (menos código é melhor do que mais código) e faz a triagem do código contra todos os princípios; carrega e aplica só as skills com sinal, e roda os testes dos domínios tocados no fim |
 | `/craft:setup` | `[stack]` | Prepara o projeto: executor de teste, linter com limites de função (20 linhas), arquivo (200), parâmetros (3), aninhamento (2) e complexidade (10). O `/craft:craft` passa a rodar esse lint na triagem |
 | `/craft:atdd` | `<o que deve mudar>` | Conduz os 7 passos: especificação Given/When/Then, teste, red, green, passing, refactor (via `/craft:craft`), passing again |
 | `/craft:hook` | `<comportamento que não pode se repetir>` | Depois de uma correção sua, avalia se ela vira hook do projeto; se sim, propõe e, com o ok, escreve em TypeScript (`.claude/hooks/`, teste com `node:test`, mensagem pelo arquivo de tradução) e liga no `.claude/settings.json` |

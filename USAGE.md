@@ -69,7 +69,7 @@ Não precisa de comando. Sempre que o Claude roda testes e a saída vem sem falh
 /craft:craft o que mudou nesta branch
 ```
 
-O Claude faz a triagem de todos os princípios, carrega só as skills com sinal, aplica uma de cada vez sem mudar comportamento e, no fim, roda os testes dos domínios tocados. O relatório diz o que mudou por princípio e quais não tiveram sinal.
+O Claude procura primeiro o que dá para apagar (regra raiz), faz a triagem de todos os princípios, carrega só as skills com sinal, aplica uma de cada vez sem mudar comportamento e, no fim, roda os testes dos domínios tocados. O relatório diz o que mudou por princípio e quais não tiveram sinal.
 
 Para um princípio só, chame a skill dele:
 
