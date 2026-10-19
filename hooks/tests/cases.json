@@ -46,5 +46,6 @@
     "tool_input": { "command": "grep -rn 'describe(' tests/" },
     "tool_response": { "stdout": "tests/a.test.ts:1:describe('a')", "stderr": "" },
     "inject": []
-  }
+  },
+  {"description": "node --test com o reporter padrão e falha não pede refactor", "origin": "real", "tool_name": "Bash", "tool_input": {"command": "node --test tests/e2e-container.test.ts 2>&1 | grep -E \"^(✔|✖)|^ℹ (pass|fail)\""}, "tool_response": {"stdout": "✔ denies an E2E runner on the host (220.99ms)\n✖ allows an E2E runner inside a container (44.11ms)\nℹ pass 1\nℹ fail 1", "stderr": ""}, "inject": []}
 ]

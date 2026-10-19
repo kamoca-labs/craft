@@ -15,7 +15,8 @@ const FAILURE = new RegExp([
   /\b(FAILURES|ERRORS)!/,
   /ELIFECYCLE/,
   /No test files found/,
-  /^# fail [1-9]/m,
+  /^(#|\u2139) fail [1-9]/m,
+  /^\u2716 /m,
   /^not ok \d+/m,
 ].map((pattern) => pattern.source).join('|'), 'm')
 
