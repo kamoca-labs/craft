@@ -41,6 +41,8 @@ Arquivos de teste ficam fora dos limites de linhas por função e por arquivo (u
 | Go | golangci-lint (`.golangci.yml`) | `funlen`, `gocyclo`, `nestif`, `lll` |
 | Rust | Clippy (`clippy.toml`) | `too-many-lines-threshold`, `too-many-arguments-threshold`, `cognitive-complexity-threshold` |
 
+Frontend em Vue ou React: pergunte se o build de produção deve remover o `data-testid`. Se sim, configure o plugin da stack listado em `craft:test-ids`. Nunca remova o atributo do build que roda o E2E.
+
 Executor de teste: o que o projeto já usa. Sem nenhum, o padrão da stack (vitest, pest, pytest, `go test`, `cargo test`). Confira que roda filtrado (veja a execução filtrada em `craft:atdd`).
 
 ## CLAUDE.md

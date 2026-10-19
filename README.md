@@ -49,7 +49,8 @@ Ficam fora do menu de `/` (`user-invocable: false`): a entrada é o `/craft:craf
 | Simplicidade | `kiss`, `yagni`, `dry` |
 | Idioma | `i18n` (código em inglês, texto do usuário pelo i18n da stack) |
 | Escrita | `ste` (respostas e textos no padrão ASD-STE100; carregada pelo hook em toda sessão, fora da triagem) |
-| Clean Code | `naming`, `functions`, `arguments`, `guard-clauses`, `side-effects`, `comments`, `errors`, `clean-tests` |
+| Clean Code | `naming`, `functions`, `arguments`, `guard-clauses`, `side-effects`, `comments`, `errors` |
+| Testes | `clean-tests` (regras de todo teste e catálogo das camadas), `unit-tests` (unidade, componente e integração: a regra e os casos de borda), `e2e-tests` (só a jornada do usuário, sem estilo, `hover` nem campo a campo, só com a feature pronta e só em container), `test-ids` (`data-testid` com nome de negócio em todo elemento interativo, e o teste acha o elemento por ele) |
 
 Quando os princípios brigam (DRY × KISS, inversão de dependência × YAGNI), a ordem de prioridade está em `skills/craft/SKILL.md`.
 
@@ -62,4 +63,5 @@ Quando os princípios brigam (DRY × KISS, inversão de dependência × YAGNI), 
 | `memory-outside-project` | antes de `Edit`/`Write` e de `Bash` | **Nega** gravar em `~/.claude/projects/*/memory/`, a auto memory local. Pelo shell, nega redirecionamento (`>`, `>>`) e `tee` para lá. Ler e apagar a memória local passa, para mover os fatos para o projeto |
 | `atdd-first` | antes de `Edit`/`Write` em arquivo de código | **Nega** a edição se `craft:atdd` não foi carregada na sessão. Arquivo que não é código (`.md`, `.json`, `.yml`, `.env`) passa direto |
 | `english-code` | antes de `Edit`/`Write` em arquivo de código | **Nega** texto novo com letra fora do ASCII (acento, outro alfabeto) em identificador, comentário ou string. Pastas de tradução (`lang/`, `locales/`, `i18n/`, `l10n/`, `translations/`), arquivos de teste e arquivos que não são código passam direto. Só o texto novo é checado, então editar arquivo legado não trava |
+| `test-id` | antes de `Edit`/`Write` em `.vue`, `.jsx` e `.tsx` | **Nega** texto novo com elemento interativo sem `data-testid`: `button`, `a`, `input`, `select`, `textarea`, `form` e todo elemento com handler de `click`, `submit`, `change` ou `input`. Passam o `<input type="hidden">`, o wrapper que repassa os atributos do pai (`v-bind="$attrs"`, `{...rest}`) e os arquivos de teste. Só o texto novo é checado |
 | `refactor-on-green` | depois de rodar testes com saída sem falha | Injeta a triagem do `craft:craft` (passo 6 do ATDD) |

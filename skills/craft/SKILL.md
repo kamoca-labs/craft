@@ -46,7 +46,10 @@ Os testes estão verdes. Se você acabou de fazê-los passar (passo 5 do ATDD), 
 | `craft:side-effects` | Efeito colateral | Alguma função altera estado, grava ou envia algo que o nome não anuncia? |
 | `craft:comments` | Comentários | Há comentário explicando *o quê* o código faz? |
 | `craft:errors` | Erros | Algum erro é engolido, logado e ignorado, ou vira `null` silencioso? |
-| `craft:clean-tests` | Testes | Algum teste tem lógica, testa mais de um comportamento ou tem nome vago? |
+| `craft:clean-tests` | Testes | Algum teste tem lógica, testa mais de um comportamento, tem nome vago ou está na camada errada? |
+| `craft:unit-tests` | Unidade e integração | Algum teste verifica método privado, mock de mock, getter, a biblioteca ou a aparência? |
+| `craft:test-ids` | Test id | Algum elemento interativo está sem `data-testid`, tem um id genérico ou de posição, ou algum componente não repassa os atributos do pai? |
+| `craft:e2e-tests` | E2E | Algum teste E2E verifica algo que não impede o usuário de concluir o objetivo dele (estilo, `hover`, texto exato, campo a campo)? |
 
 ## Quando os princípios brigam
 

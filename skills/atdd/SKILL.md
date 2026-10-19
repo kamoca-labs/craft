@@ -9,7 +9,7 @@ argument-hint: "<o que deve mudar>"
 Toda mudança de comportamento segue estes passos, nesta ordem. Nunca pule, junte ou reordene.
 
 1. **Especificação**: escreva os critérios de aceite como cenários Given/When/Then. Mostre ao usuário e espere o ok antes de seguir.
-2. **Teste**: escreva os testes de aceite que expressam a especificação. Nenhum código de produção ainda.
+2. **Teste**: escreva os testes de aceite que expressam a especificação, na unidade ou na integração (`craft:clean-tests`). O E2E não entra no ciclo. Nenhum código de produção ainda.
 3. **Red**: rode **só os testes novos** e confirme que falham **pelo motivo esperado** (comportamento ausente), não por erro de sintaxe, import ou setup.
 4. **Green**: escreva o mínimo de código de produção que faz os testes passarem. Menos código é melhor do que mais código: reutilize o que já existe, e o código genérico nasce reutilizável (regra raiz do `craft:craft`).
 5. **Passing**: rode **só os testes novos** e confirme que passam.
@@ -25,6 +25,7 @@ Toda mudança de comportamento segue estes passos, nesta ordem. Nunca pule, junt
 - Se o usuário corrigir algo que você fez, avalie com `craft:hook` se a correção vira hook do projeto.
 - Decisão ou escolha tomada no caminho (biblioteca, formato, regra de negócio) fica registrada no repo: no CLAUDE.md se é contexto para o modelo, em `.claude/memory/` se é aprendizado da conversa (`craft:memory`), em `docs/` se é para o time, sempre com caminho relativo. Nunca na memória local do Claude nem em caminho absoluto.
 - Siga o executor de teste e o ambiente do projeto (container, script do `package.json`, `artisan test`).
+- Escreva o E2E só quando a feature está pronta: todos os ciclos dela verdes e o fluxo completo na tela. Escreva um teste por jornada nova e rode em container (`craft:e2e-tests`). Um E2E no meio do ciclo falha por tela incompleta, gera ruído e atrasa a entrega.
 
 ## Execução filtrada
 

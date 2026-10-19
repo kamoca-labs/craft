@@ -9,6 +9,7 @@
 - [Refactor sob demanda](#refactor-sob-demanda)
 - [Combinar com o plugin git](#combinar-com-o-plugin-git)
 - [Código em inglês, texto do usuário traduzido](#código-em-inglês-texto-do-usuário-traduzido)
+- [Test id em todo elemento interativo](#test-id-em-todo-elemento-interativo)
 - [Escrita no padrão ASD-STE100](#escrita-no-padrão-asd-ste100)
 - [Correção vira hook](#correção-vira-hook)
 - [Memória do projeto](#memória-do-projeto)
@@ -77,7 +78,10 @@ Para um princípio só, chame a skill dele:
 ```
 /craft:errors app/Services/PaymentGateway.php
 /craft:clean-tests tests/Feature/UploadTest.php
+/craft:e2e-tests tests/e2e/
 ```
+
+O `/craft:e2e-tests` apaga da suíte E2E o assert que não impede o usuário de concluir o objetivo dele (estilo, `hover`, texto exato, campo a campo). Ele move a regra de negócio para o teste de unidade.
 
 ## Combinar com o plugin git
 
@@ -102,6 +106,20 @@ O hook `english-code` nega texto fora do inglês em arquivo de código:
 | `it('recusa anexo acima do limite')` em `tests/Feature/AttachmentTest.php` | liberado (arquivo de teste: `tests/`, `test/`, `__tests__/`, `spec/`, `*.test.*`, `*.spec.*`, `*_test.*`, `test_*.py`) |
 
 Texto em inglês escrito direto no código para o usuário (`<button>Save</button>`) o hook não detecta; a triagem do `/craft:craft` pega pela skill `craft:i18n`. Projeto sem i18n recebe a proposta da biblioteca padrão da stack, com o seu ok antes de instalar.
+
+## Test id em todo elemento interativo
+
+O hook `test-id` nega um elemento interativo sem `data-testid` em `.vue`, `.jsx` e `.tsx`:
+
+| Edição | Resultado |
+|---|---|
+| `<button @click="save">Salvar</button>` | negado: `<button data-testid="profile-save-button" @click="save">` |
+| `<Card onClick={open}>` | negado: o handler torna o componente interativo |
+| `` <li :data-testid="`item-${index}`"> `` | o hook libera, mas a triagem do `/craft:craft` pega o índice pela skill `craft:test-ids`: use o SKU |
+| `<button class="btn" v-bind="$attrs">` num `BaseButton.vue` | liberado (o test id chega pelo pai) |
+| `<button>Save</button>` em `src/components/Form.test.tsx` | liberado (arquivo de teste) |
+
+O teste acha o elemento pelo `getByTestId` primeiro. A remoção do atributo no build de produção é opcional: o `/craft:setup` pergunta.
 
 ## Escrita no padrão ASD-STE100
 
@@ -154,6 +172,7 @@ Se o Claude tentar gravar na auto memory local (`~/.claude/projects/<projeto>/me
 | Injetou com a suíte vermelha | executor novo com formato de falha não reconhecido | pegue a linha em `~/.claude/hook-cases.jsonl`, cole no `hooks/tests/cases.json` com `"inject": []` e adicione o padrão em `FAILURE` |
 | `atdd-first` negou edição que não muda comportamento | ajuste de config numa extensão de código | carregue `/craft:atdd` mesmo assim; se o arquivo não é código, adicione a exceção em `CODE_FILE` com um teste em `atdd-first.test.ts` |
 | `english-code` negou texto que não é de usuário nem código | dado de domínio (nome de cidade num seed) | mova o dado para JSON/CSV; se é uma pasta de tradução com outro nome, adicione em `TRANSLATION_FOLDER` com um teste em `english-code.test.ts` |
+| `test-id` negou um elemento que não é interativo | um `<a>` de âncora decorativa, ou um `>` solto num atributo sem aspas | adicione o `data-testid` mesmo assim; se a leitura da tag errou, corrija `OPENING_TAG` com um teste em `test-id.test.ts` |
 | Não injetou com a suíte verde | executor de teste não reconhecido | escreva o caso no `cases.json` com `"inject": ["refactor-on-green"]` e adicione o executor em `TEST_RUNNER` |
 
 O passo a passo completo está em [transformar caso real em teste](../../USAGE.md#transformar-caso-real-em-teste).

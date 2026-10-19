@@ -44,6 +44,12 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/english-code.ts\"",
             "timeout": 10,
             "statusMessage": "craft:english-code: código em inglês?"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/test-id.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:test-id: elemento interativo com data-testid?"
           }
         ]
       }
