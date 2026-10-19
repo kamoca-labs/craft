@@ -33,7 +33,7 @@ Cada princípio é uma skill própria, com regra, porquê, sinais de violação,
 |---|---|---|
 | `/craft:craft` | `[arquivo ou escopo]` | Reforça a regra raiz (menos código é melhor do que mais código) e faz a triagem do código contra todos os princípios; carrega e aplica só as skills com sinal, e roda os testes dos domínios tocados no fim |
 | `/craft:setup` | `[stack]` | Prepara o projeto: executor de teste, linter com limites de função (20 linhas), arquivo (200), parâmetros (3), aninhamento (2) e complexidade (10). O `/craft:craft` passa a rodar esse lint na triagem |
-| `/craft:atdd` | `<o que deve mudar>` | Conduz os 7 passos: especificação Given/When/Then, teste, red, green, passing, refactor (via `/craft:craft`), passing again |
+| `/craft:atdd` | `<o que deve mudar>` | Conduz os 7 passos: especificação Given/When/Then, um laço de teste, red, green e passing por cenário, refactor (via `/craft:craft`) e passing again. Aceita um refactor preparatório antes do laço, em commit próprio |
 | `/craft:memory` | `[o que lembrar ou esquecer]` | Memória de longo prazo do projeto em `.claude/memory/`, no padrão da auto memory do Claude Code: o catálogo `MEMORY.md` e um arquivo por fato (`feedback`, `project`, `reference`). Vai para o git, então o time vê. O hook carrega a skill e o catálogo em toda sessão |
 | `/craft:hook` | `<comportamento que não pode se repetir>` | Depois de uma correção sua, avalia se ela vira hook do projeto; se sim, propõe e, com o ok, escreve em TypeScript (`.claude/hooks/`, teste com `node:test`, mensagem pelo arquivo de tradução) e liga no `.claude/settings.json` |
 
@@ -47,6 +47,7 @@ Ficam fora do menu de `/` (`user-invocable: false`): a entrada é o `/craft:craf
 |---|---|
 | SOLID | `single-responsibility`, `open-closed`, `liskov-substitution`, `interface-segregation`, `dependency-inversion` |
 | Simplicidade | `kiss`, `yagni`, `dry` |
+| Performance | `performance` (no refactor, entende os dados, mede e compara formas, e fica com a que ganha com número) |
 | Idioma | `i18n` (código em inglês, texto do usuário pelo i18n da stack) |
 | Escrita | `ste` (respostas e textos no padrão ASD-STE100; carregada pelo hook em toda sessão, fora da triagem) |
 | Clean Code | `naming`, `functions`, `arguments`, `guard-clauses`, `side-effects`, `comments`, `errors` |

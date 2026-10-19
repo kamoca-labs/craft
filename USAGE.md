@@ -39,9 +39,9 @@ O Claude detecta a stack, mostra o plano (dependências, configs, limites) e **e
      E a mensagem informa o limite de 10 MB
    ```
 
-2. Escreve o teste e roda: `Passo 3 (Red): 1 falhando, expected 422 got 201`.
-3. Escreve o mínimo de código: `Passo 5 (Passing): 1 passando`.
-4. O hook injeta a triagem, ele carrega só o que tem sinal e refatora: `Passo 6 (Refactor): craft:dry, limite unificado em MAX_ATTACHMENT_SIZE; sem sinal nos demais`.
+2. Escreve o teste de **um** cenário e roda: `Passo 3 (Red): 1 falhando, expected 422 got 201`.
+3. Escreve o mínimo de código: `Passo 5 (Passing): 1 passando`. Se a especificação tem outro cenário, ele volta ao passo 2 com o próximo.
+4. Com todos os cenários verdes, o hook injeta a triagem. O Claude carrega só o que tem sinal e refatora: `Passo 6 (Refactor): craft:dry, limite unificado em MAX_ATTACHMENT_SIZE. Sem sinal nos demais`. Quando a performance tem sinal, ele mede a forma atual, compara pelo menos duas formas e põe a tabela no commit `perf`.
 5. Roda os testes dos domínios tocados: `Passo 7 (Passing again): 34 passando em tests/Feature/Protocol e tests/Unit/Attachment`.
 
 ## Correção de bug com ATDD

@@ -1,26 +1,50 @@
 ---
 name: atdd
-description: Fluxo ATDD de 7 passos (especificação Given/When/Then, teste, red, green, passing, refactor, passing again). Use em toda feature ou correção de bug que muda comportamento, antes de escrever código de produção.
+description: Fluxo ATDD de 7 passos (especificação Given/When/Then, e um laço de teste, red, green e passing por cenário, depois refactor e passing again). Use em toda feature ou correção de bug que muda comportamento, antes de escrever código de produção.
 argument-hint: "<o que deve mudar>"
 ---
 
 # ATDD
 
-Toda mudança de comportamento segue estes passos, nesta ordem. Nunca pule, junte ou reordene.
+Toda mudança de comportamento segue estes passos, nesta ordem. Nunca pule nem reordene. Os passos 2 a 5 formam um laço: **um cenário por volta**.
 
-1. **Especificação**: escreva os critérios de aceite como cenários Given/When/Then. Mostre ao usuário e espere o ok antes de seguir.
-2. **Teste**: escreva os testes de aceite que expressam a especificação, na unidade ou na integração (`craft:clean-tests`). O E2E não entra no ciclo. Nenhum código de produção ainda.
-3. **Red**: rode **só os testes novos** e confirme que falham **pelo motivo esperado** (comportamento ausente), não por erro de sintaxe, import ou setup.
-4. **Green**: escreva o mínimo de código de produção que faz os testes passarem. Menos código é melhor do que mais código: reutilize o que já existe, e o código genérico nasce reutilizável (regra raiz do `craft:craft`).
-5. **Passing**: rode **só os testes novos** e confirme que passam.
-6. **Refactor**: melhore o código com a skill `craft:craft`, que faz a triagem dos princípios e carrega só os que se aplicam. O hook `refactor-on-green` injeta essa triagem automaticamente quando a suíte fica verde. O comportamento não muda.
+1. **Especificação**: escreva todos os critérios de aceite como cenários Given/When/Then. Mostre ao usuário e espere o ok antes de seguir.
+2. **Teste**: escreva o teste de aceite de **um** cenário, na unidade ou na integração (`craft:clean-tests`). O E2E não entra no laço. Nenhum código de produção ainda.
+3. **Red**: rode **só o teste novo** e confirme que falha **pelo motivo esperado** (comportamento ausente), não por erro de sintaxe, import ou setup.
+4. **Green**: escreva o mínimo de código de produção que faz o teste passar. Menos código é melhor do que mais código: reutilize o que já existe, e o código genérico nasce reutilizável (regra raiz do `craft:craft`).
+5. **Passing**: rode os testes dos cenários já feitos e confirme que passam. Se ainda há cenário, volte ao passo 2 com o próximo.
+6. **Refactor**: com todos os cenários verdes, melhore o código com a skill `craft:craft`. Ela faz a triagem dos princípios, inclusive a performance, e carrega só os que se aplicam. O hook `refactor-on-green` injeta essa triagem quando a suíte fica verde. O comportamento não muda.
 7. **Passing again**: rode os testes **dos domínios tocados** e confirme que tudo continua passando. Veja [execução filtrada](#execução-filtrada).
+
+## Por que um cenário por volta
+
+Todos os testes de uma vez e depois todo o código é "test first", não "test-driven". Os testes em lote verificam um comportamento imaginado, e o código nasce grande de uma vez só. Com um cenário por volta, cada teste nasce do código que já existe, e cada green é pequeno.
+
+## Refactor preparatório
+
+Se o código atual deixa a mudança difícil, refatore **antes** do passo 2: primeiro deixe a mudança fácil, depois faça a mudança fácil.
+
+- A suíte precisa estar verde antes e depois.
+- O refactor não muda comportamento e segue o `craft:craft`.
+- O refactor vai num commit próprio, antes dos commits de comportamento.
+
+## Commits
+
+Nunca junte uma mudança estrutural e uma mudança de comportamento no mesmo commit. O tipo do commit semântico diz qual é:
+
+| Mudança | Tipo | Quando |
+|---|---|---|
+| Estrutural: o comportamento não muda | `refactor`, `perf` | refactor preparatório e passo 6 |
+| Comportamento | `feat`, `fix` | passos 2 a 5 |
+
+Ordem: o refactor preparatório, depois o comportamento, depois o refactor do passo 6.
 
 ## Regras
 
 - Nunca escreva código de produção sem um teste falhando que o exija.
 - Ao fim de cada passo, diga qual passo terminou e o resultado. Ex.: "Passo 3 (Red): 2 falhando, `expected 'error' got undefined`".
 - Se um teste falhar no passo 5 ou 7, volte ao passo 4 ou corrija o refactor. Nunca altere o teste para passar, a não ser que a especificação tenha mudado.
+- Nunca desligue, pule ou apague um teste para a suíte passar.
 - Código só em inglês, inclusive os identificadores dos testes. O nome e o dado de teste podem estar na língua do projeto. Texto que o usuário vê vai para o arquivo de tradução, na língua dele, pelo i18n da stack. Veja `craft:i18n`; o hook `english-code` nega o que fugir disso.
 - Se o usuário corrigir algo que você fez, avalie com `craft:hook` se a correção vira hook do projeto.
 - Decisão ou escolha tomada no caminho (biblioteca, formato, regra de negócio) fica registrada no repo: no CLAUDE.md se é contexto para o modelo, em `.claude/memory/` se é aprendizado da conversa (`craft:memory`), em `docs/` se é para o time, sempre com caminho relativo. Nunca na memória local do Claude nem em caminho absoluto.
@@ -33,7 +57,8 @@ A suíte inteira cresce com o projeto e passa a custar minutos sem dizer nada a 
 
 | Passo | O que rodar |
 |---|---|
-| 3 e 5 | só os testes escritos no passo 2 |
+| 3 | só o teste escrito no passo 2 |
+| 5 | os testes dos cenários já feitos |
 | 6 (entre um refactor e outro) | os testes do arquivo ou módulo refatorado |
 | 7 | os testes dos domínios tocados: os dos arquivos alterados (`git diff --name-only main...`) e os dos módulos que importam esses arquivos |
 
@@ -53,6 +78,13 @@ Filtros por executor:
 | `node --test` | `node --test <arquivos de teste>`, `--test-name-pattern <nome>` |
 | go | `go test ./<pacote>/...`, `-run <nome>` |
 | cargo | `cargo test <nome>`, `-p <crate>` |
+
+## Quando não se aplica
+
+- **Mudança sem comportamento** (config, doc, nome, refactor puro): pule o laço. Refatore pelo `craft:craft` com a suíte verde antes e depois.
+- **Especificação incerta**: faça um spike, um código só para aprender. Mostre ao usuário o que aprendeu. Depois, apague o código do spike e comece no passo 1. Nunca aproveite o código do spike na produção.
+- **Visual que um teste por código não verifica** (layout, animação): verifique por screenshot e escreva o teste só para o comportamento.
+- **Estado externo que não dá para controlar**: isole a fronteira (`craft:dependency-inversion`) e teste a regra com um dublê. A fronteira fica no teste de integração.
 
 ## Exemplo do passo 1
 

@@ -6,7 +6,7 @@ argument-hint: "[arquivo ou escopo]"
 
 # Craft: refactor guiado por princípios
 
-Os testes estão verdes. Se você acabou de fazê-los passar (passo 5 do ATDD), faça agora o passo 6: refatore o código que tocou e rode de novo os testes dos domínios tocados (passo 7). Se já terminou o refactor, este é o passo 7: confirme que tudo passa e reporte.
+Os testes estão verdes. Se você está no laço do ATDD e ainda há cenário, volte ao passo 2 com o próximo: a triagem fica para o fim. Se todos os cenários estão verdes, faça agora o passo 6: refatore o código que tocou e rode de novo os testes dos domínios tocados (passo 7). Se já terminou o refactor, este é o passo 7: confirme que tudo passa e reporte.
 
 ## Regra raiz: menos código
 
@@ -46,6 +46,7 @@ Os testes estão verdes. Se você acabou de fazê-los passar (passo 5 do ATDD), 
 | `craft:side-effects` | Efeito colateral | Alguma função altera estado, grava ou envia algo que o nome não anuncia? |
 | `craft:comments` | Comentários | Há comentário explicando *o quê* o código faz? |
 | `craft:errors` | Erros | Algum erro é engolido, logado e ignorado, ou vira `null` silencioso? |
+| `craft:performance` | Performance | Algum trecho roda sobre muitos dados ou num caminho quente (laço dentro de laço, query no laço, I/O repetido, chamadas em série) sem uma medição que compare formas? |
 | `craft:clean-tests` | Testes | Algum teste tem lógica, testa mais de um comportamento, tem nome vago ou está na camada errada? |
 | `craft:unit-tests` | Unidade e integração | Algum teste verifica método privado, mock de mock, getter, a biblioteca ou a aparência? |
 | `craft:test-ids` | Test id | Algum elemento interativo está sem `data-testid`, tem um id genérico ou de posição, ou algum componente não repassa os atributos do pai? |
@@ -58,13 +59,15 @@ Princípios são ferramentas, não metas. Quando um puxa contra o outro, vale es
 1. **Comportamento correto** (testes verdes, erros tratados).
 2. **Legibilidade** (nomes, funções, guard clauses): o próximo leitor entende sem ajuda.
 3. **Regra raiz, KISS e YAGNI**: menos código, menos conceito.
-4. **DRY**: só quando a duplicação é do mesmo conhecimento.
-5. **Extensibilidade (O, D, I do SOLID)**: só quando a variação já existe, não quando é imaginada.
+4. **Performance medida**: um ganho medido acima do ruído pode custar legibilidade, com a comparação no commit. Sem medição, a legibilidade vence.
+5. **DRY**: só quando a duplicação é do mesmo conhecimento.
+6. **Extensibilidade (O, D, I do SOLID)**: só quando a variação já existe, não quando é imaginada.
 
 Conflitos comuns:
 
 - **DRY × KISS**: duplicação é mais barata que a abstração errada. Espere a terceira repetição antes de extrair.
 - **Open/Closed ou inversão de dependência × YAGNI**: crie a abstração quando houver a segunda implementação real ou uma fronteira de I/O que precisa de dublê no teste. Antes disso, é especulação.
+- **Performance × legibilidade**: a forma mais rápida vence só com a medição no volume real e com a comparação entre formas (`craft:performance`).
 - **Responsabilidade única × KISS**: separar responsabilidades não é picar o código em dez classes de uma linha. Se as partes sempre mudam juntas, são uma responsabilidade só.
 
 ## Checklist antes de sair do passo 6
@@ -73,5 +76,7 @@ Conflitos comuns:
 - [ ] Regra raiz aplicada: nada no escopo que dá para apagar.
 - [ ] Triagem feita em todas as linhas da tabela.
 - [ ] Skill carregada e aplicada para cada princípio com sinal.
+- [ ] Toda otimização tem medição antes e depois e venceu outra forma.
+- [ ] Commit do refactor separado do commit de comportamento.
 - [ ] Comportamento igual (nenhum teste foi editado para passar).
 - [ ] Testes dos domínios tocados rodados de novo e verdes; suíte completa só se a mudança tocou algo compartilhado (veja a execução filtrada em `craft:atdd`).
