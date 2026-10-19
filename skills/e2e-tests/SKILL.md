@@ -28,7 +28,7 @@ Exemplo: "se eu crio um item, o item aparece na lista" é E2E. "No hover, o bot�
 
 ## Onde rodar
 
-**Só em container**, nunca no host.
+**Só em container**, nunca no host. O hook `e2e-container` nega o executor E2E fora de `docker run`, `docker exec` e `docker compose run/exec`.
 
 - Use a imagem oficial do executor, na mesma versão do pacote do projeto. Playwright: `mcr.microsoft.com/playwright:v<versão>-noble`. Cypress: `cypress/included:<versão>`.
 - Declare um serviço `e2e` no compose de dev, na mesma rede do app. O teste acessa o app pelo nome do serviço (`http://app:3000`), não por `localhost`.

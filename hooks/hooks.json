@@ -50,6 +50,35 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/test-id.ts\"",
             "timeout": 10,
             "statusMessage": "craft:test-id: elemento interativo com data-testid?"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/test-skip.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:test-skip: teste pulado ou focado?"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/e2e-container.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:e2e-container: E2E em container?"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/filtered-tests.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:filtered-tests: testes com filtro?"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/push-gate.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:push-gate: suíte completa antes do push?"
           }
         ]
       }

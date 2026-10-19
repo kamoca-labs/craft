@@ -79,4 +79,4 @@ Conflitos comuns:
 - [ ] Toda otimização tem medição antes e depois e venceu outra forma.
 - [ ] Commit do refactor separado do commit de comportamento.
 - [ ] Comportamento igual (nenhum teste foi editado para passar).
-- [ ] Testes dos domínios tocados rodados de novo e verdes; suíte completa só se a mudança tocou algo compartilhado (veja a execução filtrada em `craft:atdd`).
+- [ ] Testes dos domínios tocados rodados de novo, com filtro, e verdes. A suíte completa roda no CI, ou local só com o consentimento do usuário (veja a execução filtrada em `craft:atdd`).

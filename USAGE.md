@@ -173,6 +173,8 @@ Se o Claude tentar gravar na auto memory local (`~/.claude/projects/<projeto>/me
 | `atdd-first` negou edição que não muda comportamento | ajuste de config numa extensão de código | carregue `/craft:atdd` mesmo assim; se o arquivo não é código, adicione a exceção em `CODE_FILE` com um teste em `atdd-first.test.ts` |
 | `english-code` negou texto que não é de usuário nem código | dado de domínio (nome de cidade num seed) | mova o dado para JSON/CSV; se é uma pasta de tradução com outro nome, adicione em `TRANSLATION_FOLDER` com um teste em `english-code.test.ts` |
 | `test-id` negou um elemento que não é interativo | um `<a>` de âncora decorativa, ou um `>` solto num atributo sem aspas | adicione o `data-testid` mesmo assim; se a leitura da tag errou, corrija `OPENING_TAG` com um teste em `test-id.test.ts` |
+| `filtered-tests` negou uma execução já filtrada | um filtro que o hook não conhece | adicione o filtro em `FILTER_FLAG` ou `TEST_PATH` com um teste em `filtered-tests.test.ts` |
+| `push-gate` negou o push num projeto com CI | um CI com config fora da lista | adicione o caminho em `CI_CONFIGS` com um teste em `push-gate.test.ts` |
 | Não injetou com a suíte verde | executor de teste não reconhecido | escreva o caso no `cases.json` com `"inject": ["refactor-on-green"]` e adicione o executor em `TEST_RUNNER` |
 
 O passo a passo completo está em [transformar caso real em teste](../../USAGE.md#transformar-caso-real-em-teste).

@@ -44,12 +44,12 @@ Ordem: o refactor preparatório, depois o comportamento, depois o refactor do pa
 - Nunca escreva código de produção sem um teste falhando que o exija.
 - Ao fim de cada passo, diga qual passo terminou e o resultado. Ex.: "Passo 3 (Red): 2 falhando, `expected 'error' got undefined`".
 - Se um teste falhar no passo 5 ou 7, volte ao passo 4 ou corrija o refactor. Nunca altere o teste para passar, a não ser que a especificação tenha mudado.
-- Nunca desligue, pule ou apague um teste para a suíte passar.
+- Nunca desligue, pule ou apague um teste para a suíte passar. O hook `test-skip` nega `.skip`, `.only` e afins.
 - Código só em inglês, inclusive os identificadores dos testes. O nome e o dado de teste podem estar na língua do projeto. Texto que o usuário vê vai para o arquivo de tradução, na língua dele, pelo i18n da stack. Veja `craft:i18n`; o hook `english-code` nega o que fugir disso.
 - Se o usuário corrigir algo que você fez, avalie com `craft:hook` se a correção vira hook do projeto.
 - Decisão ou escolha tomada no caminho (biblioteca, formato, regra de negócio) fica registrada no repo: no CLAUDE.md se é contexto para o modelo, em `.claude/memory/` se é aprendizado da conversa (`craft:memory`), em `docs/` se é para o time, sempre com caminho relativo. Nunca na memória local do Claude nem em caminho absoluto.
 - Siga o executor de teste e o ambiente do projeto (container, script do `package.json`, `artisan test`).
-- Escreva o E2E só quando a feature está pronta: todos os ciclos dela verdes e o fluxo completo na tela. Escreva um teste por jornada nova e rode em container (`craft:e2e-tests`). Um E2E no meio do ciclo falha por tela incompleta, gera ruído e atrasa a entrega.
+- Escreva o E2E só quando a feature está pronta: todos os ciclos dela verdes e o fluxo completo na tela. Escreva um teste por jornada nova e rode em container (`craft:e2e-tests`). O hook `e2e-container` nega o E2E no host. Um E2E no meio do ciclo falha por tela incompleta, gera ruído e atrasa a entrega.
 
 ## Execução filtrada
 
@@ -62,7 +62,14 @@ A suíte inteira cresce com o projeto e passa a custar minutos sem dizer nada a 
 | 6 (entre um refactor e outro) | os testes do arquivo ou módulo refatorado |
 | 7 | os testes dos domínios tocados: os dos arquivos alterados (`git diff --name-only main...`) e os dos módulos que importam esses arquivos |
 
-Rode a suíte completa só quando a mudança tocar algo que todos usam (config, módulo base, schema ou migração, helper compartilhado, dependência atualizada) ou quando o usuário pedir. Fora disso, ela fica para o CI.
+Todo teste roda com filtro. O hook `filtered-tests` nega a suíte completa sem o consentimento do usuário.
+
+A suíte completa roda assim:
+
+- **Projeto com CI**: a suíte completa roda na nuvem, depois do push. Não rode local.
+- **Projeto sem CI**: antes do push ou do PR/MR, pergunte ao usuário com o `AskUserQuestion`. Use as opções exatas `Rodar a suíte completa local` e `Seguir sem a suíte completa`. O hook `push-gate` nega o push e o PR/MR até a resposta. Se a resposta é rodar, rode a suíte e faça o push só com ela verde.
+
+A resposta vale até a próxima edição de código. Depois de uma edição, pergunte de novo.
 
 Ao reportar, diga o filtro usado. Ex.: "Passo 7 (Passing again): 34 passando em `tests/Feature/Protocol` e `tests/Unit/Attachment`".
 

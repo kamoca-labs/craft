@@ -21,9 +21,54 @@ const MESSAGES: Record<string, string> = JSON.parse(fs.readFileSync(path.join(im
 export const CODE_FILE = /\.(ts|tsx|js|jsx|mjs|cjs|vue|svelte|php|py|go|rs|java|kt|rb|cs)$/
 export const TEST_FILE = /(^|\/)(tests?|__tests__|specs?)\/|[._](test|spec)\.\w+$|(^|\/)test_[^/]+\.py$/
 
+export const TEST_RUNNER = new RegExp([
+  /\b(npx|pnpm( exec)?|bunx)\s+(vitest|jest)\b/,
+  /(^|[\s;&|/])(vitest|jest|pest|phpunit|pytest)\b/,
+  /\b(npm|pnpm|yarn|bun|composer)(\s+run)?\s+test\b/,
+  /\bartisan\s+test\b/,
+  /\bnode\s+--test\b/,
+  /\b(go|cargo|mvn|gradle)\s+test\b/,
+].map((pattern) => pattern.source).join('|'))
+
 export function addedText({ tool_input }: HookInput): string {
   const edits = tool_input.edits?.map((edit) => edit.new_string) || []
   return [tool_input.content, tool_input.new_string, ...edits].filter(Boolean).join('\n')
+}
+
+export const FULL_SUITE_LOCAL = MESSAGES['consent.full-suite-local']
+export const SKIP_FULL_SUITE = MESSAGES['consent.skip-full-suite']
+
+type TranscriptBlock = { type: string, id?: string, name?: string, tool_use_id?: string, input?: { file_path?: string } }
+type TranscriptEntry = { type: string, message?: { content?: string | TranscriptBlock[] }, toolUseResult?: { answers?: Record<string, string> } }
+
+function blocks(entry: TranscriptEntry): TranscriptBlock[] {
+  const content = entry.message?.content
+  return Array.isArray(content) ? content : []
+}
+
+function readTranscript(transcriptPath: string): TranscriptEntry[] {
+  try {
+    return fs.readFileSync(transcriptPath, 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line))
+  } catch {
+    return []
+  }
+}
+
+const isCodeEdit = (block: TranscriptBlock) => block.type === 'tool_use' && /^(Edit|MultiEdit|Write)$/.test(block.name || '') && CODE_FILE.test(block.input?.file_path || '')
+
+export function consentGiven(transcriptPath: string | undefined, labels: string[]): boolean {
+  const questions = new Set<string>()
+  let lastEdit = -1
+  let lastConsent = -1
+  readTranscript(transcriptPath || '').forEach((entry, index) => {
+    for (const block of blocks(entry)) {
+      if (block.type === 'tool_use' && block.name === 'AskUserQuestion' && block.id) questions.add(block.id)
+      if (isCodeEdit(block)) lastEdit = index
+      const answered = block.type === 'tool_result' && questions.has(block.tool_use_id || '')
+      if (answered && Object.values(entry.toolUseResult?.answers || {}).some((answer) => labels.includes(answer))) lastConsent = index
+    }
+  })
+  return lastConsent > lastEdit
 }
 
 export function message(key: string, params: Record<string, string> = {}): string {
