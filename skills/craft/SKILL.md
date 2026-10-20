@@ -56,6 +56,11 @@ Os testes estão verdes. Se você está no laço do ATDD e ainda há cenário, v
 | `craft:unit-tests` | Unidade e integração | Algum teste verifica método privado, mock de mock, getter, a biblioteca ou a aparência? |
 | `craft:test-ids` | Test id | Algum elemento interativo está sem `data-testid`, tem um id genérico ou de posição, ou algum componente não repassa os atributos do pai? |
 | `craft:e2e-tests` | E2E | Algum teste E2E verifica algo que não impede o usuário de concluir o objetivo dele (estilo, `hover`, texto exato, campo a campo)? |
+| `impeccable` (skill externa) | Interface | A mudança altera UI (componente, CSS, template)? |
+
+A linha do `impeccable` não carrega skill. Se a resposta é sim, sugira ao usuário `/impeccable audit` ou `/impeccable harden` sobre os arquivos tocados. Nunca rode o comando você mesmo.
+
+Se a skill `impeccable` não está na lista de skills da sessão, sugira a instalação pelo site oficial, https://impeccable.style (repo `pbakaus/impeccable`). O site manda rodar `/plugin marketplace add pbakaus/impeccable` e instalar o **Impeccable** em `/plugin`, na aba **Discover**.
 
 ## Quando os princípios brigam
 
