@@ -23,7 +23,12 @@ Os testes estão verdes. Se você está no laço do ATDD e ainda há cenário, v
 3. **Regra raiz**: antes da triagem, procure no escopo o código que dá para apagar. Apagar vale mais que adicionar.
 4. **Triagem**: leia o código do escopo e faça a pergunta de cada linha da tabela abaixo.
 5. **Aprofunde só onde há sinal**: para cada princípio com sinal, carregue a skill dele com a ferramenta `Skill` (`craft:<skill>`) e siga o que ela diz. Não carregue a skill de um princípio sem sinal.
-6. **Um refactor por vez**: mude, rode os testes do módulo refatorado, siga. Nunca edite um teste para fazê-lo passar.
+6. **Um refactor por vez**: mude, rode os testes do módulo refatorado, siga. Nunca edite um teste para fazê-lo passar. A verificação tem rodadas limitadas:
+   - uma rodada de triagem, com todas as linhas da tabela
+   - um lote de correções com todos os achados da triagem, um refactor por vez
+   - no máximo uma rodada de confirmação, só sobre o que mudou
+
+   Depois, pare e reporte. O achado que sobra vai para o relatório, não para uma rodada nova.
 7. **Reporte**: uma linha para a regra raiz e uma por princípio com sinal (`craft:dry: regra do limite de anexo unificada em MAX_ATTACHMENT_SIZE`). Diga quais não tiveram sinal.
 
 ## Triagem
@@ -76,6 +81,7 @@ Conflitos comuns:
 - [ ] Regra raiz aplicada: nada no escopo que dá para apagar.
 - [ ] Triagem feita em todas as linhas da tabela.
 - [ ] Skill carregada e aplicada para cada princípio com sinal.
+- [ ] No máximo uma rodada de confirmação depois do lote de correções.
 - [ ] Toda otimização tem medição antes e depois e venceu outra forma.
 - [ ] Commit do refactor separado do commit de comportamento.
 - [ ] Comportamento igual (nenhum teste foi editado para passar).
