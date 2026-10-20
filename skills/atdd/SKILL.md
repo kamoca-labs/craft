@@ -8,7 +8,7 @@ argument-hint: "<o que deve mudar>"
 
 Toda mudança de comportamento segue estes passos, nesta ordem. Nunca pule nem reordene. Os passos 2 a 5 formam um laço: **um cenário por volta**.
 
-1. **Especificação**: escreva todos os critérios de aceite como cenários Given/When/Then. Percorra as [bordas do mundo real](#bordas-do-mundo-real) e inclua as que a feature tem. Mostre ao usuário e espere o ok antes de seguir.
+1. **Especificação**: escreva todos os critérios de aceite como cenários Given/When/Then. Percorra as [bordas do mundo real](#bordas-do-mundo-real) e inclua as que a feature tem. Carregue a skill `craft:acceptance-criteria` com a ferramenta `Skill` e siga-a. Mostre ao usuário e espere o ok. Com o ok, carregue a skill `craft:tasks`: ela cria as tarefas e propõe a meta.
 2. **Teste**: escreva o teste de aceite de **um** cenário, na unidade ou na integração (`craft:clean-tests`). O E2E não entra no laço. Nenhum código de produção ainda.
 3. **Red**: rode **só o teste novo** e confirme que falha **pelo motivo esperado** (comportamento ausente), não por erro de sintaxe, import ou setup.
 4. **Green**: escreva o mínimo de código de produção que faz o teste passar. Menos código é melhor do que mais código: reutilize o que já existe, e o código genérico nasce reutilizável (regra raiz do `craft:craft`).
