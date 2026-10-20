@@ -33,7 +33,23 @@ Se a resposta for não:
 | Caso único | só a correção, sem registro |
 | Contexto útil depois de um evento (ex.: suíte verde) | hook que **injeta** contexto, em vez de negar |
 
-**Proponha e espere o ok**: diga a correção, a regra, o evento (`PreToolUse`/`PostToolUse` e o matcher), um exemplo negado e um liberado. Hook é imposição; quem decide é o usuário.
+**Proponha e espere o ok**: diga a correção, a regra, o evento (`PreToolUse`, `PostToolUse` ou `Stop`, e o matcher), um exemplo negado e um liberado. Hook é imposição; quem decide é o usuário.
+
+## Duas camadas
+
+Escolha o evento pelo custo e pela certeza da checagem:
+
+| Checagem | Evento | Exemplo |
+|---|---|---|
+| Mecânica, barata e sem ambiguidade | `PreToolUse`: nega na hora, antes da ferramenta rodar | `git add .env`, `.only` num teste |
+| Cara, ou que pede o julgamento do modelo | `Stop`: roda uma vez no fim, sobre os arquivos tocados na sessão | lint de vários arquivos, heurística que pode errar |
+
+- As duas camadas passam pelas três perguntas acima. No `Stop`, o hook acha o candidato, e o modelo julga cada achado.
+- Na dúvida entre as duas, escolha o `Stop`. Uma negação na hora interrompe o trabalho, então ela precisa estar certa.
+- O `Stop` lê só os arquivos tocados na sessão (pelo transcript ou pelo `git diff`), não o projeto inteiro.
+- O `Stop` não repete o achado que a camada do `PreToolUse` já reportou.
+- Para reportar, o `Stop` sai com `exit 2` e a lista de achados no stderr. Sem achado novo, ele sai com `exit 0`, em silêncio.
+- Se a entrada traz `stop_hook_active` verdadeiro, libere. Os achados já saíram uma vez.
 
 ## Como escrever
 
