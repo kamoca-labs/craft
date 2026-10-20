@@ -29,7 +29,7 @@ O Claude detecta a stack, mostra o plano (dependências, configs, limites) e **e
 /craft:atdd recusar anexo acima de 10 MB no protocolo
 ```
 
-1. O Claude escreve os cenários e **espera o seu ok**:
+1. O Claude escreve os cenários e **espera o seu ok**. Ele percorre a lista de bordas do mundo real (texto longo, emoji, timeout, 403, duplo envio e outras). Ele inclui só as que a feature tem:
 
    ```gherkin
    Cenário: anexo acima do limite é recusado
@@ -71,7 +71,9 @@ Não precisa de comando. Sempre que o Claude roda testes e a saída vem sem falh
 /craft:craft o que mudou nesta branch
 ```
 
-O Claude procura primeiro o que dá para apagar (regra raiz), faz a triagem de todos os princípios, carrega só as skills com sinal, aplica uma de cada vez sem mudar comportamento e, no fim, roda os testes dos domínios tocados. O relatório diz o que mudou por princípio e quais não tiveram sinal.
+O Claude procura primeiro o que dá para apagar (regra raiz), faz a triagem de todos os princípios, carrega só as skills com sinal, aplica uma de cada vez sem mudar comportamento e, no fim, roda os testes dos domínios tocados. Ele faz uma rodada de triagem, um lote de correções e no máximo uma rodada de confirmação. Depois, ele para. O relatório diz o que mudou por princípio e quais não tiveram sinal.
+
+Se a mudança altera UI (componente, CSS, template), o relatório sugere `/impeccable audit` ou `/impeccable harden` sobre os arquivos tocados. O Claude não roda o comando. Sem a skill `impeccable` na sessão, ele sugere a instalação pelo site oficial, https://impeccable.style.
 
 Para um princípio só, chame a skill dele:
 
@@ -81,7 +83,7 @@ Para um princípio só, chame a skill dele:
 /craft:e2e-tests tests/e2e/
 ```
 
-O `/craft:e2e-tests` apaga da suíte E2E o assert que não impede o usuário de concluir o objetivo dele (estilo, `hover`, texto exato, campo a campo). Ele move a regra de negócio para o teste de unidade.
+O `/craft:e2e-tests` apaga da suíte E2E o assert que não impede o usuário de concluir o objetivo dele (estilo, `hover`, texto exato, campo a campo). Ele move a regra de negócio para o teste de unidade. Os estados carregando, vazio, erro e sem permissão entram quando a tela tem esses estados.
 
 ## Combinar com o plugin git
 
@@ -105,7 +107,7 @@ O hook `english-code` nega texto fora do inglês em arquivo de código:
 | texto em português num `.md`, `.json` ou `.po` | liberado (não é código) |
 | `it('recusa anexo acima do limite')` em `tests/Feature/AttachmentTest.php` | liberado (arquivo de teste: `tests/`, `test/`, `__tests__/`, `spec/`, `*.test.*`, `*.spec.*`, `*_test.*`, `test_*.py`) |
 
-Texto em inglês escrito direto no código para o usuário (`<button>Save</button>`) o hook não detecta; a triagem do `/craft:craft` pega pela skill `craft:i18n`. Projeto sem i18n recebe a proposta da biblioteca padrão da stack, com o seu ok antes de instalar.
+Texto em inglês escrito direto no código para o usuário (`<button>Save</button>`) o hook não detecta; a triagem do `/craft:craft` pega pela skill `craft:i18n`. Projeto sem i18n recebe a proposta da biblioteca padrão da stack, com o seu ok antes de instalar. A mesma skill pega data, número e moeda formatados à mão (use o `Intl`), largura fixa num contêiner de texto e `margin-left` onde cabe `margin-inline-start`.
 
 ## Test id em todo elemento interativo
 
@@ -135,7 +137,7 @@ Texto em inglês segue a norma completa. Texto em português segue as regras que
 
 ## Correção vira hook
 
-Você corrige o Claude (ex.: "não roda `git add .env`"). Ele avalia se a correção repete, se dá para checar pela entrada da ferramenta e se o padrão erra pouco. Com os três sim, propõe o hook e **espera o seu ok**; depois escreve o teste, a regra em TypeScript em `.claude/hooks/rules/`, a mensagem em `.claude/hooks/locales/pt-BR.json` e liga no `.claude/settings.json`. Se a correção exige julgamento, ela vai para a skill do assunto ou o CLAUDE.md, não para hook. Para pedir direto:
+Você corrige o Claude (ex.: "não roda `git add .env`"). Ele avalia se a correção repete, se dá para checar pela entrada da ferramenta e se o padrão erra pouco. Com os três sim, propõe o hook e **espera o seu ok**; depois escreve o teste, a regra em TypeScript em `.claude/hooks/rules/`, a mensagem em `.claude/hooks/locales/pt-BR.json` e liga no `.claude/settings.json`. Se a correção exige julgamento, ela vai para a skill do assunto ou o CLAUDE.md, não para hook. A checagem barata e certa nega na hora (`PreToolUse`). A checagem cara ou de julgamento roda uma vez no `Stop`, sobre os arquivos tocados na sessão. Para pedir direto:
 
 ```
 /craft:hook nunca commitar .env
@@ -176,5 +178,7 @@ Se o Claude tentar gravar na auto memory local (`~/.claude/projects/<projeto>/me
 | `filtered-tests` negou uma execução já filtrada | um filtro que o hook não conhece | adicione o filtro em `FILTER_FLAG` ou `TEST_PATH` com um teste em `filtered-tests.test.ts` |
 | `push-gate` negou o push num projeto com CI | um CI com config fora da lista | adicione o caminho em `CI_CONFIGS` com um teste em `push-gate.test.ts` |
 | Não injetou com a suíte verde | executor de teste não reconhecido | escreva o caso no `cases.json` com `"inject": ["refactor-on-green"]` e adicione o executor em `TEST_RUNNER` |
+
+Antes de mexer no hook, classifique o achado (`craft:hook`). Problema real: corrija. Falso positivo com evidência: a exceção mais estreita possível, com o motivo `"<quem decidiu>: <evidência>"` no commit. Dúvida: pergunte ao usuário uma vez. Exceção ampla (arquivo inteiro, regra inteira) só com o pedido do usuário.
 
 O passo a passo completo está em [transformar caso real em teste](../../USAGE.md#transformar-caso-real-em-teste).

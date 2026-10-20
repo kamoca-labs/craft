@@ -23,7 +23,12 @@ Os testes estão verdes. Se você está no laço do ATDD e ainda há cenário, v
 3. **Regra raiz**: antes da triagem, procure no escopo o código que dá para apagar. Apagar vale mais que adicionar.
 4. **Triagem**: leia o código do escopo e faça a pergunta de cada linha da tabela abaixo.
 5. **Aprofunde só onde há sinal**: para cada princípio com sinal, carregue a skill dele com a ferramenta `Skill` (`craft:<skill>`) e siga o que ela diz. Não carregue a skill de um princípio sem sinal.
-6. **Um refactor por vez**: mude, rode os testes do módulo refatorado, siga. Nunca edite um teste para fazê-lo passar.
+6. **Um refactor por vez**: mude, rode os testes do módulo refatorado, siga. Nunca edite um teste para fazê-lo passar. A verificação tem rodadas limitadas:
+   - uma rodada de triagem, com todas as linhas da tabela
+   - um lote de correções com todos os achados da triagem, um refactor por vez
+   - no máximo uma rodada de confirmação, só sobre o que mudou
+
+   Depois, pare e reporte. O achado que sobra vai para o relatório, não para uma rodada nova.
 7. **Reporte**: uma linha para a regra raiz e uma por princípio com sinal (`craft:dry: regra do limite de anexo unificada em MAX_ATTACHMENT_SIZE`). Diga quais não tiveram sinal.
 
 ## Triagem
@@ -38,19 +43,24 @@ Os testes estão verdes. Se você está no laço do ATDD e ainda há cenário, v
 | `craft:kiss` | KISS | Existe uma forma mais simples que passa nos mesmos testes? |
 | `craft:yagni` | YAGNI | Há opção, parâmetro, camada ou abstração sem uso atual? |
 | `craft:dry` | DRY | A mesma regra de negócio, texto ou estilo está escrita em dois lugares, ou há código genérico preso ao caso? |
-| `craft:i18n` | Inglês e i18n | Há código fora do inglês, ou texto que o usuário vê escrito direto no código? |
+| `craft:i18n` | Inglês e i18n | Há código fora do inglês, texto que o usuário vê escrito direto no código, data ou número formatado à mão, ou largura fixa num contêiner de texto? |
 | `craft:naming` | Nomes | Algum nome precisa do código (ou de um comentário) para ser entendido? |
 | `craft:functions` | Funções | Alguma função faz mais de uma coisa ou mistura níveis de abstração? |
 | `craft:arguments` | Argumentos | Mais de três parâmetros, ou um booleano que muda o comportamento? |
 | `craft:guard-clauses` | Guard clause | Há `if` aninhado em mais de um nível, ou `else` depois de `return`? |
 | `craft:side-effects` | Efeito colateral | Alguma função altera estado, grava ou envia algo que o nome não anuncia? |
 | `craft:comments` | Comentários | Há comentário explicando *o quê* o código faz? |
-| `craft:errors` | Erros | Algum erro é engolido, logado e ignorado, ou vira `null` silencioso? |
+| `craft:errors` | Erros | Algum erro é engolido, logado e ignorado, ou vira `null` silencioso? Algum erro na tela deixa o usuário sem como recuperar? |
 | `craft:performance` | Performance | Algum trecho roda sobre muitos dados ou num caminho quente (laço dentro de laço, query no laço, I/O repetido, chamadas em série) sem uma medição que compare formas? |
 | `craft:clean-tests` | Testes | Algum teste tem lógica, testa mais de um comportamento, tem nome vago ou está na camada errada? |
 | `craft:unit-tests` | Unidade e integração | Algum teste verifica método privado, mock de mock, getter, a biblioteca ou a aparência? |
 | `craft:test-ids` | Test id | Algum elemento interativo está sem `data-testid`, tem um id genérico ou de posição, ou algum componente não repassa os atributos do pai? |
 | `craft:e2e-tests` | E2E | Algum teste E2E verifica algo que não impede o usuário de concluir o objetivo dele (estilo, `hover`, texto exato, campo a campo)? |
+| `impeccable` (skill externa) | Interface | A mudança altera UI (componente, CSS, template)? |
+
+A linha do `impeccable` não carrega skill. Se a resposta é sim, sugira ao usuário `/impeccable audit` ou `/impeccable harden` sobre os arquivos tocados. Nunca rode o comando você mesmo.
+
+Se a skill `impeccable` não está na lista de skills da sessão, sugira a instalação pelo site oficial, https://impeccable.style (repo `pbakaus/impeccable`). O site manda rodar `/plugin marketplace add pbakaus/impeccable` e instalar o **Impeccable** em `/plugin`, na aba **Discover**.
 
 ## Quando os princípios brigam
 
@@ -76,6 +86,7 @@ Conflitos comuns:
 - [ ] Regra raiz aplicada: nada no escopo que dá para apagar.
 - [ ] Triagem feita em todas as linhas da tabela.
 - [ ] Skill carregada e aplicada para cada princípio com sinal.
+- [ ] No máximo uma rodada de confirmação depois do lote de correções.
 - [ ] Toda otimização tem medição antes e depois e venceu outra forma.
 - [ ] Commit do refactor separado do commit de comportamento.
 - [ ] Comportamento igual (nenhum teste foi editado para passar).

@@ -8,13 +8,35 @@ argument-hint: "<o que deve mudar>"
 
 Toda mudança de comportamento segue estes passos, nesta ordem. Nunca pule nem reordene. Os passos 2 a 5 formam um laço: **um cenário por volta**.
 
-1. **Especificação**: escreva todos os critérios de aceite como cenários Given/When/Then. Mostre ao usuário e espere o ok antes de seguir.
+1. **Especificação**: escreva todos os critérios de aceite como cenários Given/When/Then. Percorra as [bordas do mundo real](#bordas-do-mundo-real) e inclua as que a feature tem. Mostre ao usuário e espere o ok antes de seguir.
 2. **Teste**: escreva o teste de aceite de **um** cenário, na unidade ou na integração (`craft:clean-tests`). O E2E não entra no laço. Nenhum código de produção ainda.
 3. **Red**: rode **só o teste novo** e confirme que falha **pelo motivo esperado** (comportamento ausente), não por erro de sintaxe, import ou setup.
 4. **Green**: escreva o mínimo de código de produção que faz o teste passar. Menos código é melhor do que mais código: reutilize o que já existe, e o código genérico nasce reutilizável (regra raiz do `craft:craft`).
 5. **Passing**: rode os testes dos cenários já feitos e confirme que passam. Se ainda há cenário, volte ao passo 2 com o próximo.
 6. **Refactor**: com todos os cenários verdes, melhore o código com a skill `craft:craft`. Ela faz a triagem dos princípios, inclusive a performance, e carrega só os que se aplicam. O hook `refactor-on-green` injeta essa triagem quando a suíte fica verde. O comportamento não muda.
 7. **Passing again**: rode os testes **dos domínios tocados** e confirme que tudo continua passando. Veja [execução filtrada](#execução-filtrada).
+
+## Bordas do mundo real
+
+Um código que só funciona com dado perfeito quebra na mão do usuário. No passo 1, compare cada borda desta lista com a feature:
+
+| Borda | Exemplo |
+|---|---|
+| Texto vazio e texto muito longo | nome vazio, descrição com 5.000 caracteres |
+| Emoji e acento | `José 🚀` no campo de nome |
+| Número grande | valor na casa dos bilhões |
+| Lista muito grande | 10.000 itens na listagem |
+| Rede que cai ou dá timeout | a API não responde em 30 s |
+| Resposta 401, 403, 404 e 500 | sessão expirada, item já apagado, erro no servidor |
+| Sem permissão | usuário sem o papel de editor abre a edição |
+| Duplo envio | dois cliques seguidos no botão de salvar |
+| Operação concorrente | duas pessoas editam o mesmo item |
+
+- Escreva um cenário para cada borda que a feature tem.
+- Uma borda que a feature não tem não vira cenário. Ex.: uma regra sem rede não tem a borda de timeout.
+- O cenário de borda segue o laço como os outros: um por volta.
+
+O `craft:unit-tests` usa esta mesma lista para achar as classes de equivalência.
 
 ## Por que um cenário por volta
 

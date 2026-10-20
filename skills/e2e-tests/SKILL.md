@@ -41,8 +41,13 @@ O container dá o mesmo navegador, as mesmas fontes e o mesmo sistema no dev e n
 
 - **Jornada crítica**: entrar, cadastrar, criar, editar e apagar o item principal, comprar, buscar e achar.
 - **Resultado do objetivo**: o item aparece na lista, continua lá depois de recarregar a página, outra tela mostra o mesmo dado.
-- **Fluxo que só existe de ponta a ponta**: várias páginas em sequência, login, redirecionamento, permissão (um usuário sem acesso não vê a tela).
+- **Fluxo que só existe de ponta a ponta**: várias páginas em sequência, login, redirecionamento, permissão.
 - **Um caminho de erro por jornada, no máximo**, e só quando o erro muda o que o usuário consegue fazer. Ex.: com a senha errada, o usuário não entra.
+- **Estados da tela**: carregando, vazio, erro e sem permissão, quando a tela tem esses estados. Cada estado passa pela [pergunta de corte](#pergunta-de-corte), e o assert verifica o que o usuário vê no fim:
+  - **Carregando**: a tela sai do carregando e mostra o dado. O spinner em si não tem assert.
+  - **Vazio**: a lista vazia mostra a ação que leva ao objetivo. Ex.: o botão de criar o primeiro item.
+  - **Erro**: com a API em falha, a tela mostra o erro e a ação de tentar de novo. Este é o caminho de erro da jornada.
+  - **Sem permissão**: o usuário sem acesso não vê a ação nem a tela.
 
 ## O que nunca entra
 
