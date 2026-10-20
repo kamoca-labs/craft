@@ -44,6 +44,7 @@ Escolha o nível mais baixo que pega o bug. Suba de nível só quando o bug mora
    - um caso por classe de equivalência (válido, inválido, vazio)
    - um caso em cada limite que a regra tem (`10 MB` passa, `10 MB + 1 byte` falha)
    - nenhum caso para um limite que a regra não tem
+   - para achar as classes, percorra as [bordas do mundo real](../atdd/SKILL.md#bordas-do-mundo-real) do `craft:atdd`. Cada borda que a regra trata de outro jeito é uma classe. Uma borda que a regra não trata não ganha caso.
 5. **Componente como o usuário**: encontre o elemento pelo `getByTestId` (`craft:test-ids`). Verifique o que aparece e o evento que sai, não a aparência.
 6. **Não teste o que não pode quebrar**: getter, constante, a biblioteca, o tipo.
 
