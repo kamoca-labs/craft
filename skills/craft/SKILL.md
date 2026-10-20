@@ -38,7 +38,7 @@ Os testes estão verdes. Se você está no laço do ATDD e ainda há cenário, v
 | `craft:kiss` | KISS | Existe uma forma mais simples que passa nos mesmos testes? |
 | `craft:yagni` | YAGNI | Há opção, parâmetro, camada ou abstração sem uso atual? |
 | `craft:dry` | DRY | A mesma regra de negócio, texto ou estilo está escrita em dois lugares, ou há código genérico preso ao caso? |
-| `craft:i18n` | Inglês e i18n | Há código fora do inglês, ou texto que o usuário vê escrito direto no código? |
+| `craft:i18n` | Inglês e i18n | Há código fora do inglês, texto que o usuário vê escrito direto no código, data ou número formatado à mão, ou largura fixa num contêiner de texto? |
 | `craft:naming` | Nomes | Algum nome precisa do código (ou de um comentário) para ser entendido? |
 | `craft:functions` | Funções | Alguma função faz mais de uma coisa ou mistura níveis de abstração? |
 | `craft:arguments` | Argumentos | Mais de três parâmetros, ou um booleano que muda o comportamento? |

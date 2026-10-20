@@ -1,6 +1,6 @@
 ---
 name: i18n
-description: Código só em inglês e texto do usuário pela internacionalização da stack. Use quando há identificador, comentário ou log em outra língua, ou texto que o usuário vê (mensagem, label, botão, e-mail, erro de validação) escrito direto no código, em qualquer língua.
+description: Código só em inglês e texto do usuário pela internacionalização da stack. Use quando há identificador, comentário ou log em outra língua, texto que o usuário vê (mensagem, label, botão, e-mail, erro de validação) escrito direto no código em qualquer língua, data, número ou moeda formatados à mão, ou layout que quebra com a tradução longa ou com RTL.
 argument-hint: "[arquivo ou escopo]"
 user-invocable: false
 ---
@@ -22,6 +22,9 @@ user-invocable: false
 - String literal que chega ao usuário: `throw new ValidationError('File too large')`, `<button>Save</button>`, `flash('Saved!')`, `'Hello ' + name`.
 - Frase montada por concatenação, com plural feito por `if` (`count === 1 ? 'item' : 'items'`).
 - Teste que compara com a frase traduzida em vez de passar pela tradução.
+- Data, número ou moeda formatados à mão: `` `${day}/${month}/${year}` ``, `'R$ ' + price`, `value.toFixed(2)` na tela.
+- Largura fixa num contêiner de texto: `width: 96px` num botão, `w-24` num rótulo.
+- Propriedade física de direção no CSS: `margin-left`, `padding-right`, `border-right`.
 
 ## Como aplicar
 
@@ -31,6 +34,9 @@ user-invocable: false
 4. **Arquivo de tradução**: a frase na língua nativa do usuário (`pt-BR`, por padrão no projeto). Só ela fica fora do inglês.
 5. **Teste**: verifica a chave, ou a frase obtida pela mesma função de tradução, nunca o texto literal.
 6. **Fora do escopo do i18n**: log, mensagem de exceção que o usuário nunca vê e texto de desenvolvedor ficam em inglês literal no código.
+7. **Formato**: formate data, número e moeda pelo `Intl` (`Intl.DateTimeFormat`, `Intl.NumberFormat`) ou pelo i18n da stack, com o locale do usuário. Nunca formate à mão.
+8. **Folga para a tradução**: a frase traduzida pode ficar 30 a 40% mais longa. O contêiner de texto cresce com o conteúdo (flex, grid, padding). Nunca dê largura fixa a ele.
+9. **RTL**: use as propriedades lógicas do CSS (`margin-inline-start`, `padding-inline`, `border-inline-end`). Assim, o layout vira sozinho numa língua da direita para a esquerda.
 
 | Stack | Biblioteca | Onde ficam os textos |
 |---|---|---|
@@ -70,4 +76,4 @@ if (file.size > MAX_SIZE) {
 
 ## Pergunta de verificação
 
-Trocar o idioma do usuário exige editar só arquivos de tradução, nenhum arquivo de código?
+Trocar o idioma do usuário exige editar só arquivos de tradução, nenhum arquivo de código? Com o locale novo, a data, o número e a moeda mudam de formato e o layout continua inteiro?
