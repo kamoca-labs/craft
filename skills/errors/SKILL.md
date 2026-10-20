@@ -1,6 +1,6 @@
 ---
 name: errors
-description: Clean Code, erros tratados de forma explícita e nunca engolidos. Use quando há catch vazio, catch que só loga e segue, erro convertido em null/false silencioso, retorno de código de erro, mensagem genérica, ou falha que some sem chegar a quem pode agir.
+description: Clean Code, erros tratados de forma explícita e nunca engolidos. Use quando há catch vazio, catch que só loga e segue, erro convertido em null/false silencioso, retorno de código de erro, mensagem genérica, falha que some sem chegar a quem pode agir, ou erro na tela que não diz ao usuário como recuperar.
 argument-hint: "[arquivo ou escopo]"
 user-invocable: false
 ---
@@ -23,6 +23,9 @@ user-invocable: false
 - `throw new Error('erro')` ou mensagem sem o identificador envolvido.
 - Erro relançado sem a causa original (`throw new Error('falhou')` perdendo o `cause`).
 - Promise sem `await` nem `.catch`.
+- Mensagem ao usuário com código interno, stack trace ou o `error.message` cru.
+- Formulário que limpa os campos depois de um erro.
+- Erro de rede na tela sem ação de tentar de novo.
 
 ## Como aplicar
 
@@ -32,6 +35,16 @@ user-invocable: false
 4. Valide entrada na fronteira e lance cedo, antes de efeitos parciais.
 5. Mensagem: o que falhou + com que dado + (se ajudar) o que fazer.
 6. `try` envolve só a linha que pode falhar daquele jeito.
+
+## Erro que o usuário vê
+
+O passo 5 vale para quem desenvolve. O erro que chega ao usuário segue estas regras:
+
+- A mensagem diz o problema e como o usuário recupera. Ex.: "O arquivo tem 11 MB. Envie um arquivo de até 10 MB."
+- A mensagem não promete uma causa ou uma solução que o sistema não conhece.
+- O formulário com erro guarda o que o usuário digitou.
+- O erro de rede oferece uma ação de tentar de novo.
+- O texto vai pelo i18n da stack, nunca escrito no código (`craft:i18n`).
 
 ## Exemplo
 
@@ -68,4 +81,4 @@ async function loadConfig(path: string): Promise<Config> {
 
 ## Pergunta de verificação
 
-Se esta operação falhar em produção, alguém fica sabendo, com informação suficiente para agir, sem o sistema seguir com dado errado?
+Se esta operação falhar em produção, alguém fica sabendo, com informação suficiente para agir, sem o sistema seguir com dado errado? Se o erro chega ao usuário, ele sabe o que fazer a seguir?

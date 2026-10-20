@@ -45,7 +45,7 @@ Os testes estão verdes. Se você está no laço do ATDD e ainda há cenário, v
 | `craft:guard-clauses` | Guard clause | Há `if` aninhado em mais de um nível, ou `else` depois de `return`? |
 | `craft:side-effects` | Efeito colateral | Alguma função altera estado, grava ou envia algo que o nome não anuncia? |
 | `craft:comments` | Comentários | Há comentário explicando *o quê* o código faz? |
-| `craft:errors` | Erros | Algum erro é engolido, logado e ignorado, ou vira `null` silencioso? |
+| `craft:errors` | Erros | Algum erro é engolido, logado e ignorado, ou vira `null` silencioso? Algum erro na tela deixa o usuário sem como recuperar? |
 | `craft:performance` | Performance | Algum trecho roda sobre muitos dados ou num caminho quente (laço dentro de laço, query no laço, I/O repetido, chamadas em série) sem uma medição que compare formas? |
 | `craft:clean-tests` | Testes | Algum teste tem lógica, testa mais de um comportamento, tem nome vago ou está na camada errada? |
 | `craft:unit-tests` | Unidade e integração | Algum teste verifica método privado, mock de mock, getter, a biblioteca ou a aparência? |
