@@ -4,6 +4,7 @@
 
 - [Projeto novo](#projeto-novo)
 - [Feature nova com ATDD](#feature-nova-com-atdd)
+- [Tarefas e meta](#tarefas-e-meta)
 - [Correção de bug com ATDD](#correção-de-bug-com-atdd)
 - [Mudança só visual com o modo estilo](#mudança-só-visual-com-o-modo-estilo)
 - [Refactor automático depois do verde](#refactor-automático-depois-do-verde)
@@ -44,6 +45,29 @@ O Claude detecta a stack, mostra o plano (dependências, configs, limites) e **e
 3. Escreve o mínimo de código: `Passo 5 (Passing): 1 passando`. Se a especificação tem outro cenário, ele volta ao passo 2 com o próximo.
 4. Com todos os cenários verdes, o hook injeta a triagem. O Claude carrega só o que tem sinal e refatora: `Passo 6 (Refactor): craft:dry, limite unificado em MAX_ATTACHMENT_SIZE. Sem sinal nos demais`. Quando a performance tem sinal, ele mede a forma atual, compara pelo menos duas formas e põe a tabela no commit `perf`.
 5. Roda os testes dos domínios tocados: `Passo 7 (Passing again): 34 passando em tests/Feature/Protocol e tests/Unit/Attachment`.
+
+## Tarefas e meta
+
+No passo 1, o `/craft:atdd` carrega a skill `craft:acceptance-criteria`: cada `Então` diz um valor observável, e cada cenário diz o teste que o prova. Com o seu ok na especificação, ele carrega a `craft:tasks`. O Claude cria uma tarefa por cenário (`TaskCreate`), mais o refactor e o passing again. Você acompanha a lista com `Ctrl+T`.
+
+Antes das tarefas, ele pergunta se liga a meta. Com o seu ok, a primeira tarefa da lista é a `META:`:
+
+```
+TaskCreate: META: os 3 cenários da especificação passam
+  Verificação: `pnpm vitest run tests/unit/attachment` sai com código 0 depois da última edição de código.
+  Restrições: nenhum teste pulado, apagado nem editado para passar.
+  Limite: 6 bloqueios.
+```
+
+Ao concluir, a resposta final sempre traz o fechamento, atendida ou não: a tarefa `META:` vira `completed`, e a linha `META ENCERRADA:` cita o comando e o resultado.
+
+- O Claude Code não deixa o modelo rodar o `/goal`. Por isso a meta é a tarefa `META:` mais um Stop hook da skill `craft:tasks`. Você não digita nada.
+- O hook lê o transcript e segura o fim do turno até o comando de verificação rodar com o resultado esperado. Ele não roda comando. Por isso o Claude cita o comando e o resultado ao fim de cada passo.
+- O hook também exige o fechamento: com a condição atendida e sem a linha `META ENCERRADA:`, ele bloqueia uma vez e pede o fechamento.
+- O hook libera o fim do turno quando o Claude pede um ok seu, quando a meta chega ao limite de bloqueios e depois do fechamento. Se você recusa a meta, o Claude escreve `META ENCERRADA: recusada pelo usuário`. Se você manda parar, ele fecha a meta com o motivo e diz que ela não foi atendida.
+- Sem a ferramenta `TaskCreate`, a meta vira uma linha `META:` no texto da resposta, com as mesmas partes.
+- O hook não tem o painel, os check-ins nem a restauração do `/goal` nativo. Ele vale até o fim da sessão em que a skill carregou. Depois do carregamento, cada fim de turno roda um agente curto para conferir o transcript.
+- Em algumas sessões a `TaskCreate` vem como ferramenta adiada, e o Claude carrega o schema com `ToolSearch`. Se a ferramenta não existe nem assim, ele escreve a lista na resposta e pergunta se pode ligar a ferramenta. Com o seu ok, ele guarda uma cópia do `~/.claude/settings.json`, adiciona `"env": { "CLAUDE_CODE_ENABLE_TODO_TOOLS": "1" }` e abre uma sessão de teste para confirmar. A ferramenta aparece na próxima sessão. Você não edita nada à mão.
 
 ## Correção de bug com ATDD
 
