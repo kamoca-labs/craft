@@ -49,3 +49,34 @@ test('non-code file does not require the flow', () => {
 test('unreadable transcript does not block', () => {
   assert.strictEqual(edit('src/upload.ts', null).status, 0)
 })
+
+const COMPONENTS = ['src/components/Card.vue', 'src/components/Card.tsx', 'src/components/Card.jsx', 'src/components/Card.svelte', 'src/components/Card.astro']
+
+test('style mode allows editing a UI component without the ATDD flow', () => {
+  for (const file of COMPONENTS) {
+    assert.strictEqual(edit(file, SKILL_CALL('craft:style')).status, 0, file)
+  }
+})
+
+test('style mode does not allow editing the back-end, and the message points to /craft:atdd', () => {
+  for (const file of ['src/services/price.ts', 'app/Price.php']) {
+    const result = edit(file, SKILL_CALL('craft:style'))
+    assert.strictEqual(result.status, 2, file)
+    assert.match(result.stderr, /\/craft:atdd/, file)
+  }
+})
+
+test('mixed feature with both flows loaded allows the component and the service', () => {
+  const transcript = [SKILL_CALL('craft:style'), SLASH('craft:atdd')].join('\n')
+  for (const file of ['src/components/Card.vue', 'src/services/price.ts']) {
+    assert.strictEqual(edit(file, transcript).status, 0, file)
+  }
+})
+
+test('without any flow, a UI component is denied, and the message cites /craft:atdd and /craft:style', () => {
+  for (const file of COMPONENTS) {
+    const result = edit(file, '')
+    assert.strictEqual(result.status, 2, file)
+    assert.match(result.stderr, /\/craft:atdd.*\/craft:style/, file)
+  }
+})
