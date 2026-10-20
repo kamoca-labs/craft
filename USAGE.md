@@ -5,6 +5,7 @@
 - [Projeto novo](#projeto-novo)
 - [Feature nova com ATDD](#feature-nova-com-atdd)
 - [Correção de bug com ATDD](#correção-de-bug-com-atdd)
+- [Mudança só visual com o modo estilo](#mudança-só-visual-com-o-modo-estilo)
 - [Refactor automático depois do verde](#refactor-automático-depois-do-verde)
 - [Refactor sob demanda](#refactor-sob-demanda)
 - [Combinar com o plugin git](#combinar-com-o-plugin-git)
@@ -51,6 +52,34 @@ O Claude detecta a stack, mostra o plano (dependências, configs, limites) e **e
 ```
 
 O passo 1 vira o cenário que reproduz o bug. O passo 3 prova que o teste pega o bug **antes** da correção.
+
+## Mudança só visual com o modo estilo
+
+```
+/craft:style card do protocolo com mais respiro e o modal abrindo suave
+```
+
+1. O Claude carrega o `/impeccable`. Se a skill não está instalada, ele pede a instalação e espera.
+2. Ele muda a tela. Você olha e pede o ajuste seguinte. Não há especificação nem teste vermelho.
+3. Você diz que a tela está ok. Ele roda uma vez os testes filtrados do componente e do E2E tocados, corrige uma vez se algo quebrou e para.
+
+O hook `atdd-first` libera o `Card.vue`. Se o Claude tenta editar `src/services/protocol.ts`, o hook nega e aponta o `/craft:atdd`.
+
+### Feature mista: tela com back-end
+
+```
+/craft:style tela de anexos com o limite de 10 MB
+```
+
+O limite é regra. O Claude pergunta a ordem com o `AskUserQuestion`:
+
+| Opção | O que acontece |
+|---|---|
+| Back-end primeiro (recomendado) | o `/craft:atdd` cobre o contrato e a regra do limite. Depois, o modo estilo itera a tela com o dado real |
+| Tela primeiro | o modo estilo itera a tela com dado fixo. Depois, o `/craft:atdd` faz o back-end e troca o mock pelo dado real |
+| Por fatia | cada cenário passa pelo `/craft:atdd`, e o visual dele passa pelo modo estilo antes do cenário seguinte |
+
+Nas três opções, a regra entra só com teste. O hook nega o serviço sem o `/craft:atdd`.
 
 ## Refactor automático depois do verde
 
