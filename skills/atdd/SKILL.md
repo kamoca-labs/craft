@@ -112,7 +112,7 @@ Filtros por executor:
 
 - **Mudança sem comportamento** (config, doc, nome, refactor puro): pule o laço. Refatore pelo `craft:craft` com a suíte verde antes e depois.
 - **Especificação incerta**: faça um spike, um código só para aprender. Mostre ao usuário o que aprendeu. Depois, apague o código do spike e comece no passo 1. Nunca aproveite o código do spike na produção.
-- **Visual que um teste por código não verifica** (layout, animação): verifique por screenshot e escreva o teste só para o comportamento.
+- **Visual que um teste por código não verifica** (layout, animação): verifique por screenshot e escreva o teste só para o comportamento. Se a mudança é só visual, use o `craft:style`.
 - **Estado externo que não dá para controlar**: isole a fronteira (`craft:dependency-inversion`) e teste a regra com um dublê. A fronteira fica no teste de integração.
 
 ## Exemplo do passo 1
