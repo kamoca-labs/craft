@@ -88,3 +88,22 @@ Se o projeto já tem hooks, siga o layout e a lib que existem.
 - Rode os testes do hook e mostre um caso negado e um liberado.
 - Diga ao usuário que o hook vale a partir da próxima sessão.
 - Se a correção valia para todo projeto, não só este, sugira levá-la para um plugin.
+
+## Quando um hook do projeto nega
+
+Todo achado de um hook cai num destes três casos:
+
+| Caso | O que fazer |
+|---|---|
+| Problema real | Corrija o que o hook apontou. |
+| Falso positivo com evidência | Registre a exceção mais estreita possível no repo, com o motivo. Diga a exceção na resposta. |
+| Dúvida | Deixe o achado de pé. Pergunte ao usuário uma vez, numa linha. |
+
+- Evidência é um fato que você consegue citar: uma fixture de teste, um exemplo proposital na doc, uma escolha que o usuário já confirmou.
+- O motivo segue o formato `"<quem decidiu>: <evidência>"`. Ex.: `"usuário confirmou: o seed usa nomes de cidade em português"`.
+- Escreva "usuário confirmou" só quando o usuário confirmou de fato.
+- A exceção mais estreita cobre um valor, uma linha ou um caminho. Exceção ampla (arquivo inteiro, regra inteira) só com o pedido do usuário.
+- Nunca use uma exceção para forçar a passagem de uma edição negada.
+- Registre a exceção onde a regra já aceita uma (uma lista na própria regra), com um teste do caso liberado. O motivo vai no body do commit.
+
+Esta seção é uma política, não um mecanismo. Não crie código novo só para registrar exceções.
