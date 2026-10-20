@@ -9,7 +9,7 @@ const hooksJson = fs.readFileSync(path.join(HOOKS_DIR, 'hooks.json'), 'utf8')
 const wired = [...hooksJson.matchAll(/rules\/([\w-]+)\.ts/g)].map((match) => match[1])
 const SKILLS_DIR = path.join(HOOKS_DIR, '..', 'skills')
 const ALWAYS_ON = ['ste']
-const STEPS = ['acceptance-criteria']
+const STEPS = ['acceptance-criteria', 'tasks']
 const PRINCIPLES = fs.readdirSync(SKILLS_DIR).filter((skill) => !['craft', 'atdd', 'style', 'setup', 'hook', 'memory', ...ALWAYS_ON, ...STEPS].includes(skill)).sort()
 
 test('every rule has a dedicated hook in hooks.json', () => {
