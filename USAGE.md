@@ -238,4 +238,4 @@ Se o Claude tentar gravar na auto memory local (`~/.claude/projects/<projeto>/me
 
 Antes de mexer no hook, classifique o achado (`craft:hook`). Problema real: corrija. Falso positivo com evidência: a exceção mais estreita possível, com o motivo `"<quem decidiu>: <evidência>"` no commit. Dúvida: pergunte ao usuário uma vez. Exceção ampla (arquivo inteiro, regra inteira) só com o pedido do usuário.
 
-O passo a passo completo está em [transformar caso real em teste](../../USAGE.md#transformar-caso-real-em-teste).
+O passo a passo completo está em [transformar caso real em teste](https://github.com/kamoca-labs/marketplace/blob/main/USAGE.md#transformar-caso-real-em-teste).

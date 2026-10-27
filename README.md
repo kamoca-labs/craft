@@ -13,11 +13,11 @@
 ## Instalação
 
 ```bash
-claude plugin marketplace add ~/Development/claude-plugins
+claude plugin marketplace add kamoca-labs/marketplace
 claude plugin install craft@kamoca
 ```
 
-Requer Node 22.18+. Os comandos aparecem na próxima sessão. Clone e atualização estão no [README do repo](../../README.md#instalação).
+Requer Node 22.18+. Os comandos aparecem na próxima sessão. Atualização está no [README do marketplace](https://github.com/kamoca-labs/marketplace#instalação).
 
 ## Visão geral
 
