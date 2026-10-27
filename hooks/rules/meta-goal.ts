@@ -2,9 +2,9 @@ import { blocks, isCodeEdit, message, readInput, readTranscript, type Transcript
 
 const DEFAULT_LIMIT = 6
 const DECLARATION = /^META:/m
-const CLOSURE = /^META ENCERRADA:/m
-const VERIFICATION = /Verifica[çc][ãa]o:\s*`([^`]+)`/
-const LIMIT = /Limite:\s*(\d+)/
+const CLOSURE = /^META CLOSED:/m
+const VERIFICATION = /Verification:\s*`([^`]+)`/
+const LIMIT = /Limit:\s*(\d+)/
 
 const input = readInput()
 const entries = readTranscript(input.transcript_path || '')
