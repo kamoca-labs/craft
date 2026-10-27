@@ -1,138 +1,138 @@
-# Uso do plugin `craft`
+# Using the `craft` plugin
 
-## Sumário
+## Contents
 
-- [Projeto novo](#projeto-novo)
-- [Feature nova com ATDD](#feature-nova-com-atdd)
-- [Tarefas e meta](#tarefas-e-meta)
-- [Correção de bug com ATDD](#correção-de-bug-com-atdd)
-- [Mudança só visual com o modo estilo](#mudança-só-visual-com-o-modo-estilo)
-- [Refactor automático depois do verde](#refactor-automático-depois-do-verde)
-- [Refactor sob demanda](#refactor-sob-demanda)
-- [Combinar com o plugin git](#combinar-com-o-plugin-git)
-- [Código em inglês, texto do usuário traduzido](#código-em-inglês-texto-do-usuário-traduzido)
-- [Test id em todo elemento interativo](#test-id-em-todo-elemento-interativo)
-- [Escrita no padrão ASD-STE100](#escrita-no-padrão-asd-ste100)
-- [Correção vira hook](#correção-vira-hook)
-- [Memória do projeto](#memória-do-projeto)
-- [Quando o hook erra](#quando-o-hook-erra)
+- [New project](#new-project)
+- [New feature with ATDD](#new-feature-with-atdd)
+- [Tasks and goal](#tasks-and-goal)
+- [Bug fix with ATDD](#bug-fix-with-atdd)
+- [Visual-only change with style mode](#visual-only-change-with-style-mode)
+- [Automatic refactor after green](#automatic-refactor-after-green)
+- [Refactor on demand](#refactor-on-demand)
+- [Combine with the git plugin](#combine-with-the-git-plugin)
+- [English code, translated user-facing text](#english-code-translated-user-facing-text)
+- [Test id on every interactive element](#test-id-on-every-interactive-element)
+- [Writing in the ASD-STE100 standard](#writing-in-the-asd-ste100-standard)
+- [A correction becomes a hook](#a-correction-becomes-a-hook)
+- [Project memory](#project-memory)
+- [When a hook is wrong](#when-a-hook-is-wrong)
 
-## Projeto novo
+## New project
 
 ```
 /craft:setup
 ```
 
-O Claude detecta a stack, mostra o plano (dependências, configs, limites) e **espera o seu ok**. Depois instala o linter com os limites do craft, cria os scripts `test` e `lint` e escreve no CLAUDE.md só a linha que manda seguir o `/craft:atdd`, a que manda registrar decisões do projeto no repo (nunca na memória local do Claude) e os comandos de teste e lint, sem listar as demais skills nem os limites, que já chegam por conta própria. Violações em código que já existe só são contadas, não corrigidas. Dali em diante, o `/craft:craft` roda esse lint antes da triagem.
+Claude detects the stack, shows the plan (dependencies, configs, limits), and **waits for your approval**. Then it installs the linter with the craft limits and creates the `test` and `lint` scripts. In CLAUDE.md, it writes only three things: the line that says to follow `/craft:atdd`, the line that says to record project decisions in the repo (never in the local memory of Claude), and the test and lint commands. It does not list the other skills or the limits, because they arrive by themselves. Violations in existing code are only counted, not fixed. From then on, `/craft:craft` runs this lint before the triage.
 
-## Feature nova com ATDD
+## New feature with ATDD
 
 ```
-/craft:atdd recusar anexo acima de 10 MB no protocolo
+/craft:atdd reject an attachment above 10 MB on the request
 ```
 
-1. O Claude escreve os cenários e **espera o seu ok**. Ele percorre a lista de bordas do mundo real (texto longo, emoji, timeout, 403, duplo envio e outras). Ele inclui só as que a feature tem:
+1. Claude writes the scenarios and **waits for your approval**. It goes through the list of real-world edge cases (long text, emoji, timeout, 403, double submit, and others). It includes only the ones that the feature has:
 
    ```gherkin
-   Cenário: anexo acima do limite é recusado
-     Dado um protocolo aberto
-     Quando o usuário envia um anexo de 11 MB
-     Então a resposta é 422
-     E a mensagem informa o limite de 10 MB
+   Scenario: an attachment above the limit is rejected
+     Given an open request
+     When the user uploads an 11 MB attachment
+     Then the response is 422
+     And the message states the 10 MB limit
    ```
 
-2. Escreve o teste de **um** cenário e roda: `Passo 3 (Red): 1 falhando, expected 422 got 201`.
-3. Escreve o mínimo de código: `Passo 5 (Passing): 1 passando`. Se a especificação tem outro cenário, ele volta ao passo 2 com o próximo.
-4. Com todos os cenários verdes, o hook injeta a triagem. O Claude carrega só o que tem sinal e refatora: `Passo 6 (Refactor): craft:dry, limite unificado em MAX_ATTACHMENT_SIZE. Sem sinal nos demais`. Quando a performance tem sinal, ele mede a forma atual, compara pelo menos duas formas e põe a tabela no commit `perf`.
-5. Roda os testes dos domínios tocados: `Passo 7 (Passing again): 34 passando em tests/Feature/Protocol e tests/Unit/Attachment`.
+2. It writes the test of **one** scenario and runs it: `Step 3 (Red): 1 failing, expected 422 got 201`.
+3. It writes the minimum code: `Step 5 (Passing): 1 passing`. If the specification has another scenario, it goes back to step 2 with the next one.
+4. With all scenarios green, the hook injects the triage. Claude loads only what has a signal and refactors: `Step 6 (Refactor): craft:dry, limit unified in MAX_ATTACHMENT_SIZE. No signal in the others`. When performance has a signal, Claude measures the current form, compares at least two forms, and puts the table in the `perf` commit.
+5. It runs the tests of the touched domains: `Step 7 (Passing again): 34 passing in tests/Feature/Request and tests/Unit/Attachment`.
 
-## Tarefas e meta
+## Tasks and goal
 
-No passo 1, o `/craft:atdd` carrega a skill `craft:acceptance-criteria`: cada `Então` diz um valor observável, e cada cenário diz o teste que o prova. Com o seu ok na especificação, ele segue a `craft:tasks`, que o hook já injetou na sessão. O Claude cria uma tarefa por cenário (`TaskCreate`), mais o refactor e o passing again. Você acompanha a lista com `Ctrl+T`.
+In step 1, `/craft:atdd` loads the skill `craft:acceptance-criteria`: each `Then` states an observable value, and each scenario names the test that proves it. After you approve the specification, it follows `craft:tasks`, which the hook already injected in the session. Claude creates one task per scenario (`TaskCreate`), plus the refactor and the passing again. You follow the list with `Ctrl+T`.
 
-Com a ferramenta `TaskCreate` ligada, o Claude acha o critério sozinho (os cenários, o seu pedido ou os scripts do projeto) e liga a meta sem perguntar. Sem critério que um comando prove, ele cria só as tarefas. Você também pode chamar `/craft:tasks <o que fazer>`. A primeira tarefa da lista é a `META:`:
-
-```
-TaskCreate: META: os 3 cenários da especificação passam
-  Verificação: `pnpm vitest run tests/unit/attachment` sai com código 0 depois da última edição de código.
-  Restrições: nenhum teste pulado, apagado nem editado para passar.
-  Limite: 6 bloqueios.
-```
-
-Ao concluir, a resposta final sempre traz o fechamento, atendida ou não: a tarefa `META:` vira `completed`, e a linha `META ENCERRADA:` cita o comando e o resultado.
-
-- O Claude Code não deixa o modelo rodar o `/goal`. Por isso a meta é a tarefa `META:` mais o Stop hook `meta-goal`. Você não digita nada.
-- O hook `meta-goal` é um script, sem agente, então não gasta token. Ele lê o transcript e segura o fim do turno até o comando de verificação rodar com o resultado esperado. Ele não roda comando. Por isso o Claude cita o comando e o resultado ao fim de cada passo.
-- O hook também exige o fechamento: com a condição atendida e sem a linha `META ENCERRADA:`, ele bloqueia uma vez e pede o fechamento.
-- O hook libera o fim do turno quando o Claude pede um ok seu, quando a meta chega ao limite de bloqueios e depois do fechamento. Se você recusa a meta com palavras suas, o Claude escreve `META ENCERRADA: recusada pelo usuário`. Se você manda parar, ele fecha a meta com o motivo e diz que ela não foi atendida.
-- Sem a ferramenta `TaskCreate`, a meta vira uma linha `META:` no texto da resposta, com as mesmas partes.
-- O hook não tem o painel, os check-ins nem a restauração do `/goal` nativo. Ele vale em toda sessão e só age depois que a meta é declarada.
-- Em algumas sessões a `TaskCreate` vem como ferramenta adiada, e o Claude carrega o schema com `ToolSearch`. Se a ferramenta não existe nem assim, ele escreve a lista na resposta e pergunta se pode ligar a ferramenta. Com o seu ok, ele guarda uma cópia do `~/.claude/settings.json`, adiciona `"env": { "CLAUDE_CODE_ENABLE_TODO_TOOLS": "1" }` e abre uma sessão de teste para confirmar. A ferramenta aparece na próxima sessão. Você não edita nada à mão.
-
-### Várias atividades no mesmo pedido
-
-Fora do ATDD, o Claude também segue a `craft:tasks` quando o seu pedido tem mais de uma atividade ("corrige o login, atualiza o README e sobe o serviço"). Ele separa o pedido em tarefas, mostra a lista e liga a meta. A verificação da meta é um comando que prova o estado final de todas as atividades.
-
-## Correção de bug com ATDD
+When the `TaskCreate` tool is on, Claude finds the criterion by itself (the scenarios, your request, or the project scripts) and sets the goal without asking. If no command can prove the result, it creates only the tasks. You can also call `/craft:tasks <what to do>`. The first task of the list is the `META:` task:
 
 ```
-/craft:atdd setor sem dono quebra a listagem
+TaskCreate: META: the 3 scenarios of the specification pass
+  Verification: `pnpm vitest run tests/unit/attachment` exits with code 0 after the last code edit.
+  Constraints: no test skipped, deleted, or edited to pass.
+  Limit: 6 blocks.
 ```
 
-O passo 1 vira o cenário que reproduz o bug. O passo 3 prova que o teste pega o bug **antes** da correção.
+When the work ends, the final reply always carries the closing, met or not: the `META:` task becomes `completed`, and the `META CLOSED:` line cites the command and the result.
 
-## Mudança só visual com o modo estilo
+- Claude Code does not let the model run `/goal`. For this reason, the goal is the `META:` task plus the `meta-goal` Stop hook. You type nothing.
+- The `meta-goal` hook is a script, without an agent, so it uses no tokens. It reads the transcript and holds the end of the turn until the verification command runs with the expected result. It does not run commands. For this reason, Claude cites the command and the result at the end of each step.
+- The hook also requires the closing: if the condition is met and the `META CLOSED:` line is missing, it blocks once and asks for the closing.
+- The hook releases the end of the turn when Claude asks for your approval, when the goal reaches the block limit, and after the closing. If you refuse the goal in your own words, Claude writes `META CLOSED: refused by the user`. If you tell Claude to stop, it closes the goal with the reason and says the goal was not met.
+- Without the `TaskCreate` tool, the goal becomes a `META:` line in the text of the reply, with the same parts.
+- The hook has no panel, no check-ins, and no restore of the native `/goal`. It works in every session and acts only after the goal is declared.
+- In some sessions `TaskCreate` comes as a deferred tool, and Claude loads the schema with `ToolSearch`. If the tool does not exist even then, Claude writes the list in the reply and asks if it can enable the tool. With your approval, it keeps a copy of `~/.claude/settings.json`, adds `"env": { "CLAUDE_CODE_ENABLE_TODO_TOOLS": "1" }`, and opens a test session to confirm. The tool appears in the next session. You edit nothing by hand.
+
+### Several activities in the same request
+
+Outside ATDD, Claude also follows `craft:tasks` when your request has more than one activity ("fix the login, update the README, and start the service"). It splits the request into tasks, shows the list, and sets the goal. The verification of the goal is one command that proves the final state of all activities.
+
+## Bug fix with ATDD
 
 ```
-/craft:style card do protocolo com mais respiro e o modal abrindo suave
+/craft:atdd a department without an owner breaks the listing
 ```
 
-1. O Claude carrega o `/impeccable`. Se a skill não está instalada, ele pede a instalação e espera.
-2. Ele muda a tela. Você olha e pede o ajuste seguinte. Não há especificação nem teste vermelho.
-3. Você diz que a tela está ok. Ele roda uma vez os testes filtrados do componente e do E2E tocados, corrige uma vez se algo quebrou e para.
+Step 1 becomes the scenario that reproduces the bug. Step 3 proves that the test catches the bug **before** the fix.
 
-O hook `atdd-first` libera o `Card.vue`. Se o Claude tenta editar `src/services/protocol.ts`, o hook nega e aponta o `/craft:atdd`.
-
-### Feature mista: tela com back-end
+## Visual-only change with style mode
 
 ```
-/craft:style tela de anexos com o limite de 10 MB
+/craft:style request card with more breathing room and a modal that opens smoothly
 ```
 
-O limite é regra. O Claude pergunta a ordem com o `AskUserQuestion`:
+1. Claude loads `/impeccable`. If the skill is not installed, Claude asks for the installation and waits.
+2. It changes the screen. You look and ask for the next adjustment. There is no specification and no red test.
+3. You say the screen is ok. Claude runs the filtered tests of the touched component and E2E once, fixes once if something broke, and stops.
 
-| Opção | O que acontece |
+The `atdd-first` hook allows `Card.vue`. If Claude tries to edit `src/services/request.ts`, the hook denies the edit and points to `/craft:atdd`.
+
+### Mixed feature: screen with back end
+
+```
+/craft:style attachments screen with the 10 MB limit
+```
+
+The limit is a rule. Claude asks for the order with `AskUserQuestion`:
+
+| Option | What happens |
 |---|---|
-| Back-end primeiro (recomendado) | o `/craft:atdd` cobre o contrato e a regra do limite. Depois, o modo estilo itera a tela com o dado real |
-| Tela primeiro | o modo estilo itera a tela com dado fixo. Depois, o `/craft:atdd` faz o back-end e troca o mock pelo dado real |
-| Por fatia | cada cenário passa pelo `/craft:atdd`, e o visual dele passa pelo modo estilo antes do cenário seguinte |
+| Back end first (recommended) | `/craft:atdd` covers the contract and the limit rule. Then style mode iterates on the screen with real data |
+| Screen first | Style mode iterates on the screen with fixed data. Then `/craft:atdd` builds the back end and replaces the mock with real data |
+| By slice | Each scenario goes through `/craft:atdd`, and its visual part goes through style mode before the next scenario |
 
-Nas três opções, a regra entra só com teste. O hook nega o serviço sem o `/craft:atdd`.
+In all three options, the rule enters only with a test. The hook denies the service without `/craft:atdd`.
 
-## Refactor automático depois do verde
+## Automatic refactor after green
 
-Não precisa de comando. Sempre que o Claude roda testes e a saída vem sem falha, o hook `refactor-on-green` injeta a triagem do `craft` como contexto:
+No command is needed. Each time Claude runs tests and the output has no failure, the `refactor-on-green` hook injects the `craft` triage as context:
 
-| Comando rodado | Saída | Injeta? |
+| Command run | Output | Injects? |
 |---|---|---|
-| `pnpm vitest run` | `Tests  21 passed (21)` | sim |
-| `php artisan test` | `Tests:  48 passed` | sim |
-| `pnpm vitest run \| tail` | `Tests  1 failed \| 20 passed` | não (falha escondida pelo pipe) |
-| `node --test ...` | `# fail 1` | não |
-| `grep -rn describe tests/` | qualquer | não (não roda teste) |
+| `pnpm vitest run` | `Tests  21 passed (21)` | yes |
+| `php artisan test` | `Tests:  48 passed` | yes |
+| `pnpm vitest run \| tail` | `Tests  1 failed \| 20 passed` | no (the pipe hides the failure) |
+| `node --test ...` | `# fail 1` | no |
+| `grep -rn describe tests/` | any | no (it does not run tests) |
 
-## Refactor sob demanda
+## Refactor on demand
 
 ```
 /craft:craft app/Actions/UploadAttachment.php
-/craft:craft o que mudou nesta branch
+/craft:craft what changed in this branch
 ```
 
-O Claude procura primeiro o que dá para apagar (regra raiz), faz a triagem de todos os princípios, carrega só as skills com sinal, aplica uma de cada vez sem mudar comportamento e, no fim, roda os testes dos domínios tocados. Ele faz uma rodada de triagem, um lote de correções e no máximo uma rodada de confirmação. Depois, ele para. O relatório diz o que mudou por princípio e quais não tiveram sinal.
+Claude first looks for what it can delete (root rule). Then it triages all principles, loads only the skills with a signal, applies one at a time without a behavior change, and at the end runs the tests of the touched domains. It makes one triage round, one batch of fixes, and at most one confirmation round. Then it stops. The report says what changed per principle and which principles had no signal.
 
-Se a mudança altera UI (componente, CSS, template), o relatório sugere `/impeccable audit` ou `/impeccable harden` sobre os arquivos tocados. O Claude não roda o comando. Sem a skill `impeccable` na sessão, ele sugere a instalação pelo site oficial, https://impeccable.style.
+If the change alters the UI (component, CSS, template), the report suggests `/impeccable audit` or `/impeccable harden` on the touched files. Claude does not run the command. Without the `impeccable` skill in the session, it suggests the installation from the official site, https://impeccable.style.
 
-Para um princípio só, chame a skill dele:
+For one principle only, call its skill:
 
 ```
 /craft:errors app/Services/PaymentGateway.php
@@ -140,102 +140,102 @@ Para um princípio só, chame a skill dele:
 /craft:e2e-tests tests/e2e/
 ```
 
-O `/craft:e2e-tests` apaga da suíte E2E o assert que não impede o usuário de concluir o objetivo dele (estilo, `hover`, texto exato, campo a campo). Ele move a regra de negócio para o teste de unidade. Os estados carregando, vazio, erro e sem permissão entram quando a tela tem esses estados.
+`/craft:e2e-tests` deletes from the E2E suite each assert that does not stop the user from reaching the goal (style, `hover`, exact text, field by field). It moves the business rule to the unit test. The loading, empty, error, and no-permission states enter when the screen has them.
 
-## Combinar com o plugin git
+## Combine with the git plugin
 
 ```
-/craft:atdd recusar anexo acima de 10 MB
-... passos 1 a 7 ...
+/craft:atdd reject an attachment above 10 MB
+... steps 1 to 7 ...
 /git:commit
 ```
 
-O body do commit (e a descrição do PR/MR, se você abrir um) aproveita a especificação do passo 1 como "Por quê".
+The commit body (and the PR/MR description, if you open one) reuses the specification of step 1 as the "Why".
 
-## Código em inglês, texto do usuário traduzido
+## English code, translated user-facing text
 
-O hook `english-code` nega texto fora do inglês em arquivo de código:
+The `english-code` hook denies non-English text in a code file:
 
-| Edição | Resultado |
+| Edit | Result |
 |---|---|
-| `throw new Error('Arquivo maior que 10 MB')` em `src/upload.ts` | negado: a frase vai para `src/locales/pt-BR.json` e o código usa `t('attachment.tooLarge')` |
-| `function calcularPreço()` em `app/Price.php` | negado: `calculatePrice` |
-| `'tooLarge' => 'Arquivo maior que :max MB'` em `lang/pt_BR/attachment.php` | liberado (pasta de tradução) |
-| texto em português num `.md`, `.json` ou `.po` | liberado (não é código) |
-| `it('recusa anexo acima do limite')` em `tests/Feature/AttachmentTest.php` | liberado (arquivo de teste: `tests/`, `test/`, `__tests__/`, `spec/`, `*.test.*`, `*.spec.*`, `*_test.*`, `test_*.py`) |
+| `throw new Error('Fichier supérieur à 10 Mo')` in `src/upload.ts` | denied: the sentence goes to `src/locales/fr.json` and the code uses `t('attachment.tooLarge')` |
+| `function calculerPrénom()` in `app/Price.php` | denied: use an English name such as `calculatePrice` |
+| `'tooLarge' => 'Fichier supérieur à :max Mo'` in `lang/fr/attachment.php` | allowed (translation folder) |
+| text in another language in a `.md`, `.json`, or `.po` file | allowed (not code) |
+| `it('rejects an attachment above the limit')` in `tests/Feature/AttachmentTest.php` | allowed (test file: `tests/`, `test/`, `__tests__/`, `spec/`, `*.test.*`, `*.spec.*`, `*_test.*`, `test_*.py`) |
 
-Texto em inglês escrito direto no código para o usuário (`<button>Save</button>`) o hook não detecta; a triagem do `/craft:craft` pega pela skill `craft:i18n`. Projeto sem i18n recebe a proposta da biblioteca padrão da stack, com o seu ok antes de instalar. A mesma skill pega data, número e moeda formatados à mão (use o `Intl`), largura fixa num contêiner de texto e `margin-left` onde cabe `margin-inline-start`.
+The hook does not detect English text written directly in the code for the user (`<button>Save</button>`). The triage of `/craft:craft` catches it through the skill `craft:i18n`. A project without i18n gets a proposal for the default library of the stack, with your approval before the installation. The same skill catches dates, numbers, and currencies formatted by hand (use `Intl`), fixed width in a text container, and `margin-left` where `margin-inline-start` fits.
 
-## Test id em todo elemento interativo
+## Test id on every interactive element
 
-O hook `test-id` nega um elemento interativo sem `data-testid` em `.vue`, `.jsx` e `.tsx`:
+The `test-id` hook denies an interactive element without `data-testid` in `.vue`, `.jsx`, and `.tsx`:
 
-| Edição | Resultado |
+| Edit | Result |
 |---|---|
-| `<button @click="save">Salvar</button>` | negado: `<button data-testid="profile-save-button" @click="save">` |
-| `<Card onClick={open}>` | negado: o handler torna o componente interativo |
-| `` <li :data-testid="`item-${index}`"> `` | o hook libera, mas a triagem do `/craft:craft` pega o índice pela skill `craft:test-ids`: use o SKU |
-| `<button class="btn" v-bind="$attrs">` num `BaseButton.vue` | liberado (o test id chega pelo pai) |
-| `<button>Save</button>` em `src/components/Form.test.tsx` | liberado (arquivo de teste) |
+| `<button @click="save">Save</button>` | denied: `<button data-testid="profile-save-button" @click="save">` |
+| `<Card onClick={open}>` | denied: the handler makes the component interactive |
+| `` <li :data-testid="`item-${index}`"> `` | the hook allows it, but the triage of `/craft:craft` catches the index through the skill `craft:test-ids`: use the SKU |
+| `<button class="btn" v-bind="$attrs">` in a `BaseButton.vue` | allowed (the test id arrives through the parent) |
+| `<button>Save</button>` in `src/components/Form.test.tsx` | allowed (test file) |
 
-O teste acha o elemento pelo `getByTestId` primeiro. A remoção do atributo no build de produção é opcional: o `/craft:setup` pergunta.
+The test finds the element with `getByTestId` first. Removing the attribute in the production build is optional: `/craft:setup` asks about it.
 
-## Escrita no padrão ASD-STE100
+## Writing in the ASD-STE100 standard
 
-Não há comando. O hook `ste` injeta a skill `craft:ste` em toda sessão, e de novo depois do `/clear` e da compactação. Daí em diante, respostas, docs, commits e PRs/MRs seguem o ASD-STE100 (Simplified Technical English, Issue 9):
+There is no command. The `ste` hook injects the skill `craft:ste` in every session, and again after `/clear` and after compaction. From then on, replies, docs, commits, and PRs/MRs follow ASD-STE100 (Simplified Technical English, Issue 9):
 
-| Antes | Depois |
+| Before | After |
 |---|---|
-| "A verificação da config deve ser feita pelo usuário antes de rodar o deploy; caso contrário, pode haver falha." | "Verifique a config antes do deploy. Se a config está errada, o deploy falha." |
+| "The verification of the config should be done by the user before the deployment is run, otherwise a failure may occur." | "Check the config before the deploy. If the config is wrong, the deploy fails." |
 | "Hook config file path override" | "the path that overrides the hook configuration" |
 | "You might wanna take out the old file" | "Remove the old file." |
 
-Texto em inglês segue a norma completa. Texto em português segue as regras que valem para qualquer língua: frase de no máximo 20 palavras em procedimento e 25 em descrição, voz ativa, uma instrução por frase no imperativo, um termo por conceito e nada de ponto e vírgula. Código, comando e texto colado pelo usuário ficam como estão.
+Replies follow your language. English text follows the full standard. Text in another language follows the rules that fit any language: a sentence of at most 20 words in a procedure and 25 in a description, active voice, one imperative instruction per sentence, one term per concept, and no semicolons. Code, commands, and text pasted by the user stay as they are.
 
-## Correção vira hook
+## A correction becomes a hook
 
-Você corrige o Claude (ex.: "não roda `git add .env`"). Ele avalia se a correção repete, se dá para checar pela entrada da ferramenta e se o padrão erra pouco. Com os três sim, propõe o hook e **espera o seu ok**; depois escreve o teste, a regra em TypeScript em `.claude/hooks/rules/`, a mensagem em `.claude/hooks/locales/pt-BR.json` e liga no `.claude/settings.json`. Se a correção exige julgamento, ela vai para a skill do assunto ou o CLAUDE.md, não para hook. A checagem barata e certa nega na hora (`PreToolUse`). A checagem cara ou de julgamento roda uma vez no `Stop`, sobre os arquivos tocados na sessão. Para pedir direto:
+You correct Claude (for example, "do not run `git add .env`"). Claude judges if the correction repeats, if the tool input can check it, and if the pattern is rarely wrong. If the answer is yes to all three, it proposes the hook and **waits for your approval**. Then it writes the test, the rule in TypeScript in `.claude/hooks/rules/`, and the message in `.claude/hooks/locales/en.json`, and it wires the hook in `.claude/settings.json`. If the correction needs judgment, it goes to the skill of the subject or to CLAUDE.md, not to a hook. The cheap and sure check denies at once (`PreToolUse`). The expensive or judgment check runs once at `Stop`, on the files touched in the session. To ask directly:
 
 ```
-/craft:hook nunca commitar .env
+/craft:hook never commit .env
 ```
 
-## Memória do projeto
+## Project memory
 
-Não há comando obrigatório. O hook `memory` carrega a skill `craft:memory` e o catálogo em toda sessão. Quando uma conversa traz algo que vale para a próxima, o Claude grava no projeto:
+No command is required. The `memory` hook loads the skill `craft:memory` and the catalog in every session. When a conversation brings something that matters for the next one, Claude writes it in the project:
 
 ```
 .claude/memory/
-├── MEMORY.md                      só o catálogo, uma linha por memória
-├── feedback_testes-no-container.md
-└── project_congelamento-deploy.md
+├── MEMORY.md                      only the catalog, one line per memory
+├── feedback_tests-in-container.md
+└── project_deploy-freeze.md
 ```
 
 ```markdown
-- [Testes no container](feedback_testes-no-container.md): rode os testes com docker compose exec, nunca no host
+- [Tests in the container](feedback_tests-in-container.md): run tests with docker compose exec, never on the host
 ```
 
-Para pedir direto:
+To ask directly:
 
 ```
-/craft:memory os testes de integração precisam do Redis local
-/craft:memory esquece a regra do congelamento de deploy
+/craft:memory integration tests need the local Redis
+/craft:memory forget the deploy freeze rule
 ```
 
-Se o Claude tentar gravar na auto memory local (`~/.claude/projects/<projeto>/memory/`), o hook `memory-outside-project` nega e manda gravar em `.claude/memory/`.
+If Claude tries to write to the local auto memory (`~/.claude/projects/<project>/memory/`), the `memory-outside-project` hook denies it and says to write to `.claude/memory/`.
 
-## Quando o hook erra
+## When a hook is wrong
 
-| Erro | Exemplo | O que fazer |
+| Error | Example | What to do |
 |---|---|---|
-| Injetou com a suíte vermelha | executor novo com formato de falha não reconhecido | pegue a linha em `~/.claude/hook-cases.jsonl`, cole no `hooks/tests/cases.json` com `"inject": []` e adicione o padrão em `FAILURE` |
-| `atdd-first` negou edição que não muda comportamento | ajuste de config numa extensão de código | carregue `/craft:atdd` mesmo assim; se o arquivo não é código, adicione a exceção em `CODE_FILE` com um teste em `atdd-first.test.ts` |
-| `english-code` negou texto que não é de usuário nem código | dado de domínio (nome de cidade num seed) | mova o dado para JSON/CSV; se é uma pasta de tradução com outro nome, adicione em `TRANSLATION_FOLDER` com um teste em `english-code.test.ts` |
-| `test-id` negou um elemento que não é interativo | um `<a>` de âncora decorativa, ou um `>` solto num atributo sem aspas | adicione o `data-testid` mesmo assim; se a leitura da tag errou, corrija `OPENING_TAG` com um teste em `test-id.test.ts` |
-| `filtered-tests` negou uma execução já filtrada | um filtro que o hook não conhece | adicione o filtro em `FILTER_FLAG` ou `TEST_PATH` com um teste em `filtered-tests.test.ts` |
-| `push-gate` negou o push num projeto com CI | um CI com config fora da lista | adicione o caminho em `CI_CONFIGS` com um teste em `push-gate.test.ts` |
-| Não injetou com a suíte verde | executor de teste não reconhecido | escreva o caso no `cases.json` com `"inject": ["refactor-on-green"]` e adicione o executor em `TEST_RUNNER` |
+| It injected with a red suite | a new runner with a failure format that the hook does not know | Take the line from `~/.claude/hook-cases.jsonl`, paste it in `hooks/tests/cases.json` with `"inject": []`, and add the pattern to `FAILURE` |
+| `atdd-first` denied an edit that does not change behavior | a config adjustment in a code extension | Load `/craft:atdd` anyway. If the file is not code, add the exception to `CODE_FILE` with a test in `atdd-first.test.ts` |
+| `english-code` denied text that is neither user-facing text nor code | domain data (a city name in a seed) | Move the data to JSON or CSV. If a translation folder has another name, add it to `TRANSLATION_FOLDER` with a test in `english-code.test.ts` |
+| `test-id` denied an element that is not interactive | a decorative anchor `<a>`, or a loose `>` in an attribute without quotes | Add the `data-testid` anyway. If the tag reading is wrong, fix `OPENING_TAG` with a test in `test-id.test.ts` |
+| `filtered-tests` denied a run that is already filtered | a filter that the hook does not know | Add the filter to `FILTER_FLAG` or `TEST_PATH` with a test in `filtered-tests.test.ts` |
+| `push-gate` denied the push in a project with CI | a CI with a config outside the list | Add the path to `CI_CONFIGS` with a test in `push-gate.test.ts` |
+| It did not inject with a green suite | a test runner that the hook does not know | Write the case in `cases.json` with `"inject": ["refactor-on-green"]` and add the runner to `TEST_RUNNER` |
 
-Antes de mexer no hook, classifique o achado (`craft:hook`). Problema real: corrija. Falso positivo com evidência: a exceção mais estreita possível, com o motivo `"<quem decidiu>: <evidência>"` no commit. Dúvida: pergunte ao usuário uma vez. Exceção ampla (arquivo inteiro, regra inteira) só com o pedido do usuário.
+Before you change the hook, classify the finding (`craft:hook`). Real problem: fix it. False positive with evidence: make the narrowest possible exception, with the reason `"<who decided>: <evidence>"` in the commit. Doubt: ask the user once. A wide exception (a whole file, a whole rule) needs a request from the user.
 
-O passo a passo completo está em [transformar caso real em teste](https://github.com/kamoca-labs/marketplace/blob/main/USAGE.md#transformar-caso-real-em-teste).
+The full procedure is in [turn a real case into a test](https://github.com/kamoca-labs/marketplace/blob/main/USAGE.md#turn-a-real-case-into-a-test).
