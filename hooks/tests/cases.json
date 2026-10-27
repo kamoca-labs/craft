@@ -1,6 +1,6 @@
 [
   {
-    "description": "vitest verde depois do green do ATDD pede o refactor",
+    "description": "green vitest after the ATDD green asks for refactor",
     "origin": "usage",
     "tool_name": "Bash",
     "tool_input": { "command": "docker compose exec -T app pnpm vitest run" },
@@ -8,7 +8,7 @@
     "inject": ["refactor-on-green"]
   },
   {
-    "description": "pest verde no backend pede o refactor",
+    "description": "green pest on the back end asks for refactor",
     "origin": "usage",
     "tool_name": "Bash",
     "tool_input": { "command": "docker compose exec -T backend php artisan test --compact" },
@@ -16,7 +16,7 @@
     "inject": ["refactor-on-green"]
   },
   {
-    "description": "red do ATDD com pipe escondendo o exit code não pede refactor",
+    "description": "ATDD red with a pipe that hides the exit code does not ask for refactor",
     "origin": "usage",
     "tool_name": "Bash",
     "tool_input": { "command": "pnpm vitest run 2>&1 | tail -20" },
@@ -24,7 +24,7 @@
     "inject": []
   },
   {
-    "description": "node --test com falha não pede refactor",
+    "description": "node --test with a failure does not ask for refactor",
     "origin": "usage",
     "tool_name": "Bash",
     "tool_input": { "command": "node --test 'plugins/**/hooks/tests/*.test.ts' | grep -E '^# (pass|fail)'" },
@@ -32,7 +32,7 @@
     "inject": []
   },
   {
-    "description": "node --test verde pede refactor",
+    "description": "green node --test asks for refactor",
     "origin": "usage",
     "tool_name": "Bash",
     "tool_input": { "command": "node --test 'plugins/**/hooks/tests/*.test.ts' | grep -E '^# (pass|fail)'" },
@@ -40,12 +40,12 @@
     "inject": ["refactor-on-green"]
   },
   {
-    "description": "comando comum que cita teste não pede refactor",
+    "description": "a common command that mentions a test does not ask for refactor",
     "origin": "usage",
     "tool_name": "Bash",
     "tool_input": { "command": "grep -rn 'describe(' tests/" },
     "tool_response": { "stdout": "tests/a.test.ts:1:describe('a')", "stderr": "" },
     "inject": []
   },
-  {"description": "node --test com o reporter padrão e falha não pede refactor", "origin": "real", "tool_name": "Bash", "tool_input": {"command": "node --test tests/e2e-container.test.ts 2>&1 | grep -E \"^(✔|✖)|^ℹ (pass|fail)\""}, "tool_response": {"stdout": "✔ denies an E2E runner on the host (220.99ms)\n✖ allows an E2E runner inside a container (44.11ms)\nℹ pass 1\nℹ fail 1", "stderr": ""}, "inject": []}
+  {"description": "node --test with the default reporter and a failure does not ask for refactor", "origin": "real", "tool_name": "Bash", "tool_input": {"command": "node --test tests/e2e-container.test.ts 2>&1 | grep -E \"^(✔|✖)|^ℹ (pass|fail)\""}, "tool_response": {"stdout": "✔ denies an E2E runner on the host (220.99ms)\n✖ allows an E2E runner inside a container (44.11ms)\nℹ pass 1\nℹ fail 1", "stderr": ""}, "inject": []}
 ]

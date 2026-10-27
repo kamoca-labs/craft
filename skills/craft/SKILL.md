@@ -1,93 +1,93 @@
 ---
 name: craft
-description: Ponto de entrada do refactor (passo 6 do ATDD). Reforça a regra raiz (menos código é melhor do que mais código), faz a triagem do código alterado contra SOLID, KISS, YAGNI, DRY e Clean Code e carrega só as skills dos princípios que têm sinal de violação. Use logo depois de deixar os testes verdes, ou quando pedirem para refatorar ou revisar a qualidade de um código.
-argument-hint: "[arquivo ou escopo]"
+description: Entry point of the refactor (step 6 of ATDD). Reinforces the root rule (less code is better than more code), screens the changed code against SOLID, KISS, YAGNI, DRY and Clean Code, and loads only the skills of the principles with a sign of violation. Use right after the tests turn green, or when asked to refactor or review code quality.
+argument-hint: "[file or scope]"
 ---
 
-# Craft: refactor guiado por princípios
+# Craft: refactor guided by principles
 
-Os testes estão verdes. Se você está no laço do ATDD e ainda há cenário, volte ao passo 2 com o próximo: a triagem fica para o fim. Se todos os cenários estão verdes, faça agora o passo 6: refatore o código que tocou e rode de novo os testes dos domínios tocados (passo 7). Se já terminou o refactor, este é o passo 7: confirme que tudo passa e reporte.
+The tests are green. If you are in the ATDD loop and a scenario remains, go back to step 2 with the next one. The screening waits for the end. If all scenarios are green, do step 6 now: refactor the code you touched and run the tests of the touched domains again (step 7). If the refactor is done, this is step 7: confirm that everything passes and report.
 
-## Regra raiz: menos código
+## Root rule: less code
 
-**Menos código é melhor do que mais código.** Esta regra não é um princípio novo. Ela é o que KISS, YAGNI e DRY têm em comum, e vale para todo código que você escreve, não só no refactor:
+**Less code is better than more code.** This rule is not a new principle. It is what KISS, YAGNI and DRY have in common. It applies to all code you write, not only in the refactor:
 
-- Reutilize o que já existe antes de escrever (`craft:kiss`).
-- Escreva só o que um teste ou um uso atual exige (`craft:yagni`).
-- O código genérico nasce reutilizável, fora do caso específico (`craft:dry`).
+- Reuse what already exists before you write (`craft:kiss`).
+- Write only what a test or a current use requires (`craft:yagni`).
+- Generic code starts reusable, outside the specific case (`craft:dry`).
 
-## Como conduzir
+## How to proceed
 
-1. **Escopo**: o argumento, se houver; senão, o que mudou (`git diff` da branch contra a main).
-2. **Lint**: se o projeto tem script de lint (o `craft:setup` cria um), rode nos arquivos do escopo. Violação de tamanho ou complexidade já é sinal: `max-lines-per-function` e `complexity` → `craft:functions`, `max-params` → `craft:arguments`, `max-depth` → `craft:guard-clauses`, `max-lines` → `craft:single-responsibility`. Nunca desligue nem afrouxe a regra para passar.
-3. **Regra raiz**: antes da triagem, procure no escopo o código que dá para apagar. Apagar vale mais que adicionar.
-4. **Triagem**: leia o código do escopo e faça a pergunta de cada linha da tabela abaixo.
-5. **Aprofunde só onde há sinal**: para cada princípio com sinal, carregue a skill dele com a ferramenta `Skill` (`craft:<skill>`) e siga o que ela diz. Não carregue a skill de um princípio sem sinal.
-6. **Um refactor por vez**: mude, rode os testes do módulo refatorado, siga. Nunca edite um teste para fazê-lo passar. A verificação tem rodadas limitadas:
-   - uma rodada de triagem, com todas as linhas da tabela
-   - um lote de correções com todos os achados da triagem, um refactor por vez
-   - no máximo uma rodada de confirmação, só sobre o que mudou
+1. **Scope**: the argument, if there is one. Otherwise, what changed (`git diff` of the branch against main).
+2. **Lint**: if the project has a lint script (`craft:setup` creates one), run it on the files in scope. A size or complexity violation is already a sign: `max-lines-per-function` and `complexity` → `craft:functions`, `max-params` → `craft:arguments`, `max-depth` → `craft:guard-clauses`, `max-lines` → `craft:single-responsibility`. Never turn off or loosen the rule to make it pass.
+3. **Root rule**: before the screening, look in the scope for code you can delete. Deleting is worth more than adding.
+4. **Screening**: read the code in scope and ask the question of each row in the table below.
+5. **Go deeper only where there is a sign**: for each principle with a sign, load its skill with the `Skill` tool (`craft:<skill>`) and follow it. Do not load the skill of a principle without a sign.
+6. **One refactor at a time**: change, run the tests of the refactored module, continue. Never edit a test to make it pass. The verification has limited rounds:
+   - one screening round, with all rows of the table
+   - one batch of fixes with all findings of the screening, one refactor at a time
+   - at most one confirmation round, only over what changed
 
-   Depois, pare e reporte. O achado que sobra vai para o relatório, não para uma rodada nova.
-7. **Reporte**: uma linha para a regra raiz e uma por princípio com sinal (`craft:dry: regra do limite de anexo unificada em MAX_ATTACHMENT_SIZE`). Diga quais não tiveram sinal.
+   Then stop and report. A leftover finding goes to the report, not to a new round.
+7. **Report**: one line for the root rule and one per principle with a sign (`craft:dry: attachment limit rule unified in MAX_ATTACHMENT_SIZE`). Say which ones had no sign.
 
-## Triagem
+## Screening
 
-| Skill | Princípio | Pergunta de triagem |
+| Skill | Principle | Screening question |
 |---|---|---|
-| `craft:single-responsibility` | S do SOLID | Este módulo muda por mais de um motivo, ou por mais de um tipo de pessoa? |
-| `craft:open-closed` | O do SOLID | Um caso novo exigiu editar um `if`/`switch` que já existia? |
-| `craft:liskov-substitution` | L do SOLID | Alguma implementação lança "não suportado", ignora parâmetro ou exige `instanceof` de quem chama? |
-| `craft:interface-segregation` | I do SOLID | Alguém recebe um tipo, objeto ou props e usa só uma fração dele? |
-| `craft:dependency-inversion` | D do SOLID | A regra de negócio importa direto banco, HTTP, LLM, relógio ou storage? |
-| `craft:kiss` | KISS | Existe uma forma mais simples que passa nos mesmos testes? |
-| `craft:yagni` | YAGNI | Há opção, parâmetro, camada ou abstração sem uso atual? |
-| `craft:dry` | DRY | A mesma regra de negócio, texto ou estilo está escrita em dois lugares, ou há código genérico preso ao caso? |
-| `craft:i18n` | Inglês e i18n | Há código fora do inglês, texto que o usuário vê escrito direto no código, data ou número formatado à mão, ou largura fixa num contêiner de texto? |
-| `craft:naming` | Nomes | Algum nome precisa do código (ou de um comentário) para ser entendido? |
-| `craft:functions` | Funções | Alguma função faz mais de uma coisa ou mistura níveis de abstração? |
-| `craft:arguments` | Argumentos | Mais de três parâmetros, ou um booleano que muda o comportamento? |
-| `craft:guard-clauses` | Guard clause | Há `if` aninhado em mais de um nível, ou `else` depois de `return`? |
-| `craft:side-effects` | Efeito colateral | Alguma função altera estado, grava ou envia algo que o nome não anuncia? |
-| `craft:comments` | Comentários | Há comentário explicando *o quê* o código faz? |
-| `craft:errors` | Erros | Algum erro é engolido, logado e ignorado, ou vira `null` silencioso? Algum erro na tela deixa o usuário sem como recuperar? |
-| `craft:performance` | Performance | Algum trecho roda sobre muitos dados ou num caminho quente (laço dentro de laço, query no laço, I/O repetido, chamadas em série) sem uma medição que compare formas? |
-| `craft:clean-tests` | Testes | Algum teste tem lógica, testa mais de um comportamento, tem nome vago ou está na camada errada? |
-| `craft:unit-tests` | Unidade e integração | Algum teste verifica método privado, mock de mock, getter, a biblioteca ou a aparência? |
-| `craft:test-ids` | Test id | Algum elemento interativo está sem `data-testid`, tem um id genérico ou de posição, ou algum componente não repassa os atributos do pai? |
-| `craft:e2e-tests` | E2E | Algum teste E2E verifica algo que não impede o usuário de concluir o objetivo dele (estilo, `hover`, texto exato, campo a campo)? |
-| `impeccable` (skill externa) | Interface | A mudança altera UI (componente, CSS, template)? |
+| `craft:single-responsibility` | S of SOLID | Does this module change for more than one reason, or for more than one kind of person? |
+| `craft:open-closed` | O of SOLID | Did a new case require an edit to an existing `if`/`switch`? |
+| `craft:liskov-substitution` | L of SOLID | Does an implementation throw "not supported", ignore a parameter, or require `instanceof` from the caller? |
+| `craft:interface-segregation` | I of SOLID | Does anyone receive a type, object or props and use only a fraction of it? |
+| `craft:dependency-inversion` | D of SOLID | Does the business rule import a database, HTTP, LLM, clock or storage directly? |
+| `craft:kiss` | KISS | Is there a simpler way that passes the same tests? |
+| `craft:yagni` | YAGNI | Is there an option, parameter, layer or abstraction without a current use? |
+| `craft:dry` | DRY | Is the same business rule, text or style written in two places, or is generic code tied to one case? |
+| `craft:i18n` | English and i18n | Is there code outside English, user-visible text written directly in code, a date or number formatted by hand, or a fixed width on a text container? |
+| `craft:naming` | Names | Does any name need the code (or a comment) to be understood? |
+| `craft:functions` | Functions | Does any function do more than one thing or mix abstraction levels? |
+| `craft:arguments` | Arguments | More than three parameters, or a boolean that changes the behavior? |
+| `craft:guard-clauses` | Guard clause | Is there an `if` nested more than one level, or an `else` after `return`? |
+| `craft:side-effects` | Side effect | Does any function change state, write or send something that its name does not announce? |
+| `craft:comments` | Comments | Is there a comment that explains *what* the code does? |
+| `craft:errors` | Errors | Is any error swallowed, logged and ignored, or turned into a silent `null`? Does any error on screen leave the user without a way to recover? |
+| `craft:performance` | Performance | Does any block run over much data or on a hot path (loop in loop, query in loop, repeated I/O, serial calls) without a measurement that compares forms? |
+| `craft:clean-tests` | Tests | Does any test have logic, test more than one behavior, have a vague name or sit in the wrong layer? |
+| `craft:unit-tests` | Unit and integration | Does any test verify a private method, a mock of a mock, a getter, the library or the appearance? |
+| `craft:test-ids` | Test id | Is any interactive element without `data-testid`, with a generic or position-based id, or does a component not pass the parent attributes through? |
+| `craft:e2e-tests` | E2E | Does any E2E test verify something that does not stop the user from reaching the goal (style, `hover`, exact text, field by field)? |
+| `impeccable` (external skill) | Interface | Does the change alter the UI (component, CSS, template)? |
 
-A linha do `impeccable` não carrega skill. Se a resposta é sim, sugira ao usuário `/impeccable audit` ou `/impeccable harden` sobre os arquivos tocados. Nunca rode o comando você mesmo.
+The `impeccable` row does not load a skill. If the answer is yes, suggest `/impeccable audit` or `/impeccable harden` over the touched files to the user. Never run the command yourself.
 
-Se a skill `impeccable` não está na lista de skills da sessão, sugira a instalação pelo site oficial, https://impeccable.style (repo `pbakaus/impeccable`). O site manda rodar `/plugin marketplace add pbakaus/impeccable` e instalar o **Impeccable** em `/plugin`, na aba **Discover**.
+If the `impeccable` skill is not in the session skill list, suggest the installation from the official site, https://impeccable.style (repo `pbakaus/impeccable`). The site says to run `/plugin marketplace add pbakaus/impeccable` and to install **Impeccable** in `/plugin`, on the **Discover** tab.
 
-## Quando os princípios brigam
+## When principles conflict
 
-Princípios são ferramentas, não metas. Quando um puxa contra o outro, vale esta ordem:
+Principles are tools, not goals. When one pulls against another, use this order:
 
-1. **Comportamento correto** (testes verdes, erros tratados).
-2. **Legibilidade** (nomes, funções, guard clauses): o próximo leitor entende sem ajuda.
-3. **Regra raiz, KISS e YAGNI**: menos código, menos conceito.
-4. **Performance medida**: um ganho medido acima do ruído pode custar legibilidade, com a comparação no commit. Sem medição, a legibilidade vence.
-5. **DRY**: só quando a duplicação é do mesmo conhecimento.
-6. **Extensibilidade (O, D, I do SOLID)**: só quando a variação já existe, não quando é imaginada.
+1. **Correct behavior** (green tests, handled errors).
+2. **Readability** (names, functions, guard clauses): the next reader understands without help.
+3. **Root rule, KISS and YAGNI**: less code, less concept.
+4. **Measured performance**: a measured gain above the noise can cost readability, with the comparison in the commit. Without a measurement, readability wins.
+5. **DRY**: only when the duplication is of the same knowledge.
+6. **Extensibility (O, D, I of SOLID)**: only when the variation already exists, not when it is imagined.
 
-Conflitos comuns:
+Common conflicts:
 
-- **DRY × KISS**: duplicação é mais barata que a abstração errada. Espere a terceira repetição antes de extrair.
-- **Open/Closed ou inversão de dependência × YAGNI**: crie a abstração quando houver a segunda implementação real ou uma fronteira de I/O que precisa de dublê no teste. Antes disso, é especulação.
-- **Performance × legibilidade**: a forma mais rápida vence só com a medição no volume real e com a comparação entre formas (`craft:performance`).
-- **Responsabilidade única × KISS**: separar responsabilidades não é picar o código em dez classes de uma linha. Se as partes sempre mudam juntas, são uma responsabilidade só.
+- **DRY × KISS**: duplication is cheaper than the wrong abstraction. Wait for the third repetition before you extract.
+- **Open/Closed or dependency inversion × YAGNI**: create the abstraction when there is a second real implementation or an I/O boundary that needs a test double. Before that, it is speculation.
+- **Performance × readability**: the faster form wins only with a measurement at the real volume and a comparison between forms (`craft:performance`).
+- **Single responsibility × KISS**: separating responsibilities does not mean chopping the code into ten one-line classes. If the parts always change together, they are one responsibility.
 
-## Checklist antes de sair do passo 6
+## Checklist before you leave step 6
 
-- [ ] Lint do escopo sem violação (quando o projeto tem lint).
-- [ ] Regra raiz aplicada: nada no escopo que dá para apagar.
-- [ ] Triagem feita em todas as linhas da tabela.
-- [ ] Skill carregada e aplicada para cada princípio com sinal.
-- [ ] No máximo uma rodada de confirmação depois do lote de correções.
-- [ ] Toda otimização tem medição antes e depois e venceu outra forma.
-- [ ] Commit do refactor separado do commit de comportamento.
-- [ ] Comportamento igual (nenhum teste foi editado para passar).
-- [ ] Testes dos domínios tocados rodados de novo, com filtro, e verdes. A suíte completa roda no CI, ou local só com o consentimento do usuário (veja a execução filtrada em `craft:atdd`).
+- [ ] Lint of the scope has no violation (when the project has lint).
+- [ ] Root rule applied: nothing in scope can be deleted.
+- [ ] Screening done on all rows of the table.
+- [ ] Skill loaded and applied for each principle with a sign.
+- [ ] At most one confirmation round after the batch of fixes.
+- [ ] Every optimization has a measurement before and after and beat another form.
+- [ ] Refactor commit separate from the behavior commit.
+- [ ] Same behavior (no test was edited to pass).
+- [ ] Tests of the touched domains run again, with a filter, and green. The full suite runs in CI, or locally only with the consent of the user (see the filtered run in `craft:atdd`).

@@ -1,50 +1,50 @@
 ---
 name: dependency-inversion
-description: D do SOLID, inversão de dependência. Use quando regra de negócio importa direto banco, HTTP, LLM, storage, fila, relógio ou aleatoriedade, quando o teste precisa de mock de módulo para isolar, ou quando trocar um fornecedor exigiria mexer na regra.
-argument-hint: "[arquivo ou escopo]"
+description: D of SOLID, dependency inversion. Use when business logic imports a database, HTTP, LLM, storage, queue, clock or randomness directly, when a test needs a module mock to isolate, or when a vendor change would force a change to the logic.
+argument-hint: "[file or scope]"
 user-invocable: false
 ---
 
-# D: inversão de dependência
+# D: dependency inversion
 
-**Regra**: a regra de negócio depende de **abstrações que ela mesma define**; os detalhes (banco, API, LLM, storage, relógio) implementam essas abstrações e são **injetados** de fora. A seta de dependência aponta para dentro, para o domínio.
+**Rule**: business logic depends on **abstractions that it defines itself**. The details (database, API, LLM, storage, clock) implement these abstractions and are **injected** from outside. The dependency arrow points inward, to the domain.
 
-## Por quê
+## Why
 
-- A regra é testada com dublês simples, sem `vi.mock` de módulo, sem rede, sem banco.
-- Trocar fornecedor (S3 por disco, OpenAI por Claude) não toca na regra.
-- Tempo e aleatoriedade injetados tornam o teste determinístico.
+- You test the logic with simple doubles. You need no module `vi.mock`, no network and no database.
+- A vendor change (S3 to disk, OpenAI to Claude) does not touch the logic.
+- Injected time and randomness make the test deterministic.
 
-## Sinais de violação
+## Signs of a violation
 
-- `import { db } from '@/db'`, `fetch(...)`, `new OpenAI()`, `Date.now()`, `Math.random()` dentro da regra de negócio.
-- Teste da regra depende de `vi.mock('../db')` ou de container rodando.
-- O tipo de retorno do fornecedor (resposta crua do SDK) vaza para dentro do domínio.
+- `import { db } from '@/db'`, `fetch(...)`, `new OpenAI()`, `Date.now()` or `Math.random()` inside business logic.
+- The test of the logic depends on `vi.mock('../db')` or on a running container.
+- The vendor return type (the raw SDK response) leaks into the domain.
 
-## Como aplicar
+## How to apply
 
-1. Identifique a fronteira: o que é I/O ou não determinístico.
-2. Defina, do lado da regra, o contrato mínimo que ela precisa (`interface Clock { now(): Date }`), com tipos do domínio.
-3. Receba o contrato por parâmetro ou construtor.
-4. Implemente o adaptador real fora da regra; monte tudo no ponto de entrada (rota, comando, container de DI do framework).
-5. No teste, passe um dublê literal.
+1. Find the boundary: what is I/O or non-deterministic.
+2. Define, on the logic side, the minimum contract that it needs (`interface Clock { now(): Date }`). Use domain types.
+3. Receive the contract as a parameter or in the constructor.
+4. Implement the real adapter outside the logic. Assemble everything at the entry point (route, command, framework DI container).
+5. In the test, pass a literal double.
 
-## Exemplo
+## Example
 
 ```ts
-// antes: impossível testar o vencimento sem controlar o relógio global
+// before: you cannot test the due date without control of the global clock
 function isOverdue(invoice: Invoice) {
   return invoice.dueDate < new Date()
 }
 
-// depois: o tempo entra de fora
+// after: time comes from outside
 function isOverdue(invoice: Invoice, today: Date) {
   return invoice.dueDate < today
 }
 ```
 
 ```ts
-// regra define o contrato com tipos do domínio
+// the logic defines the contract with domain types
 interface Summarizer {
   summarize(text: string): Promise<string>
 }
@@ -53,18 +53,18 @@ async function summarizeTicket(ticket: Ticket, summarizer: Summarizer) {
   return summarizer.summarize(ticket.description)
 }
 
-// teste
-await summarizeTicket(ticket, { summarize: async () => 'resumo' })
+// test
+await summarizeTicket(ticket, { summarize: async () => 'summary' })
 ```
 
-No Laravel, prefira injeção pelo construtor e bind no service container a `Facade` dentro do domínio.
+In Laravel, prefer constructor injection and a bind in the service container. Do not use a `Facade` inside the domain.
 
-## Limites
+## Limits
 
-- **YAGNI vence**: não crie interface para código que não é I/O nem varia. Um helper puro pode ser importado direto.
-- Uma implementação real + o dublê do teste já justificam o contrato numa fronteira de I/O. Fora de fronteira, espere a segunda implementação.
-- Não injete o que o framework já resolve bem no ponto de entrada (controller pode usar o ORM direto se não há regra ali).
+- **YAGNI wins**: do not create an interface for code that is not I/O and does not vary. You can import a pure helper directly.
+- One real implementation plus the test double already justify the contract at an I/O boundary. Away from a boundary, wait for the second implementation.
+- Do not inject what the framework already resolves well at the entry point. A controller can use the ORM directly if it has no logic.
 
-## Pergunta de verificação
+## Verification question
 
-Consigo testar esta regra passando objetos literais, sem mock de módulo nem serviço externo?
+Can I test this logic with literal objects, without a module mock or an external service?

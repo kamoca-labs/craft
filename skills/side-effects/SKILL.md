@@ -1,66 +1,66 @@
 ---
 name: side-effects
-description: Clean Code, nenhum efeito colateral escondido. Use quando uma função grava, envia, altera estado global, muta o argumento recebido ou faz I/O que o nome não anuncia, como um get que cria, um validate que salva ou um format que loga.
-argument-hint: "[arquivo ou escopo]"
+description: Clean Code, no hidden side effects. Use when a function writes, sends, changes global state, mutates the received argument or does I/O that the name does not announce, such as a get that creates, a validate that saves or a format that logs.
+argument-hint: "[file or scope]"
 user-invocable: false
 ---
 
-# Nenhum efeito colateral escondido
+# No hidden side effects
 
-**Regra**: o nome da função **anuncia tudo** o que ela muda no mundo. Função que soa como consulta (`get`, `is`, `has`, `calculate`, `format`, `validate`) não altera nada. Função que altera diz o que altera (`save`, `send`, `create`, `markAsPaid`). Separe consulta de comando.
+**Rule**: the function name **announces everything** that the function changes in the world. A function that sounds like a query (`get`, `is`, `has`, `calculate`, `format`, `validate`) changes nothing. A function that changes something says what it changes (`save`, `send`, `create`, `markAsPaid`). Separate query from command.
 
-## Por quê
+## Why
 
-- O chamador confia no nome. `isValid(order)` que reserva estoque vira bug de estoque fantasma.
-- Consulta pura pode ser chamada de novo, reordenada, cacheada e testada sem setup.
-- Efeito escondido cria acoplamento temporal: "tem que chamar `check` antes de `save`, senão quebra".
+- The caller trusts the name. An `isValid(order)` that reserves stock causes a phantom stock bug.
+- You can call a pure query again, reorder it, cache it and test it without setup.
+- A hidden effect creates temporal coupling: "you must call `check` before `save`, or it breaks".
 
-## Sinais de violação
+## Signs of a violation
 
-- `getX` que cria `X` quando não encontra.
-- `validate`/`check`/`is` que grava, envia ou altera o objeto.
-- Função que muta o argumento recebido (`items.sort()` no array do chamador, `Object.assign(input, ...)`).
-- Escrita em variável de módulo ou global.
-- Consulta que dispara log de auditoria, evento ou e-mail.
+- A `getX` that creates `X` when it finds nothing.
+- A `validate`, `check` or `is` that writes, sends or changes the object.
+- A function that mutates the received argument (`items.sort()` on the caller array, `Object.assign(input, ...)`).
+- A write to a module variable or a global.
+- A query that triggers an audit log, an event or an email.
 
-## Como aplicar
+## How to apply
 
-1. Para cada função, liste o que ela altera fora do próprio escopo.
-2. Se o nome não anuncia, ou **renomeie** para anunciar, ou **separe** em consulta pura + comando.
-3. Retorne valor novo em vez de mutar o recebido (`toSorted`, spread, `structuredClone`).
-4. Empurre os efeitos para a borda: o núcleo calcula, a camada de fora grava e envia.
+1. For each function, list what it changes outside its own scope.
+2. If the name does not announce it, **rename** the function to announce it, or **split** it into a pure query and a command.
+3. Return a new value instead of mutating the received one (`toSorted`, spread, `structuredClone`).
+4. Push the effects to the edge: the core calculates, the outer layer writes and sends.
 
-## Exemplo
+## Example
 
 ```ts
-// antes: o "get" cria, e quem chama não sabe
+// before: the "get" creates, and the caller does not know
 async function getCart(userId: number) {
   return (await carts.findByUser(userId)) ?? (await carts.create({ userId }))
 }
 
-// depois: o nome diz
+// after: the name tells the truth
 async function findOrCreateCart(userId: number) {
   return (await carts.findByUser(userId)) ?? (await carts.create({ userId }))
 }
 ```
 
 ```ts
-// antes: muta o array do chamador
+// before: mutates the caller array
 function topScores(scores: number[]) {
   return scores.sort((a, b) => b - a).slice(0, 3)
 }
 
-// depois
+// after
 function topScores(scores: number[]) {
   return scores.toSorted((a, b) => b - a).slice(0, 3)
 }
 ```
 
-## Limites
+## Limits
 
-- Log de diagnóstico e métrica não contam como efeito de negócio; não precisam estar no nome.
-- Cache interno transparente (memoização) é aceitável se o resultado observável é o mesmo.
+- A diagnostic log and a metric do not count as a business effect. They do not need to be in the name.
+- A transparent internal cache (memoization) is acceptable if the observable result is the same.
 
-## Pergunta de verificação
+## Verification question
 
-Se eu chamar esta função duas vezes seguidas, ou não chamar, algo no sistema fica diferente sem que o nome dela avise?
+If I call this function twice in a row, or do not call it, does anything in the system change without a warning in its name?

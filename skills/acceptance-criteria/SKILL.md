@@ -1,22 +1,22 @@
 ---
 name: acceptance-criteria
-description: Critério de aceite verificável para os cenários do passo 1 do craft:atdd. Use ao escrever os cenários Given/When/Then, antes de pedir o ok do usuário na especificação.
-argument-hint: "[especificação]"
+description: Verifiable acceptance criteria for the scenarios of step 1 of craft:atdd. Use when you write the Given/When/Then scenarios, before you ask the user to approve the specification.
+argument-hint: "[specification]"
 user-invocable: false
 ---
 
-# Critério de aceite verificável
+# Verifiable acceptance criteria
 
-Um critério que ninguém verifica não fecha o ciclo. Antes de pedir o ok do usuário, confira cada cenário:
+A criterion that nobody verifies does not close the cycle. Before you ask the user for approval, check each scenario:
 
-- O `Então` diz um valor que dá para observar: um código (`422`), um texto, uma contagem, um estado. Nunca um adjetivo (`rápido`, `correto`, `amigável`).
-- O cenário diz qual teste o prova: a camada (`craft:clean-tests`) e o comando filtrado que o roda.
-- O `Dado` fixa os dados de entrada. O cenário não depende de ordem nem de relógio.
-- Se não dá para dizer como um teste prova o cenário, o critério está vago. Reescreva o cenário ou pergunte ao usuário.
+- The `Then` states a value that you can observe: a code (`422`), a text, a count, a state. Never an adjective (`fast`, `correct`, `friendly`).
+- The scenario states which test proves it: the layer (`craft:clean-tests`) and the filtered command that runs it.
+- The `Given` fixes the input data. The scenario does not depend on order or on the clock.
+- If you cannot say how a test proves the scenario, the criterion is vague. Rewrite the scenario or ask the user.
 
-Com o ok do usuário, carregue a skill `craft:tasks`.
+After the user approves, load the `craft:tasks` skill.
 
-## Verificação
+## Verification
 
-- Cada cenário tem um `Então` observável e o teste que o prova.
-- Nenhum cenário usa adjetivo no lugar de valor.
+- Each scenario has an observable `Then` and the test that proves it.
+- No scenario uses an adjective in place of a value.

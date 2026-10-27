@@ -36,7 +36,7 @@ test('every session source injects the memory skill and the project catalog', ()
 test('a project without memory gets the skill and the empty catalog notice', () => {
   const context = sessionContext(sandbox())
   assert.match(context, /\.claude\/memory\//)
-  assert.match(context, /ainda não tem memória/)
+  assert.match(context, /has no memory yet/)
 })
 
 test('a large catalog is cut at a whole line and stays under the Claude Code limit', () => {
@@ -48,7 +48,7 @@ test('a large catalog is cut at a whole line and stays under the Claude Code lim
   assert.ok(context.length < CONTEXT_LIMIT, `${context.length}`)
   assert.ok(catalogLines.length > 0 && catalogLines.length < 400, `${catalogLines.length}`)
   assert.deepStrictEqual(catalogLines.filter((line) => !CATALOG_LINE.test(line)), [])
-  assert.match(context, /cortado/)
+  assert.match(context, /The catalog is cut here/)
 })
 
 test('session start is not logged as a use case', () => {

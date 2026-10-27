@@ -1,0 +1,18 @@
+{
+  "deny.atdd-first": "load /craft:atdd before you edit code. If the change is only visual in a UI component (.vue, .tsx, .jsx, .svelte, .astro), load /craft:style. The /craft:style skill does not cover rules, state, or back end: that part stays in /craft:atdd. If the change does not alter behavior, load /craft:atdd anyway: it says when the flow does not apply.",
+  "deny.english-code": "code must be in English only: identifiers, comments, and logs. Test files are excluded: test names and test data can use the language of the project. Put user-facing text in the translation file (lang/, locales/, i18n/) and use the key through the i18n of the stack. Load craft:i18n for the pattern of each language.",
+  "deny.test-id": "every interactive element of a component needs data-testid: button, a, input, select, textarea, form, and every element with a click, submit, change, or input handler. Use a business name in kebab-case (profile-save-button). In a repeated item, use the business id (item-card-${item.sku}), never the position. A wrapper that forwards the attributes of the parent (v-bind=\"$attrs\" in Vue, {...rest} in React) passes. See craft:test-ids.",
+  "deny.test-skip": "do not skip, focus, or disable a test (.skip, .only, .todo, xit, fit, markTestSkipped, t.Skip, #[ignore], @Disabled). A red test shows what the code lacks: fix the code. If the specification changed, change the test together with it. See craft:atdd.",
+  "deny.e2e-container": "an E2E test runs only in a container, never on the host. Run it with the e2e service of the compose file: docker compose run --rm e2e <command>. If the project has no e2e service yet, create it with the official image of the runner at the version of the package (mcr.microsoft.com/playwright:v<version>-noble, cypress/included:<version>). See craft:e2e-tests.",
+  "deny.filtered-tests": "run only the tests that the change can break, with a filter: the test file or folder, related, --filter, -k, -t, -run. The full suite runs in CI. Without CI, it runs locally only before a push or a PR/MR, with the consent of the user through AskUserQuestion (Run the full suite locally / Continue without the full suite). For the filtered run, see craft:atdd.",
+  "deny.push-gate": "the project has no CI, so no place runs the full suite after the push. Before a push or a PR/MR, ask the user with AskUserQuestion if you must run the full suite locally. Use the exact options Run the full suite locally and Continue without the full suite. If the user chooses to run it, run the suite and push only when it is green. See craft:atdd.",
+  "consent.full-suite-local": "Run the full suite locally",
+  "consent.skip-full-suite": "Continue without the full suite",
+  "capture.injected": "{rule} injected context",
+  "deny.memory-outside-project": "memory belongs to the project, in .claude/memory/, inside the repo. Write the file there and add the line to .claude/memory/MEMORY.md. Local memory (~/.claude/projects/) is valid only on this machine and the team cannot see it. See craft:memory.",
+  "context.memory-catalog": "## Current catalog (.claude/memory/MEMORY.md)",
+  "context.memory-empty": "The project has no memory yet. Create .claude/memory/MEMORY.md with the first memory.",
+  "context.memory-truncated": "(The catalog is cut here. Read the rest in .claude/memory/MEMORY.md.)",
+  "block.meta-verify": "[craft:meta-goal] The goal is not closed. Run `{command}` after the last code edit, with a success result. Cite the command and the result in the reply. Then close the goal.",
+  "block.meta-close": "[craft:meta-goal] Goal met. Mark the META task as completed. End the reply with META CLOSED: met, the verification command, and the result."
+}

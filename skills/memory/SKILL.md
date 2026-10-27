@@ -1,58 +1,58 @@
 ---
 name: memory
-description: Memória de longo prazo do projeto em `.claude/memory/`, dentro do repo, no padrão da auto memory do Claude Code. O hook memory injeta esta skill e o catálogo em toda sessão, e o hook memory-outside-project nega memória fora do projeto. Use quando aprender algo que vale para uma conversa futura, ou quando pedirem para lembrar ou esquecer algo.
-argument-hint: "[o que lembrar ou esquecer]"
+description: Long-term project memory in `.claude/memory/`, inside the repo, in the format of Claude Code auto memory. The memory hook injects this skill and the catalog in every session. The memory-outside-project hook denies memory outside the project. Use it when you learn something that matters for a future conversation, or when asked to remember or forget something.
+argument-hint: "[what to remember or forget]"
 ---
 
-# Memória do projeto
+# Project memory
 
-**Regra**: toda memória é do projeto. Ela fica em `.claude/memory/`, dentro do repo, e vai para o git com o resto. Nunca grave memória em `~/.claude/projects/<projeto>/memory/`: ela só vale nesta máquina e o time não vê. O hook `memory-outside-project` nega essa gravação.
+**Rule**: all memory belongs to the project. It lives in `.claude/memory/`, inside the repo, and goes to git with the rest. Never write memory to `~/.claude/projects/<project>/memory/`. It is valid only on this machine and the team cannot see it. The `memory-outside-project` hook denies this write.
 
-## Consultar
+## Read
 
-- O catálogo `MEMORY.md` está no fim deste contexto.
-- Antes de agir, confira se uma linha do catálogo toca o assunto. Se toca, leia o arquivo da memória.
-- A memória diz o que era verdade quando foi escrita. Se ela cita arquivo, função ou flag, confira se ainda existe.
+- The `MEMORY.md` catalog is at the end of this context.
+- Before you act, check if a catalog line touches the subject. If it does, read the memory file.
+- A memory states what was true when it was written. If it names a file, function, or flag, check that it still exists.
 
-## Salvar
+## Save
 
-Ao fim de cada interação, pergunte: isto vale para uma conversa futura? Se vale, salve sem esperar pedido.
+At the end of each interaction, ask: does this matter for a future conversation? If it does, save it without waiting for a request.
 
-| `type` | O que guarda |
+| `type` | What it stores |
 |---|---|
-| `feedback` | correção do usuário, ou abordagem que ele confirmou |
-| `project` | trabalho em andamento, prazo, decisão ou restrição que o código e o git não mostram |
-| `reference` | onde achar informação fora do repo (issue, dashboard, doc) |
+| `feedback` | a user correction, or an approach the user confirmed |
+| `project` | work in progress, deadline, decision, or constraint that the code and git do not show |
+| `reference` | where to find information outside the repo (issue, dashboard, doc) |
 
-Não salve:
+Do not save:
 
-- o que o código, o git, o CLAUDE.md ou o `docs/` já dizem;
-- o que só vale para a conversa atual;
-- segredo, credencial ou dado pessoal: o repo é do time;
-- preferência pessoal de uma pessoa: ela vai no `~/.claude/CLAUDE.md` dela.
+- what the code, git, CLAUDE.md, or `docs/` already say
+- what is valid only for the current conversation
+- secrets, credentials, or personal data: the repo belongs to the team
+- the personal preference of one person: it goes in that person's `~/.claude/CLAUDE.md`
 
-Passos:
+Steps:
 
-1. Procure no catálogo uma memória que já cobre o fato. Se existe, atualize o arquivo dela.
-2. Escreva um arquivo por fato em `.claude/memory/<type>_<assunto>.md`:
+1. Search the catalog for a memory that already covers the fact. If one exists, update its file.
+2. Write one file per fact in `.claude/memory/<type>_<subject>.md`:
 
    ```markdown
    ---
-   name: <assunto-em-kebab-case>
-   description: <uma linha, usada para decidir se a memória é relevante>
+   name: <subject-in-kebab-case>
+   description: <one line, used to decide if the memory is relevant>
    type: feedback | project | reference
    ---
 
-   <o fato>
+   <the fact>
 
-   **Por quê:** <o motivo, em feedback e project>
-   **Como aplicar:** <quando e como usar, em feedback e project>
+   **Why:** <the reason, in feedback and project>
+   **How to apply:** <when and how to use it, in feedback and project>
    ```
 
-3. Adicione uma linha no catálogo: `- [Título](<arquivo>.md): <gancho de uma linha>`.
-4. Troque data relativa por data absoluta ("quinta" vira "2026-10-15").
-5. Se uma memória ficou errada, apague o arquivo e a linha dela.
+3. Add one line to the catalog: `- [Title](<file>.md): <one-line hook>`.
+4. Replace a relative date with an absolute date ("Thursday" becomes "2026-10-15").
+5. If a memory became wrong, delete its file and its line.
 
-## Catálogo
+## Catalog
 
-O `MEMORY.md` é só o catálogo: uma linha por memória, sem frontmatter, sem instrução e sem o conteúdo da memória. Mantenha cada linha curta. O hook injeta só o começo do catálogo, então junte ou apague linhas velhas quando ele cresce.
+`MEMORY.md` is only the catalog: one line per memory, with no frontmatter, no instruction, and no memory content. Keep each line short. The hook injects only the start of the catalog, so merge or delete old lines when it grows.

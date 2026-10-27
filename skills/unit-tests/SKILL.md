@@ -1,57 +1,57 @@
 ---
 name: unit-tests
-description: Teste de unidade, de componente e de integração cobre a regra de negócio e os casos de borda pela interface pública. Use ao escrever ou revisar teste que verifica método privado, mocka tudo, testa getter, constante, framework ou biblioteca, verifica classe CSS ou snapshot grande, ou repete o mesmo caso com valores parecidos.
-argument-hint: "[arquivo ou escopo]"
+description: Unit, component and integration tests cover the business rule and its edge cases through the public interface. Use when you write or review a test that checks a private method, mocks everything, tests a getter, constant, framework or library, checks a CSS class or a large snapshot, or repeats the same case with similar values.
+argument-hint: "[file or scope]"
 user-invocable: false
 ---
 
-# Unidade, componente e integração cobrem a regra
+# Unit, component and integration cover the rule
 
-**Regra**: estes testes cobrem a **regra de negócio** e os **casos de borda** dela, pela **interface pública**. Use o nível mais baixo que pega o bug. Teste o que a regra decide, não como o código está escrito.
+**Rule**: these tests cover the **business rule** and its **edge cases**, through the **public interface**. Use the lowest level that catches the bug. Test what the rule decides, not how the code is written.
 
-## Por quê
+## Why
 
-- São os testes rápidos da suíte. Por isso, os casos de borda ficam aqui, não no E2E (`craft:e2e-tests`).
-- Um teste preso à implementação quebra em todo refactor. Então o refactor para de acontecer.
-- Um teste de algo que não pode quebrar (getter, constante, a biblioteca) custa manutenção e não pega bug.
+- These are the fast tests of the suite. For this reason, the edge cases stay here, not in E2E (`craft:e2e-tests`).
+- A test tied to the implementation breaks on every refactor. Then the refactor stops happening.
+- A test of something that cannot break (getter, constant, the library) costs maintenance and catches no bug.
 
-## Qual nível
+## Which level
 
-| Nível | O que cobre | Fronteira |
+| Level | What it covers | Boundary |
 |---|---|---|
-| Unidade | função ou classe com regra: cálculo, validação, decisão, conversão | sem I/O. Relógio e aleatoriedade entram injetados |
-| Componente (front) | o que o componente mostra e o que ele faz quando o usuário interage | renderiza e interage como o usuário (Testing Library), sem rede |
-| Integração | o módulo com a fronteira real dele: rota HTTP do próprio app, banco de teste, fila | mock só de serviço de terceiro |
+| Unit | function or class with a rule: calculation, validation, decision, conversion | no I/O. Clock and randomness are injected |
+| Component (front end) | what the component shows and what it does when the user interacts | renders and interacts like the user (Testing Library), no network |
+| Integration | the module with its real boundary: HTTP route of the app itself, test database, queue | mock only third-party services |
 
-Escolha o nível mais baixo que pega o bug. Suba de nível só quando o bug mora na ligação entre as partes.
+Choose the lowest level that catches the bug. Move up a level only when the bug lives in the link between the parts.
 
-## Sinais de violação
+## Signs of violation
 
-- Teste de método privado, ou `as any` e reflexão para chegar nele.
-- Mock de tudo: o teste verifica que um mock chamou outro mock.
-- `expect(repo.save).toHaveBeenCalledWith(...)` quando o estado salvo ou o retorno bastaria.
-- Teste de getter, setter, constante, tipo que o compilador já checa, ou do framework e da biblioteca.
-- No componente: assert em classe CSS, estilo, `hover`, ou snapshot do markup inteiro.
-- Dez casos com valores parecidos que passam pelo mesmo caminho da regra.
-- Teste de unidade que sobe banco ou faz request real.
+- Test of a private method, or `as any` and reflection to reach it.
+- Mock of everything: the test verifies that one mock called another mock.
+- `expect(repo.save).toHaveBeenCalledWith(...)` when the saved state or the return value is enough.
+- Test of a getter, setter, constant, a type that the compiler already checks, or of the framework and the library.
+- In the component: assert on a CSS class, style, `hover`, or a snapshot of the whole markup.
+- Ten cases with similar values that go through the same path of the rule.
+- Unit test that starts a database or makes a real request.
 
-## Como aplicar
+## How to apply
 
-1. **Interface pública**: chame o que o código de produção chama. Se um método privado precisa de teste próprio, ele quer ser uma unidade separada (`craft:single-responsibility`).
-2. **Assert no resultado**: retorno, estado persistido, resposta HTTP, o que aparece na tela do componente.
-3. **Mock só na fronteira que você não controla**: rede externa, relógio, aleatoriedade (`craft:dependency-inversion`). Na integração, use o banco de teste real.
-4. **Casos de borda pela regra, não pela lista de valores**:
-   - um caso por classe de equivalência (válido, inválido, vazio)
-   - um caso em cada limite que a regra tem (`10 MB` passa, `10 MB + 1 byte` falha)
-   - nenhum caso para um limite que a regra não tem
-   - para achar as classes, percorra as [bordas do mundo real](../atdd/SKILL.md#bordas-do-mundo-real) do `craft:atdd`. Cada borda que a regra trata de outro jeito é uma classe. Uma borda que a regra não trata não ganha caso.
-5. **Componente como o usuário**: encontre o elemento pelo `getByTestId` (`craft:test-ids`). Verifique o que aparece e o evento que sai, não a aparência.
-6. **Não teste o que não pode quebrar**: getter, constante, a biblioteca, o tipo.
+1. **Public interface**: call what the production code calls. If a private method needs its own test, it wants to be a separate unit (`craft:single-responsibility`).
+2. **Assert on the result**: return value, persisted state, HTTP response, what appears on the screen of the component.
+3. **Mock only at the boundary you do not control**: external network, clock, randomness (`craft:dependency-inversion`). In integration, use the real test database.
+4. **Edge cases by the rule, not by a list of values**:
+   - one case for each equivalence class (valid, invalid, empty)
+   - one case at each limit that the rule has (`10 MB` passes, `10 MB + 1 byte` fails)
+   - no case for a limit that the rule does not have
+   - to find the classes, go through the [real-world edges](../atdd/SKILL.md#real-world-edges) of `craft:atdd`. Each edge that the rule treats differently is a class. An edge that the rule does not treat gets no case.
+5. **Component like the user**: find the element with `getByTestId` (`craft:test-ids`). Verify what appears and the event that leaves, not the appearance.
+6. **Do not test what cannot break**: getter, constant, the library, the type.
 
-## Exemplo
+## Example
 
 ```ts
-// antes: teste preso à implementação
+// before: test tied to the implementation
 test('upload', async () => {
   const repo = { save: vi.fn() }
   const service = new UploadService(repo)
@@ -59,26 +59,26 @@ test('upload', async () => {
   expect(repo.save).not.toHaveBeenCalled()
 })
 
-// depois: regra pela interface pública, um caso em cada limite
-test('anexo de 10 MB é aceito', async () => {
+// after: rule through the public interface, one case at each limit
+test('attachment of 10 MB is accepted', async () => {
   const result = await uploadAttachment(makeFile({ size: 10 * MB }))
 
   expect(result.ok).toBe(true)
 })
 
-test('anexo acima de 10 MB é recusado', async () => {
+test('attachment above 10 MB is rejected', async () => {
   const result = await uploadAttachment(makeFile({ size: 10 * MB + 1 }))
 
   expect(result.error).toBe('attachment.tooLarge')
 })
 ```
 
-## Limites
+## Limits
 
-- Teste de contrato entre implementações (`craft:liskov-substitution`) pode chamar cada implementação concreta.
-- Um mock de colaborador interno vale quando o colaborador é lento ou não determinístico e não há fronteira para injetar. Registre o motivo no nome do dublê (`slowPdfRendererStub`).
-- Um snapshot pequeno e estável (um JSON de saída, uma mensagem de erro) é aceitável. Snapshot de markup inteiro não é.
+- A contract test across implementations (`craft:liskov-substitution`) can call each concrete implementation.
+- A mock of an internal collaborator is acceptable when the collaborator is slow or not deterministic and there is no boundary to inject. Record the reason in the name of the double (`slowPdfRendererStub`).
+- A small and stable snapshot (an output JSON, an error message) is acceptable. A snapshot of the whole markup is not.
 
-## Pergunta de verificação
+## Verification question
 
-Se eu reescrever o código por dentro sem mudar a regra, algum destes testes quebra? Se quebra, ele testa a implementação.
+If I rewrite the code inside without changing the rule, does any of these tests break? If one breaks, it tests the implementation.

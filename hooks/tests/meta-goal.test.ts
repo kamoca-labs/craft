@@ -3,8 +3,8 @@ import { test } from 'node:test'
 import { assistantText, bashRun, codeEdit, runRule, taskCreate, userText } from './transcript.ts'
 
 const COMMAND = 'pnpm vitest run tests/unit/attachment'
-const META = taskCreate('META: os 3 cenários passam', `Verificação: \`${COMMAND}\` sai com código 0.\nLimite: 2 bloqueios.`)
-const FEEDBACK = userText('Stop hook feedback: [craft:meta-goal] A meta não fechou.')
+const META = taskCreate('META: the 3 scenarios pass', `Verification: \`${COMMAND}\` exits with code 0.\nLimit: 2 blocks.`)
+const FEEDBACK = userText('Stop hook feedback: [craft:meta-goal] The goal is not closed.')
 
 function stop(transcript: string[], lastMessage = 'Feito.') {
   const result = runRule('meta-goal', {}, transcript, [], { last_assistant_message: lastMessage })
@@ -19,33 +19,33 @@ test('allows the stop when no goal was declared', () => {
 test('blocks when the verification command did not run after the last code edit', () => {
   const answer = stop([META, bashRun(COMMAND), codeEdit('src/upload.ts')])
   assert.strictEqual(answer.decision, 'block')
-  assert.match(answer.reason, /Rode `pnpm vitest run tests\/unit\/attachment`/)
+  assert.match(answer.reason, /Run `pnpm vitest run tests\/unit\/attachment`/)
 })
 
 test('blocks when the verification command failed', () => {
-  assert.match(stop([META, codeEdit('src/upload.ts'), bashRun(COMMAND, true)]).reason, /Rode/)
+  assert.match(stop([META, codeEdit('src/upload.ts'), bashRun(COMMAND, true)]).reason, /Run/)
 })
 
 test('asks for the closure when the verification passed after the last edit', () => {
-  assert.match(stop([META, codeEdit('src/upload.ts'), bashRun(COMMAND)]).reason, /Meta atendida/)
+  assert.match(stop([META, codeEdit('src/upload.ts'), bashRun(COMMAND)]).reason, /Goal met/)
 })
 
 test('a goal declared as assistant text works like the task', () => {
-  const text = assistantText(`META: tudo passa\nVerificação: \`${COMMAND}\` sai com 0.`)
-  assert.match(stop([text, bashRun(COMMAND)]).reason, /Meta atendida/)
+  const text = assistantText(`META: everything passes\nVerification: \`${COMMAND}\` exits with 0.`)
+  assert.match(stop([text, bashRun(COMMAND)]).reason, /Goal met/)
 })
 
 test('allows the stop after the closure', () => {
-  assert.strictEqual(stop([META, bashRun(COMMAND), assistantText('META ENCERRADA: atendida.')]), null)
+  assert.strictEqual(stop([META, bashRun(COMMAND), assistantText('META CLOSED: met.')]), null)
 })
 
 test('a new goal after a closed one blocks again', () => {
-  const closed = [META, assistantText('META ENCERRADA: atendida.'), taskCreate('META: outra coisa', 'Verificação: `pnpm build` sai com 0.')]
-  assert.match(stop(closed).reason, /Rode `pnpm build`/)
+  const closed = [META, assistantText('META CLOSED: met.'), taskCreate('META: something else', 'Verification: `pnpm build` exits with 0.')]
+  assert.match(stop(closed).reason, /Run `pnpm build`/)
 })
 
 test('allows the stop when the answer asks the user something', () => {
-  assert.strictEqual(stop([META], 'Qual caminho você prefere?'), null)
+  assert.strictEqual(stop([META], 'Which path do you prefer?'), null)
 })
 
 test('allows the stop when the block limit was reached', () => {

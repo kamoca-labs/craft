@@ -1,60 +1,60 @@
 ---
 name: interface-segregation
-description: I do SOLID, segregação de interface. Use quando uma função, classe ou componente recebe um tipo, objeto ou props grande e usa só uma fração dele, ou quando uma interface obriga implementações a cumprir métodos que não fazem sentido para elas.
-argument-hint: "[arquivo ou escopo]"
+description: I of SOLID, interface segregation. Use when a function, class or component receives a large type, object or props and uses only a fraction of it, or when an interface forces implementations to provide methods that make no sense for them.
+argument-hint: "[file or scope]"
 user-invocable: false
 ---
 
-# I: segregação de interface
+# I: interface segregation
 
-**Regra**: ninguém depende do que não usa. Interfaces, tipos de parâmetro e props são **pequenos e focados** no que o consumidor precisa, não no que o produtor tem.
+**Rule**: nobody depends on what it does not use. Interfaces, parameter types and props are **small and focused** on what the consumer needs, not on what the producer has.
 
-## Por quê
+## Why
 
-- Mudança em um campo que você não usa não te obriga a recompilar, re-testar ou ajustar mocks.
-- Teste fica barato: o dublê tem dois campos, não trinta.
-- A assinatura documenta exatamente do que a função depende.
-- Implementações não precisam fingir métodos (veja `craft:liskov-substitution`).
+- A change to a field that you do not use does not force you to recompile, re-test or adjust mocks.
+- The test is cheap: the double has two fields, not thirty.
+- The signature documents exactly what the function depends on.
+- Implementations do not need to fake methods (see `craft:liskov-substitution`).
 
-## Sinais de violação
+## Signs of a violation
 
-- Função recebe `user: User` inteiro e lê só `user.email`.
-- Componente recebe o objeto da API inteiro como prop.
-- Mock de teste montado com `as unknown as Service` ou cheio de campos irrelevantes.
-- Interface com métodos que algumas implementações deixam vazios ou lançam erro.
+- A function receives a whole `user: User` and reads only `user.email`.
+- A component receives the whole API object as a prop.
+- A test mock uses `as unknown as Service` or has many irrelevant fields.
+- An interface has methods that some implementations leave empty or make throw an error.
 
-## Como aplicar
+## How to apply
 
-1. Para cada consumidor, liste o que ele realmente lê ou chama.
-2. Declare o tipo do parâmetro com só isso (`Pick<User, 'email'>`, um tipo próprio, ou o valor primitivo).
-3. Interface grande com consumidores diferentes vira interfaces pequenas por papel; quem precisa de várias combina (`Reader & Writer`).
+1. For each consumer, list what it really reads or calls.
+2. Declare the parameter type with only that (`Pick<User, 'email'>`, a dedicated type, or the primitive value).
+3. A large interface with different consumers becomes small interfaces by role. A consumer that needs several combines them (`Reader & Writer`).
 
-## Exemplo
+## Example
 
 ```ts
-// antes: o teste precisa montar um User completo
+// before: the test must build a full User
 function sendWelcome(user: User) {
-  return mailer.send(user.email, `Olá, ${user.name}`)
+  return mailer.send(user.email, `Hello, ${user.name}`)
 }
 
-// depois: depende só do que lê
+// after: it depends only on what it reads
 function sendWelcome(recipient: Pick<User, 'email' | 'name'>) {
-  return mailer.send(recipient.email, `Olá, ${recipient.name}`)
+  return mailer.send(recipient.email, `Hello, ${recipient.name}`)
 }
 ```
 
-Em componente:
+In a component:
 
 ```vue
-<!-- antes: <UserBadge :user="user" /> usando só nome e foto -->
+<!-- before: <UserBadge :user="user" /> that uses only the name and the photo -->
 <UserBadge :name="user.name" :avatar-url="user.avatarUrl" />
 ```
 
-## Limites
+## Limits
 
-- Não crie uma interface por método. Se todos os consumidores usam os mesmos três métodos, é uma interface só.
-- Passar o objeto inteiro é aceitável quando a função **é** sobre aquela entidade como um todo (serializar, validar o `User`).
+- Do not create one interface per method. If all consumers use the same three methods, use one interface.
+- Passing the whole object is acceptable when the function **is** about that entity as a whole (serialize, validate the `User`).
 
-## Pergunta de verificação
+## Verification question
 
-O dublê de teste deste consumidor tem algum campo que o código nunca lê?
+Does the test double of this consumer have a field that the code never reads?

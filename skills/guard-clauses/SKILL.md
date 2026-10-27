@@ -1,38 +1,38 @@
 ---
 name: guard-clauses
-description: Clean Code, guard clause em vez de condicional aninhada. Use quando há if dentro de if, else depois de return/throw, o caminho principal da função fica indentado no fim, ou validações envolvem o código útil.
-argument-hint: "[arquivo ou escopo]"
+description: Clean Code, guard clause instead of nested conditional. Use when there is an if inside an if, an else after return/throw, the main path of the function is indented at the end, or validations wrap the useful code.
+argument-hint: "[file or scope]"
 user-invocable: false
 ---
 
-# Guard clause em vez de condicional aninhada
+# Guard clause instead of nested conditional
 
-**Regra**: trate os casos de exceção e de saída antecipada **no topo**, com `return` ou `throw` imediato. O caminho feliz fica no fim, sem indentação, lido em linha reta.
+**Rule**: handle the exception cases and the early exits **at the top**, with an immediate `return` or `throw`. The happy path stays at the end, without indentation, and reads in a straight line.
 
-## Por quê
+## Why
 
-- Cada nível de `if` é um contexto que o leitor tem que empilhar na cabeça.
-- Com guard clauses, cada pré-condição é uma linha isolada: fácil de ler, testar e remover.
-- `else` depois de `return` é ruído: o `return` já encerrou.
+- Each `if` level is a context that the reader must stack in their head.
+- With guard clauses, each precondition is an isolated line: easy to read, test and remove.
+- An `else` after a `return` is noise. The `return` already ended the flow.
 
-## Sinais de violação
+## Violation signs
 
-- Indentação de três níveis ou mais.
-- `if (valid) { ...20 linhas... } else { throw }`, com o erro lá embaixo, longe da condição.
-- `else` após `return`, `throw`, `continue` ou `break`.
-- Variável `result` acumulada só para ter um `return` único no fim.
+- Indentation of three levels or more.
+- `if (valid) { ...20 lines... } else { throw }`, with the error far below the condition.
+- An `else` after `return`, `throw`, `continue` or `break`.
+- A `result` variable accumulated only to have a single `return` at the end.
 
-## Como aplicar
+## How to apply
 
-1. Inverta a condição de cada `if` que envolve o resto da função e saia cedo.
-2. Remova `else` depois de saída.
-3. Em laços, use `continue` para pular o item inválido em vez de envolver o corpo.
-4. Junte guard clauses que formam uma regra só numa função com nome (`if (!canClose(invoice)) ...`).
+1. Invert the condition of each `if` that wraps the rest of the function, and exit early.
+2. Remove the `else` after an exit.
+3. In loops, use `continue` to skip the invalid item instead of wrapping the body.
+4. Merge guard clauses that form one rule into a named function (`if (!canClose(invoice)) ...`).
 
-## Exemplo
+## Example
 
 ```ts
-// antes
+// before
 function approve(request: Request, user: User) {
   if (request) {
     if (request.status === 'pending') {
@@ -49,7 +49,7 @@ function approve(request: Request, user: User) {
   throw new NotFound()
 }
 
-// depois
+// after
 function approve(request: Request | undefined, user: User) {
   if (!request) throw new NotFound()
   if (request.status !== 'pending') throw new InvalidState()
@@ -59,11 +59,11 @@ function approve(request: Request | undefined, user: User) {
 }
 ```
 
-## Limites
+## Limits
 
-- Dois ramos de mesmo peso (não é exceção x caminho feliz) podem ficar como `if/else` ou ternário simples.
-- Muitas guard clauses seguidas (mais de cinco) indicam validação que merece uma função ou um schema próprio.
+- Two branches of equal weight (not exception versus happy path) can stay as `if/else` or a simple ternary.
+- Many guard clauses in a row (more than five) show a validation that needs its own function or schema.
 
-## Pergunta de verificação
+## Check question
 
-O caminho principal da função está no nível zero de indentação, depois de todas as saídas antecipadas?
+Is the main path of the function at indentation level zero, after all the early exits?

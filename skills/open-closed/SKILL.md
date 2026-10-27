@@ -1,44 +1,44 @@
 ---
 name: open-closed
-description: O do SOLID, aberto/fechado. Use quando adicionar um caso novo (tipo, formato, canal, regra) obriga a editar um if/switch que já existe, ou quando a mesma cadeia de condicionais por tipo se repete em vários lugares.
-argument-hint: "[arquivo ou escopo]"
+description: O of SOLID, open/closed. Use when a new case (type, format, channel, rule) forces an edit to an existing if/switch, or when the same chain of conditionals by type repeats in several places.
+argument-hint: "[file or scope]"
 user-invocable: false
 ---
 
-# O: aberto para extensão, fechado para modificação
+# O: open for extension, closed for modification
 
-**Regra**: comportamento novo entra **acrescentando** uma definição (um item num mapa, uma classe nova, um handler registrado), não editando ramos que já funcionam e já estão testados.
+**Rule**: new behavior enters by **adding** a definition (an item in a map, a new class, a registered handler). It does not enter by editing branches that already work and are already tested.
 
-## Por quê
+## Why
 
-- Código testado e em produção não é tocado para acomodar um caso novo, então não quebra.
-- O caso novo vive em um lugar só, com teste próprio.
-- O `switch` por tipo costuma se repetir em vários pontos; esquecer um deles é bug clássico.
+- You do not touch tested code that runs in production to fit a new case, so it does not break.
+- The new case lives in one place, with its own test.
+- A `switch` by type often repeats in several places. To forget one of them is a classic bug.
 
-## Sinais de violação
+## Signs of a violation
 
-- `switch (type)` ou cadeia `if/else if` por tipo, formato ou canal.
-- A mesma cadeia de condicionais em mais de um arquivo.
-- O PR de "suporte a PIX" edita cinco arquivos que já existiam.
+- A `switch (type)` or an `if/else if` chain by type, format or channel.
+- The same chain of conditionals in more than one file.
+- The PR/MR for "PIX support" edits five files that already existed.
 
-## Como aplicar
+## How to apply
 
-1. Identifique o eixo de variação (tipo de pagamento, formato de exportação).
-2. Defina o contrato mínimo que cada variação cumpre.
-3. Troque o `switch` por uma tabela (mapa de tipo para implementação) ou polimorfismo.
-4. Caso novo = entrada nova na tabela.
+1. Identify the axis of variation (payment type, export format).
+2. Define the minimum contract that each variation meets.
+3. Replace the `switch` with a table (a map from type to implementation) or with polymorphism.
+4. A new case is a new entry in the table.
 
-## Exemplo
+## Example
 
 ```ts
-// antes: cada formato novo edita esta função
+// before: each new format edits this function
 function exportReport(report: Report, format: string) {
   if (format === 'csv') return toCsv(report)
   if (format === 'pdf') return toPdf(report)
-  throw new Error(`formato desconhecido: ${format}`)
+  throw new Error(`unknown format: ${format}`)
 }
 
-// depois: formato novo é uma linha no mapa
+// after: a new format is one line in the map
 const EXPORTERS: Record<Format, (report: Report) => Buffer> = {
   csv: toCsv,
   pdf: toPdf,
@@ -49,12 +49,12 @@ function exportReport(report: Report, format: Format) {
 }
 ```
 
-## Limites
+## Limits
 
-- **YAGNI vence**: com um caso só, não há eixo de variação. Um `if` com dois ramos que nunca crescem é mais simples que um mapa.
-- Crie a extensão quando chegar o **segundo ou terceiro** caso real, não antes.
-- Mapa de funções resolve a maioria; hierarquia de classes só quando cada variação carrega estado ou vários métodos.
+- **YAGNI wins**: with only one case, there is no axis of variation. An `if` with two branches that never grow is simpler than a map.
+- Create the extension when the **second or third** real case arrives, not before.
+- A map of functions solves most cases. Use a class hierarchy only when each variation has state or several methods.
 
-## Pergunta de verificação
+## Verification question
 
-Para adicionar o próximo caso, quantos arquivos existentes eu edito? O ideal é zero (ou só o registro).
+To add the next case, how many existing files do I edit? The ideal number is zero (or only the registry).

@@ -10,7 +10,7 @@ test('every session source injects the tool skill as SessionStart context', () =
     assert.strictEqual(result.status, 0, result.stderr)
     const { hookEventName, additionalContext } = JSON.parse(result.stdout).hookSpecificOutput
     assert.strictEqual(hookEventName, 'SessionStart', source)
-    assert.match(additionalContext, /a ferramenta do usuário/, source)
+    assert.match(additionalContext, /Claude is the user's tool/, source)
     assert.doesNotMatch(additionalContext, /^---/, source)
     assert.ok(additionalContext.length < CONTEXT_LIMIT, source)
   }

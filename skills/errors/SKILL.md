@@ -1,55 +1,55 @@
 ---
 name: errors
-description: Clean Code, erros tratados de forma explícita e nunca engolidos. Use quando há catch vazio, catch que só loga e segue, erro convertido em null/false silencioso, retorno de código de erro, mensagem genérica, falha que some sem chegar a quem pode agir, ou erro na tela que não diz ao usuário como recuperar.
-argument-hint: "[arquivo ou escopo]"
+description: Clean Code, errors handled in an explicit way and never swallowed. Use when there is an empty catch, a catch that only logs and goes on, a silent null/false for an error, an error code return, a generic message, a failure that never reaches someone who can act, or a screen error with no recovery step.
+argument-hint: "[file or scope]"
 user-invocable: false
 ---
 
-# Erros explícitos, nunca engolidos
+# Explicit errors, never swallowed
 
-**Regra**: todo erro tem um destino claro: é **tratado** por quem sabe o que fazer com ele, ou **propagado** com contexto até alguém que saiba. Nunca desaparece. Falhe cedo, falhe alto, com mensagem que diz o que deu errado e com que dado.
+**Rule**: every error has a clear destination. It is **handled** by the code that knows what to do with it, or **propagated** with context to the code that knows. It never disappears. Fail early and fail loud, with a message that says what went wrong and with which data.
 
-## Por quê
+## Why
 
-- Erro engolido vira dado corrompido ou comportamento estranho longe da causa, horas depois.
-- `null` silencioso empurra o problema para quem chama, que geralmente não confere.
-- Mensagem com contexto encurta a investigação de horas para minutos.
+- A swallowed error becomes corrupted data or strange behavior, far from the cause, hours later.
+- A silent `null` pushes the problem to the caller, and the caller usually does not check.
+- A message with context reduces the investigation from hours to minutes.
 
-## Sinais de violação
+## Violation signs
 
-- `catch {}` vazio, ou `catch (e) { console.log(e) }` e segue como se nada tivesse acontecido.
-- `try/catch` que retorna `null`, `false` ou `[]` em caso de falha, indistinguível de "não há dado".
-- `catch` genérico em volta de bloco grande, capturando até bug de programação.
-- `throw new Error('erro')` ou mensagem sem o identificador envolvido.
-- Erro relançado sem a causa original (`throw new Error('falhou')` perdendo o `cause`).
-- Promise sem `await` nem `.catch`.
-- Mensagem ao usuário com código interno, stack trace ou o `error.message` cru.
-- Formulário que limpa os campos depois de um erro.
-- Erro de rede na tela sem ação de tentar de novo.
+- An empty `catch {}`, or `catch (e) { console.log(e) }` that goes on as if nothing happened.
+- A `try/catch` that returns `null`, `false` or `[]` on failure, so it looks the same as "no data".
+- A generic `catch` around a large block, which also catches programming bugs.
+- `throw new Error('error')`, or a message without the identifier involved.
+- An error rethrown without the original cause (`throw new Error('failed')` that loses the `cause`).
+- A promise with no `await` and no `.catch`.
+- A user message with an internal code, a stack trace or the raw `error.message`.
+- A form that clears the fields after an error.
+- A network error on screen with no retry action.
 
-## Como aplicar
+## How to apply
 
-1. Para cada `catch`, decida: **aqui eu sei recuperar?** Se não, não capture; deixe subir.
-2. Se captura para dar contexto, relance com `cause`.
-3. Erro esperado do domínio (não encontrado, sem permissão, estado inválido) vira tipo próprio, tratado na borda (HTTP 404/403/422).
-4. Valide entrada na fronteira e lance cedo, antes de efeitos parciais.
-5. Mensagem: o que falhou + com que dado + (se ajudar) o que fazer.
-6. `try` envolve só a linha que pode falhar daquele jeito.
+1. For each `catch`, decide: **do I know how to recover here?** If not, do not catch. Let it go up.
+2. If you catch to add context, rethrow with `cause`.
+3. An expected domain error (not found, no permission, invalid state) becomes its own type, handled at the boundary (HTTP 404/403/422).
+4. Validate input at the boundary and throw early, before partial effects.
+5. Message: what failed + with which data + (if it helps) what to do.
+6. The `try` wraps only the line that can fail in that way.
 
-## Erro que o usuário vê
+## Error that the user sees
 
-O passo 5 vale para quem desenvolve. O erro que chega ao usuário segue estas regras:
+Step 5 is for developers. The error that reaches the user follows these rules:
 
-- A mensagem diz o problema e como o usuário recupera. Ex.: "O arquivo tem 11 MB. Envie um arquivo de até 10 MB."
-- A mensagem não promete uma causa ou uma solução que o sistema não conhece.
-- O formulário com erro guarda o que o usuário digitou.
-- O erro de rede oferece uma ação de tentar de novo.
-- O texto vai pelo i18n da stack, nunca escrito no código (`craft:i18n`).
+- The message states the problem and how the user recovers. Example: "The file is 11 MB. Upload a file of 10 MB or less."
+- The message does not promise a cause or a solution that the system does not know.
+- A form with an error keeps what the user typed.
+- A network error offers a retry action.
+- The text goes through the i18n of the stack and is never written in the code (`craft:i18n`).
 
-## Exemplo
+## Example
 
 ```ts
-// antes: falha some, chamador recebe null e segue
+// before: the failure disappears, the caller gets null and goes on
 async function loadConfig(path: string) {
   try {
     return JSON.parse(await fs.readFile(path, 'utf8'))
@@ -59,7 +59,7 @@ async function loadConfig(path: string) {
   }
 }
 
-// depois: arquivo ausente é caso previsto; JSON inválido sobe com contexto
+// after: a missing file is an expected case, invalid JSON goes up with context
 async function loadConfig(path: string): Promise<Config> {
   const content = await fs.readFile(path, 'utf8').catch((error) => {
     if (error.code === 'ENOENT') return '{}'
@@ -68,17 +68,17 @@ async function loadConfig(path: string): Promise<Config> {
   try {
     return JSON.parse(content)
   } catch (error) {
-    throw new Error(`config inválida em ${path}`, { cause: error })
+    throw new Error(`invalid config at ${path}`, { cause: error })
   }
 }
 ```
 
-## Limites
+## Limits
 
-- Capturar para **recuperar** é correto (retry, fallback documentado, valor padrão previsto em teste).
-- Na borda do sistema (handler HTTP, job, CLI) um tratador genérico que loga e responde 500 é o lugar certo para o "pega tudo".
-- Não transforme todo erro em exceção customizada: crie tipo próprio só para o que alguém vai tratar de forma diferente.
+- Catching to **recover** is correct (retry, documented fallback, a default value covered by a test).
+- At the system boundary (HTTP handler, job, CLI), a generic handler that logs and answers 500 is the right place for the "catch all".
+- Do not turn every error into a custom exception. Create a dedicated type only for what someone will handle in a different way.
 
-## Pergunta de verificação
+## Check question
 
-Se esta operação falhar em produção, alguém fica sabendo, com informação suficiente para agir, sem o sistema seguir com dado errado? Se o erro chega ao usuário, ele sabe o que fazer a seguir?
+If this operation fails in production, does someone learn about it, with enough information to act, without the system going on with wrong data? If the error reaches the user, does the user know what to do next?

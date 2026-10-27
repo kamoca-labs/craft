@@ -1,70 +1,70 @@
 ---
 name: setup
-description: Prepara um projeto para o craft. Configura executor de teste, linter com limites de tamanho e complexidade (função, classe, parâmetros, aninhamento) e scripts `test` e `lint`. Use ao começar um projeto novo ou quando o projeto ainda não tem lint com limites ou script de teste.
-argument-hint: "[stack, se não der para detectar]"
+description: Prepares a project for craft. Configures the test runner, a linter with size and complexity limits (function, class, parameters, nesting), and the `test` and `lint` scripts. Use when you start a new project, or when the project has no lint with limits or no test script yet.
+argument-hint: "[stack, if it cannot be detected]"
 ---
 
-# Setup de qualidade
+# Quality setup
 
-Deixa o projeto pronto para `craft:atdd` e `craft:craft`: o que hoje é revisão no olho vira regra que o linter cobra.
+This skill gets the project ready for `craft:atdd` and `craft:craft`. What is a visual review today becomes a rule that the linter enforces.
 
-## Como conduzir
+## How to proceed
 
-1. **Detecte a stack** pelos manifestos (`package.json`, `composer.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`) e pelo gerenciador de pacote (lockfile). Se o projeto roda em container, os comandos rodam lá.
-2. **Levante o que já existe**: executor de teste, linter, configs, scripts. Nunca substitua: complete o que falta e **nunca afrouxe** um limite que já é mais rígido.
-3. **Mostre o plano e espere o ok**: dependências a instalar, arquivos a criar ou editar, limites. Uma tabela curta.
-4. **Aplique**: instale com o gerenciador do projeto, escreva as configs, crie os scripts `test` e `lint`.
-5. **Rode o lint** uma vez. Violações em código que já existe **não** são corrigidas agora: reporte a contagem por regra e sugira `/craft:craft` por módulo. Se forem muitas, ligue as regras de tamanho como aviso (`warn`) e diga isso no relatório.
-6. **Reporte**: arquivos tocados, comandos de `test` e `lint`, violações existentes.
+1. **Detect the stack** from the manifests (`package.json`, `composer.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`) and from the package manager (lockfile). If the project runs in a container, run the commands there.
+2. **List what already exists**: test runner, linter, configs, scripts. Never replace: complete what is missing and **never loosen** a limit that is already stricter.
+3. **Show the plan and wait for the ok**: dependencies to install, files to create or edit, limits. Use a short table.
+4. **Apply**: install with the package manager of the project, write the configs, create the `test` and `lint` scripts.
+5. **Run the lint** once. Do **not** fix violations in existing code now. Report the count per rule and suggest `/craft:craft` per module. If there are many, set the size rules as warnings (`warn`) and say so in the report.
+6. **Report**: touched files, `test` and `lint` commands, existing violations.
 
-## Limites
+## Limits
 
-Os mesmos números que as skills do craft usam como sinal, então o linter e a triagem falam a mesma língua.
+These are the same numbers that the craft skills use as a sign, so the linter and the screening speak the same language.
 
-| Limite | Valor | Skill que resolve a violação |
+| Limit | Value | Skill that fixes the violation |
 |---|---|---|
-| Linhas por função | 20 (sem contar branco e comentário) | `craft:functions` |
-| Linhas por arquivo/classe | 200 | `craft:single-responsibility` |
-| Parâmetros | 3 | `craft:arguments` |
-| Aninhamento | 2 níveis | `craft:guard-clauses` |
-| Complexidade ciclomática | 10 | `craft:functions`, `craft:guard-clauses` |
+| Lines per function | 20 (not counting blank lines and comments) | `craft:functions` |
+| Lines per file/class | 200 | `craft:single-responsibility` |
+| Parameters | 3 | `craft:arguments` |
+| Nesting | 2 levels | `craft:guard-clauses` |
+| Cyclomatic complexity | 10 | `craft:functions`, `craft:guard-clauses` |
 
-Arquivos de teste ficam fora dos limites de linhas por função e por arquivo (um `describe` é longo por natureza).
+Test files are outside the limits of lines per function and per file (a `describe` is long by nature).
 
-## Por stack
+## By stack
 
-| Stack | Ferramenta | Regras |
+| Stack | Tool | Rules |
 |---|---|---|
 | JS/TS | ESLint (flat config, `eslint.config.js`) | `max-lines-per-function`, `max-lines`, `max-params`, `max-depth`, `complexity` |
-| PHP | PHPMD (`phpmd.xml`) + Pint para estilo | `ExcessiveMethodLength`, `ExcessiveClassLength`, `ExcessiveParameterList`, `CyclomaticComplexity`, `NPathComplexity` |
-| Python | Ruff (`pyproject.toml`) | `max-args`, `max-statements`, `max-branches`, `max-nested-blocks`, `mccabe.max-complexity` (selecione `PLR`, `C90`) |
+| PHP | PHPMD (`phpmd.xml`) + Pint for style | `ExcessiveMethodLength`, `ExcessiveClassLength`, `ExcessiveParameterList`, `CyclomaticComplexity`, `NPathComplexity` |
+| Python | Ruff (`pyproject.toml`) | `max-args`, `max-statements`, `max-branches`, `max-nested-blocks`, `mccabe.max-complexity` (select `PLR`, `C90`) |
 | Go | golangci-lint (`.golangci.yml`) | `funlen`, `gocyclo`, `nestif`, `lll` |
 | Rust | Clippy (`clippy.toml`) | `too-many-lines-threshold`, `too-many-arguments-threshold`, `cognitive-complexity-threshold` |
 
-Frontend em Vue ou React: pergunte se o build de produção deve remover o `data-testid`. Se sim, configure o plugin da stack listado em `craft:test-ids`. Nunca remova o atributo do build que roda o E2E.
+Vue or React frontend: ask whether the production build must remove `data-testid`. If yes, configure the plugin of the stack listed in `craft:test-ids`. Never remove the attribute from the build that runs the E2E.
 
-Executor de teste: o que o projeto já usa. Sem nenhum, o padrão da stack (vitest, pest, pytest, `go test`, `cargo test`). Confira que roda filtrado (veja a execução filtrada em `craft:atdd`).
+Test runner: the one the project already uses. If there is none, use the default of the stack (vitest, pest, pytest, `go test`, `cargo test`). Check that it runs filtered (see the filtered run in `craft:atdd`).
 
 ## CLAUDE.md
 
-Crie ou complete um CLAUDE.md mínimo com o contexto do projeto que o setup levantou:
+Create or complete a minimal CLAUDE.md with the project context that the setup found:
 
 ```markdown
-Toda mudança de comportamento segue `/craft:atdd`.
-Referência, decisão ou escolha sobre o projeto mora no repo (CLAUDE.md, `docs/`, `.claude/memory/`), com caminho relativo. Nunca na memória local do Claude (`~/.claude/`) nem com caminho absoluto: só valeria nesta máquina e o time não veria.
+Every behavior change follows `/craft:atdd`.
+A reference, decision or choice about the project lives in the repo (CLAUDE.md, `docs/`, `.claude/memory/`), with a relative path. Never in the local memory of Claude (`~/.claude/`) and never with an absolute path: it would hold only on this machine and the team would not see it.
 
-## Comandos
+## Commands
 
-- Testes: `<comando>`; filtrado: `<comando filtrado>`
-- Lint: `<comando>`
+- Tests: `<command>`, filtered: `<filtered command>`
+- Lint: `<command>`
 ```
 
-Mais uma linha só se algo foge do padrão da stack (testes dentro de container, serviço que precisa estar de pé).
+Add one more line only if something departs from the stack default (tests inside a container, a service that must be up).
 
-A linha da referência existe porque, sem ela, o modelo grava decisões do projeto na memória local dele, que não vai para o repo nem para o time.
+The reference line exists because, without it, the model writes project decisions to its local memory. That memory does not go to the repo or to the team.
 
-A linha do ATDD é a única referência a skill: sem ela, o modelo só carrega o `craft:atdd` quando lembra, e o fluxo precisa valer desde o primeiro código. Não liste as demais skills, agents, hooks, princípios nem os limites do lint: o `craft:atdd` já leva ao `craft:craft`, o hook dispara a triagem e os limites estão no arquivo de config. Repetir gasta contexto em toda sessão e desatualiza.
+The ATDD line is the only reference to a skill. Without it, the model loads `craft:atdd` only when it remembers, and the flow must apply from the first code. Do not list the other skills, agents, hooks, principles or the lint limits. `craft:atdd` already leads to `craft:craft`, the hook triggers the screening, and the limits are in the config file. Repeating them spends context in every session and goes out of date.
 
-## Fora do escopo
+## Out of scope
 
-CI, hooks de pre-commit e formatação de código existente. Se o usuário pedir, faça em mudança separada.
+CI, pre-commit hooks and formatting of existing code. If the user asks, do it in a separate change.

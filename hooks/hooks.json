@@ -7,25 +7,25 @@
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/ste.ts\"",
             "timeout": 10,
-            "statusMessage": "craft:ste: escrita no padrão ASD-STE100"
+            "statusMessage": "craft:ste: writing in the ASD-STE100 standard"
           },
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/memory.ts\"",
             "timeout": 10,
-            "statusMessage": "craft:memory: memória do projeto"
+            "statusMessage": "craft:memory: project memory"
           },
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/tasks.ts\"",
             "timeout": 10,
-            "statusMessage": "craft:tasks: tarefas e meta"
+            "statusMessage": "craft:tasks: tasks and goal"
           },
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/tool.ts\"",
             "timeout": 10,
-            "statusMessage": "craft:tool: o Claude é a ferramenta"
+            "statusMessage": "craft:tool: Claude is the user's tool"
           }
         ]
       }
@@ -37,7 +37,7 @@
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/meta-goal.ts\"",
             "timeout": 10,
-            "statusMessage": "craft:meta-goal: meta fechada?"
+            "statusMessage": "craft:meta-goal: goal closed?"
           }
         ]
       }
@@ -50,7 +50,7 @@
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/memory-outside-project.ts\"",
             "timeout": 10,
-            "statusMessage": "craft:memory-outside-project: memória no projeto?"
+            "statusMessage": "craft:memory-outside-project: memory in the project?"
           }
         ]
       },
@@ -61,25 +61,25 @@
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/atdd-first.ts\"",
             "timeout": 10,
-            "statusMessage": "craft:atdd-first: fluxo carregado antes do código?"
+            "statusMessage": "craft:atdd-first: flow loaded before code?"
           },
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/english-code.ts\"",
             "timeout": 10,
-            "statusMessage": "craft:english-code: código em inglês?"
+            "statusMessage": "craft:english-code: code in English?"
           },
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/test-id.ts\"",
             "timeout": 10,
-            "statusMessage": "craft:test-id: elemento interativo com data-testid?"
+            "statusMessage": "craft:test-id: interactive element with data-testid?"
           },
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/test-skip.ts\"",
             "timeout": 10,
-            "statusMessage": "craft:test-skip: teste pulado ou focado?"
+            "statusMessage": "craft:test-skip: test skipped or focused?"
           }
         ]
       },
@@ -90,19 +90,19 @@
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/e2e-container.ts\"",
             "timeout": 10,
-            "statusMessage": "craft:e2e-container: E2E em container?"
+            "statusMessage": "craft:e2e-container: E2E in a container?"
           },
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/filtered-tests.ts\"",
             "timeout": 10,
-            "statusMessage": "craft:filtered-tests: testes com filtro?"
+            "statusMessage": "craft:filtered-tests: tests with a filter?"
           },
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/push-gate.ts\"",
             "timeout": 10,
-            "statusMessage": "craft:push-gate: suíte completa antes do push?"
+            "statusMessage": "craft:push-gate: full suite before the push?"
           }
         ]
       }
@@ -115,7 +115,7 @@
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/refactor-on-green.ts\"",
             "timeout": 10,
-            "statusMessage": "craft:refactor-on-green: suíte verde?"
+            "statusMessage": "craft:refactor-on-green: suite green?"
           }
         ]
       }

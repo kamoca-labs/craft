@@ -1,63 +1,63 @@
 ---
 name: kiss
-description: KISS (keep it simple). Use quando uma solução parece engenhosa demais para o problema, usa padrão, biblioteca ou camada onde uma construção simples resolve, ou exige explicação para ser entendida.
-argument-hint: "[arquivo ou escopo]"
+description: KISS (keep it simple). Use when a solution looks too clever for the problem, uses a pattern, library or layer where a simple construct works, or needs an explanation to be understood.
+argument-hint: "[file or scope]"
 user-invocable: false
 ---
 
-# KISS: o mais simples que passa nos testes
+# KISS: the simplest thing that passes the tests
 
-**Regra**: entre duas soluções que passam nos mesmos testes, vence a que tem **menos conceitos** para o leitor segurar na cabeça. Simples não é curto: é óbvio.
+**Rule**: between two solutions that pass the same tests, the one with **fewer concepts** for the reader to hold in mind wins. Simple does not mean short. Simple means obvious.
 
-## Por quê
+## Why
 
-- Código é lido muito mais vezes do que escrito; cada conceito extra cobra em toda leitura.
-- Bug se esconde em complexidade. O código óbvio tem bug óbvio.
-- Quem dá manutenção às 3 da manhã não é você descansado.
+- Code is read many more times than it is written. Each extra concept costs on every read.
+- Bugs hide in complexity. Obvious code has obvious bugs.
+- The person who maintains the code at 3 AM is not you, rested.
 
-## Sinais de violação
+## Violation signs
 
-- Padrão de projeto (factory, strategy, builder) para um caso só.
-- Truque de linguagem: `reduce` montando objeto que um `for` deixaria claro, operador ternário aninhado, metaprogramação.
-- Biblioteca nova para o que a plataforma já faz (`lodash.get` em vez de `?.`, date picker em vez de `<input type="date">`).
-- Você precisa de um comentário ou de um diagrama para explicar o fluxo.
-- Estado guardado que poderia ser calculado.
+- A design pattern (factory, strategy, builder) for one case only.
+- A language trick: a `reduce` that builds an object when a `for` would be clear, a nested ternary operator, metaprogramming.
+- A new library for what the platform already does (`lodash.get` instead of `?.`, a date picker instead of `<input type="date">`).
+- You need a comment or a diagram to explain the flow.
+- Stored state that you could compute.
 
-## Como aplicar
+## How to apply
 
-1. Pergunte: qual é a forma mais direta de cumprir **estes** testes?
-2. Reutilize antes de escrever. Prefira, nesta ordem: código que o projeto já tem, recurso da linguagem, recurso da plataforma/framework, dependência já instalada, código próprio.
-3. Troque o engenhoso pelo explícito, mesmo que fique uma ou duas linhas maior.
-4. Elimine estado derivado: calcule na hora.
+1. Ask: what is the most direct way to satisfy **these** tests?
+2. Reuse before you write. Prefer, in this order: code that the project already has, a language feature, a platform or framework feature, an installed dependency, your own code.
+3. Replace the clever with the explicit, even if it is one or two lines longer.
+4. Remove derived state: compute it on the spot.
 
-## Exemplo
+## Example
 
 ```ts
-// antes: engenhoso
+// before: clever
 const byStatus = tickets.reduce<Record<string, Ticket[]>>(
   (acc, t) => ({ ...acc, [t.status]: [...(acc[t.status] ?? []), t] }), {})
 
-// depois: a plataforma já faz
+// after: the platform already does it
 const byStatus = Object.groupBy(tickets, (ticket) => ticket.status)
 ```
 
 ```ts
-// antes
-const label = isAdmin ? (isOwner ? 'dono' : 'admin') : isOwner ? 'dono' : 'membro'
+// before
+const label = isAdmin ? (isOwner ? 'owner' : 'admin') : isOwner ? 'owner' : 'member'
 
-// depois
+// after
 function roleLabel({ isAdmin, isOwner }: Member) {
-  if (isOwner) return 'dono'
+  if (isOwner) return 'owner'
   if (isAdmin) return 'admin'
-  return 'membro'
+  return 'member'
 }
 ```
 
-## Limites
+## Limits
 
-- Simples não é ingênuo: não remova validação, tratamento de erro ou segurança em nome de KISS.
-- Entre duas formas igualmente simples, fique com a que é correta nos casos de borda.
+- Simple does not mean naive. Do not remove validation, error handling or security in the name of KISS.
+- Between two equally simple forms, keep the one that is correct in the edge cases.
 
-## Pergunta de verificação
+## Check question
 
-Um dev que nunca viu este código entende o que ele faz em uma leitura, sem rodar?
+Does a developer who never saw this code understand what it does in one read, without running it?

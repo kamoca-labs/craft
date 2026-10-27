@@ -3,8 +3,8 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 
-export const FULL_SUITE_LOCAL = 'Rodar a suíte completa local'
-export const SKIP_FULL_SUITE = 'Seguir sem a suíte completa'
+export const FULL_SUITE_LOCAL = 'Run the full suite locally'
+export const SKIP_FULL_SUITE = 'Continue without the full suite'
 
 let toolUseCount = 0
 
@@ -18,7 +18,7 @@ function toolResult(id: string, content: string, toolUseResult: object) {
 }
 
 export function answer(label: string): string {
-  const question = 'Rodo a suíte completa local antes do push?'
+  const question = 'Run the full suite locally before the push?'
   const use = toolUse('AskUserQuestion', { questions: [{ question, options: [{ label: FULL_SUITE_LOCAL }, { label: SKIP_FULL_SUITE }] }] })
   return [use.line, toolResult(use.id, `Your questions have been answered: "${question}"="${label}".`, { answers: { [question]: label } })].join('\n')
 }
