@@ -48,9 +48,9 @@ O Claude detecta a stack, mostra o plano (dependências, configs, limites) e **e
 
 ## Tarefas e meta
 
-No passo 1, o `/craft:atdd` carrega a skill `craft:acceptance-criteria`: cada `Então` diz um valor observável, e cada cenário diz o teste que o prova. Com o seu ok na especificação, ele carrega a `craft:tasks`. O Claude cria uma tarefa por cenário (`TaskCreate`), mais o refactor e o passing again. Você acompanha a lista com `Ctrl+T`.
+No passo 1, o `/craft:atdd` carrega a skill `craft:acceptance-criteria`: cada `Então` diz um valor observável, e cada cenário diz o teste que o prova. Com o seu ok na especificação, ele segue a `craft:tasks`, que o hook já injetou na sessão. O Claude cria uma tarefa por cenário (`TaskCreate`), mais o refactor e o passing again. Você acompanha a lista com `Ctrl+T`.
 
-Antes das tarefas, ele pergunta se liga a meta. Com o seu ok, a primeira tarefa da lista é a `META:`:
+Com a ferramenta `TaskCreate` ligada, o Claude acha o critério sozinho (os cenários, o seu pedido ou os scripts do projeto) e liga a meta sem perguntar. Sem critério que um comando prove, ele cria só as tarefas. Você também pode chamar `/craft:tasks <o que fazer>`. A primeira tarefa da lista é a `META:`:
 
 ```
 TaskCreate: META: os 3 cenários da especificação passam
@@ -61,13 +61,17 @@ TaskCreate: META: os 3 cenários da especificação passam
 
 Ao concluir, a resposta final sempre traz o fechamento, atendida ou não: a tarefa `META:` vira `completed`, e a linha `META ENCERRADA:` cita o comando e o resultado.
 
-- O Claude Code não deixa o modelo rodar o `/goal`. Por isso a meta é a tarefa `META:` mais um Stop hook da skill `craft:tasks`. Você não digita nada.
-- O hook lê o transcript e segura o fim do turno até o comando de verificação rodar com o resultado esperado. Ele não roda comando. Por isso o Claude cita o comando e o resultado ao fim de cada passo.
+- O Claude Code não deixa o modelo rodar o `/goal`. Por isso a meta é a tarefa `META:` mais o Stop hook `meta-goal`. Você não digita nada.
+- O hook `meta-goal` é um script, sem agente, então não gasta token. Ele lê o transcript e segura o fim do turno até o comando de verificação rodar com o resultado esperado. Ele não roda comando. Por isso o Claude cita o comando e o resultado ao fim de cada passo.
 - O hook também exige o fechamento: com a condição atendida e sem a linha `META ENCERRADA:`, ele bloqueia uma vez e pede o fechamento.
-- O hook libera o fim do turno quando o Claude pede um ok seu, quando a meta chega ao limite de bloqueios e depois do fechamento. Se você recusa a meta, o Claude escreve `META ENCERRADA: recusada pelo usuário`. Se você manda parar, ele fecha a meta com o motivo e diz que ela não foi atendida.
+- O hook libera o fim do turno quando o Claude pede um ok seu, quando a meta chega ao limite de bloqueios e depois do fechamento. Se você recusa a meta com palavras suas, o Claude escreve `META ENCERRADA: recusada pelo usuário`. Se você manda parar, ele fecha a meta com o motivo e diz que ela não foi atendida.
 - Sem a ferramenta `TaskCreate`, a meta vira uma linha `META:` no texto da resposta, com as mesmas partes.
-- O hook não tem o painel, os check-ins nem a restauração do `/goal` nativo. Ele vale até o fim da sessão em que a skill carregou. Depois do carregamento, cada fim de turno roda um agente curto para conferir o transcript.
+- O hook não tem o painel, os check-ins nem a restauração do `/goal` nativo. Ele vale em toda sessão e só age depois que a meta é declarada.
 - Em algumas sessões a `TaskCreate` vem como ferramenta adiada, e o Claude carrega o schema com `ToolSearch`. Se a ferramenta não existe nem assim, ele escreve a lista na resposta e pergunta se pode ligar a ferramenta. Com o seu ok, ele guarda uma cópia do `~/.claude/settings.json`, adiciona `"env": { "CLAUDE_CODE_ENABLE_TODO_TOOLS": "1" }` e abre uma sessão de teste para confirmar. A ferramenta aparece na próxima sessão. Você não edita nada à mão.
+
+### Várias atividades no mesmo pedido
+
+Fora do ATDD, o Claude também segue a `craft:tasks` quando o seu pedido tem mais de uma atividade ("corrige o login, atualiza o README e sobe o serviço"). Ele separa o pedido em tarefas, mostra a lista e liga a meta. A verificação da meta é um comando que prova o estado final de todas as atividades.
 
 ## Correção de bug com ATDD
 

@@ -32,7 +32,17 @@ export const assistantText = (text: string) => JSON.stringify({ type: 'assistant
 
 export const codeEdit = (file: string) => toolUse('Edit', { file_path: file, old_string: 'a', new_string: 'b' }).line
 
-export function runRule(rule: string, toolInput: object, transcript: string[] = [], projectFiles: string[] = []) {
+export const taskCreate = (subject: string, description: string) => toolUse('TaskCreate', { subject, description }).line
+
+export function bashRun(command: string, failed = false): string {
+  const use = toolUse('Bash', { command })
+  const result = JSON.stringify({ type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: use.id, is_error: failed, content: failed ? 'Exit code 1' : 'ok' }] } })
+  return [use.line, result].join('\n')
+}
+
+export const userText = (text: string) => JSON.stringify({ type: 'user', message: { content: text } })
+
+export function runRule(rule: string, toolInput: object, transcript: string[] = [], projectFiles: string[] = [], extra: object = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'craft-hooks-'))
   const transcriptPath = path.join(dir, 'transcript.jsonl')
   const projectDir = path.join(dir, 'project')
@@ -43,7 +53,7 @@ export function runRule(rule: string, toolInput: object, transcript: string[] = 
   }
   fs.mkdirSync(projectDir, { recursive: true })
   return spawnSync('node', [path.join(import.meta.dirname, '..', 'rules', `${rule}.ts`)], {
-    input: JSON.stringify({ tool_name: 'Bash', tool_input: toolInput, transcript_path: transcriptPath, cwd: projectDir }),
+    input: JSON.stringify({ tool_name: 'Bash', tool_input: toolInput, transcript_path: transcriptPath, cwd: projectDir, ...extra }),
     encoding: 'utf8',
     env: { ...process.env, HOOK_CASES_LOG: path.join(dir, 'cases.jsonl'), CLAUDE_PROJECT_DIR: projectDir },
   })

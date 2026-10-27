@@ -12,5 +12,7 @@
   "deny.memory-outside-project": "memória fica no projeto, em .claude/memory/, dentro do repo. Grave o arquivo lá e adicione a linha no .claude/memory/MEMORY.md. A memória local (~/.claude/projects/) só vale nesta máquina e o time não vê. Veja craft:memory.",
   "context.memory-catalog": "## Catálogo atual (.claude/memory/MEMORY.md)",
   "context.memory-empty": "O projeto ainda não tem memória. Crie o .claude/memory/MEMORY.md na primeira memória.",
-  "context.memory-truncated": "(Catálogo cortado aqui. Leia o resto em .claude/memory/MEMORY.md.)"
+  "context.memory-truncated": "(Catálogo cortado aqui. Leia o resto em .claude/memory/MEMORY.md.)",
+  "block.meta-verify": "[craft:meta-goal] A meta não fechou. Rode `{command}` depois da última edição de código, com resultado de sucesso, e cite o comando e o resultado na resposta. Depois, feche a meta.",
+  "block.meta-close": "[craft:meta-goal] Meta atendida. Marque a tarefa META como completed e termine a resposta com META ENCERRADA: atendida, o comando de verificação e o resultado."
 }
