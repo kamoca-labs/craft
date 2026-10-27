@@ -20,6 +20,12 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/tasks.ts\"",
             "timeout": 10,
             "statusMessage": "craft:tasks: tarefas e meta"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/tool.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:tool: o Claude é a ferramenta"
           }
         ]
       }
