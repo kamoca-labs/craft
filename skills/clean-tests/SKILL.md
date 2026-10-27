@@ -1,86 +1,86 @@
 ---
 name: clean-tests
-description: Clean Code aplicado a testes e catálogo das camadas de teste. Use ao escrever ou revisar qualquer teste, para escolher a camada (unidade, componente, integração, E2E) e carregar a skill dela, ou quando um teste tem lógica (if, laço, cálculo), testa vários comportamentos de uma vez, tem nome vago, setup gigante, depende de ordem ou de tempo real, ou verifica implementação em vez de comportamento.
-argument-hint: "[arquivo ou escopo]"
+description: Clean Code applied to tests, and the catalog of test layers. Use when you write or review any test, to choose the layer (unit, component, integration, E2E) and load its skill. Also use when a test has logic (if, loop, calculation), tests several behaviors at once, has a vague name, has a huge setup, depends on order or real time, or verifies implementation instead of behavior.
+argument-hint: "[file or scope]"
 user-invocable: false
 ---
 
-# Teste também é código
+# A test is also code
 
-**Regra**: o teste é a especificação executável. Ele é **legível como uma frase**, testa **um comportamento**, não tem lógica, e falha por um motivo só, com mensagem que diz qual. Cada comportamento fica na **camada mais baixa** que o cobre.
+**Rule**: the test is the executable specification. It is **readable as a sentence**, tests **one behavior**, has no logic, and fails for one reason only, with a message that says which. Each behavior stays in the **lowest layer** that covers it.
 
-## Camadas
+## Layers
 
-Escolha a camada de cada teste antes de escrever. Depois, carregue a skill da camada com a ferramenta `Skill`.
+Choose the layer of each test before you write it. Then load the skill of the layer with the `Skill` tool.
 
-| Camada | O que cobre | Skill |
+| Layer | What it covers | Skill |
 |---|---|---|
-| Unidade, componente, integração | a regra de negócio e todos os casos de borda dela, pela interface pública | `craft:unit-tests` |
-| E2E | só a jornada do usuário: ele consegue concluir o objetivo no sistema real. Entra só com a feature pronta e roda só em container | `craft:e2e-tests` |
+| Unit, component, integration | the business rule and all its edge cases, through the public interface | `craft:unit-tests` |
+| E2E | only the user journey: the user can reach the goal in the real system. It enters only with the feature ready and runs only in a container | `craft:e2e-tests` |
 
-- A maioria dos testes fica na unidade e na integração. O E2E tem poucos testes, um por jornada crítica.
-- Os testes de aceite do ATDD ficam na unidade e na integração. O E2E vem depois, com a feature pronta.
-- Um caso de borda nunca sobe para o E2E.
-- Estilo, `hover`, cor e animação não têm teste funcional em nenhuma camada.
+- Most tests stay in unit and integration. E2E has few tests, one for each critical journey.
+- The acceptance tests of ATDD stay in unit and integration. E2E comes after, with the feature ready.
+- An edge case never moves up to E2E.
+- Style, `hover`, color and animation have no functional test in any layer.
 
-## Por quê
+## Why
 
-- Quando o teste falha, você lê o teste, não o código: ele precisa explicar o que se esperava.
-- Teste com lógica pode ter bug próprio e passar errado.
-- Teste acoplado à implementação quebra em todo refactor, e aí o refactor para de acontecer.
-- Teste na camada errada custa caro: um caso de borda no E2E deixa a suíte lenta e frágil.
+- When the test fails, you read the test, not the code. The test must explain what was expected.
+- A test with logic can have its own bug and pass wrongly.
+- A test coupled to the implementation breaks on every refactor, and then the refactor stops happening.
+- A test in the wrong layer costs a lot: an edge case in E2E makes the suite slow and fragile.
 
-## Sinais de violação
+## Signs of violation
 
-- `if`, `for`, cálculo ou chamada da própria função testada para gerar o valor esperado.
-- Nome vago: `test('funciona')`, `test('caso 2')`.
-- Vários comportamentos num teste: arrange, act, assert, act, assert...
-- Setup de 40 linhas com dados que o teste nunca lê.
-- Testes que dependem da ordem de execução ou de estado compartilhado.
-- `Date.now()`, `Math.random()`, rede real.
-- Assert sobre chamada interna (`expect(repo.save).toHaveBeenCalledWith(...)`) quando o resultado observável bastaria.
-- Teste na camada errada: caso de borda no E2E, ou regra de negócio que só o E2E cobre.
+- `if`, `for`, a calculation, or a call to the tested function itself to produce the expected value.
+- Vague name: `test('works')`, `test('case 2')`.
+- Several behaviors in one test: arrange, act, assert, act, assert...
+- Setup of 40 lines with data that the test never reads.
+- Tests that depend on the execution order or on shared state.
+- `Date.now()`, `Math.random()`, real network.
+- Assert on an internal call (`expect(repo.save).toHaveBeenCalledWith(...)`) when the observable result is enough.
+- Test in the wrong layer: an edge case in E2E, or a business rule that only E2E covers.
 
-## Como aplicar
+## How to apply
 
-1. **Camada**: escolha pela tabela de [Camadas](#camadas) e carregue a skill dela.
-2. **Nome** = comportamento esperado, em frase: `'anexo acima de 10 MB é recusado com 422'`.
-3. **Estrutura Arrange / Act / Assert**, cada parte visível, separada por linha em branco.
-4. **Valor esperado literal**: `assert.equal(total, 95)`, não `assert.equal(total, 100 * 0.95)`.
-5. **Só os dados relevantes à vista**. O resto fica num construtor de teste com padrões (`makeTicket({ status: 'closed' })`).
-6. **Um comportamento por teste**. Vários asserts são ok se descrevem o mesmo resultado.
-7. **Determinístico**: injete relógio e aleatoriedade (`craft:dependency-inversion`).
-8. **Teste o que se vê de fora**: retorno, estado persistido, resposta HTTP, o que o usuário vê. Mock só na fronteira.
-9. **DRY com moderação**: repetir um dado no teste para deixá-lo legível é melhor que esconder em helper (`craft:dry`).
+1. **Layer**: choose from the [Layers](#layers) table and load its skill.
+2. **Name** = expected behavior, as a sentence: `'attachment above 10 MB is rejected with 422'`.
+3. **Arrange / Act / Assert structure**, each part visible, separated by a blank line.
+4. **Literal expected value**: `assert.equal(total, 95)`, not `assert.equal(total, 100 * 0.95)`.
+5. **Show only the relevant data**. The rest stays in a test builder with defaults (`makeTicket({ status: 'closed' })`).
+6. **One behavior per test**. Several asserts are fine if they describe the same result.
+7. **Deterministic**: inject the clock and randomness (`craft:dependency-inversion`).
+8. **Test what is seen from outside**: return value, persisted state, HTTP response, what the user sees. Mock only at the boundary.
+9. **DRY in moderation**: repeating a value in the test to keep it readable is better than hiding it in a helper (`craft:dry`).
 
-## Exemplo
+## Example
 
 ```ts
-// antes
-test('desconto', () => {
+// before
+test('discount', () => {
   for (const total of [50, 100, 200]) {
     const expected = total >= 100 ? total * 0.9 : total
     expect(applyDiscount(total)).toBe(expected)
   }
 })
 
-// depois
-test('compra a partir de 100 recebe 10% de desconto', () => {
+// after
+test('purchase of 100 or more gets a 10% discount', () => {
   expect(applyDiscount(200)).toBe(180)
 })
 
-test('compra abaixo de 100 não recebe desconto', () => {
+test('purchase below 100 gets no discount', () => {
   expect(applyDiscount(50)).toBe(50)
 })
 ```
 
-Tabelas de casos (`test.each`) são aceitáveis quando cada linha tem entrada e saída **literais** e o nome interpola o caso.
+Case tables (`test.each`) are acceptable when each row has **literal** input and output and the name interpolates the case.
 
-## Limites
+## Limits
 
-- Teste de contrato reaproveitado entre implementações (`craft:liskov-substitution`) pode iterar sobre as implementações: o laço é sobre o alvo, não sobre o cálculo do esperado.
-- Teste E2E naturalmente tem vários passos. Ainda assim, ele cobre uma jornada só (`craft:e2e-tests`).
+- A contract test reused across implementations (`craft:liskov-substitution`) can iterate over the implementations. The loop is over the target, not over the calculation of the expected value.
+- An E2E test naturally has several steps. Even so, it covers one journey only (`craft:e2e-tests`).
 
-## Pergunta de verificação
+## Verification question
 
-Se este teste falhar, o nome e a mensagem já me dizem qual comportamento quebrou, sem abrir o código? E ele está na camada mais baixa que cobre esse comportamento?
+If this test fails, do the name and the message already tell me which behavior broke, without opening the code? Is the test in the lowest layer that covers this behavior?

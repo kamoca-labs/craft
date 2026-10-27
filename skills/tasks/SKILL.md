@@ -1,45 +1,45 @@
 ---
 name: tasks
-description: Separa o pedido em atividades com TaskCreate e liga a meta de sessão (tarefa META mais o Stop hook meta-goal). O hook tasks carrega esta skill em toda sessão. O usuário também a chama com /craft:tasks. Use também no passo 1 do craft:atdd, depois do ok do usuário na especificação.
-argument-hint: "[o que fazer]"
+description: Splits the request into activities with TaskCreate and sets the session goal (a META task plus the meta-goal Stop hook). The tasks hook loads this skill in every session. The user can also call it with /craft:tasks. Use it also in step 1 of craft:atdd, after the user approves the specification.
+argument-hint: "[what to do]"
 ---
 
-# Tarefas e meta
+# Tasks and goal
 
-Toda sessão usa tarefas, e a meta quando há critério. O hook `meta-goal` segura o fim do turno até a meta fechar. Pergunta só informativa não leva tarefa nem meta.
+Every session uses tasks, and a goal when a criterion exists. The `meta-goal` hook holds the end of the turn until the goal is closed. A purely informative question gets no task and no goal.
 
-## Tarefas
+## Tasks
 
-1. Pedido com mais de uma atividade ou passo: crie uma tarefa por atividade com `TaskCreate`. No ATDD, depois do ok na especificação, crie uma por cenário, mais o refactor e o passing again.
-2. Se a `TaskCreate` aparece só pelo nome, carregue o schema com `ToolSearch` (`select:TaskCreate,TaskUpdate`).
-3. Mantenha uma tarefa em `in_progress`. Marque `completed` com o resultado do comando.
-4. Cenário novo no laço: a especificação mudou. Peça o ok do usuário antes de seguir.
-5. Ao fim de cada passo, escreva o comando e o resultado na resposta.
+1. If the request has more than one activity or step, create one task per activity with `TaskCreate`. In ATDD, after the user approves the specification, create one task per scenario, plus the refactor and the passing again.
+2. If `TaskCreate` appears only by name, load its schema with `ToolSearch` (`select:TaskCreate,TaskUpdate`).
+3. Keep one task in `in_progress`. Mark a task `completed` with the result of the command.
+4. A new scenario in the loop means the specification changed. Ask the user for approval before you continue.
+5. At the end of each step, write the command and its result in the reply.
 
-## Meta
+## Goal
 
-Ache o critério da meta sozinho, sem perguntar. Procure nesta ordem:
+Find the goal criterion yourself. Do not ask. Search in this order:
 
-1. Os cenários da especificação do ATDD: o comando filtrado que os prova.
-2. O que o usuário pediu: "o build passa" vira o comando de build.
-3. Os scripts do projeto (`package.json`, `composer.json`, `Makefile`, CI): teste filtrado, `lint`, `build`.
+1. The scenarios of the ATDD specification: the filtered command that proves them.
+2. What the user asked for: "the build passes" becomes the build command.
+3. The project scripts (`package.json`, `composer.json`, `Makefile`, CI): filtered test, `lint`, `build`.
 
-Com critério e com a `TaskCreate`, crie a tarefa `META:` primeiro, sempre. Sem critério que um comando prove (texto, decisão, pesquisa), crie só as tarefas e não declare meta. Pergunte ao usuário só se há dois critérios possíveis e a escolha muda o trabalho. O assunto é `META: ` mais o estado final mensurável. A descrição traz:
+If you have a criterion and `TaskCreate`, always create the `META:` task first. If no command can prove the result (text, decision, research), create only the tasks and declare no goal. Ask the user only if two criteria are possible and the choice changes the work. The subject is `META: ` plus the measurable final state. The description has these fields:
 
-- `Verificação: ` o comando filtrado exato entre crases e o resultado esperado. Nunca a suíte completa.
-- `Restrições: ` nenhum teste pulado, apagado nem editado para passar, mais as da atividade.
-- `Limite: N` bloqueios do hook: o número de tarefas mais folga.
+- `Verification: ` the exact filtered command between backticks and the expected result. Never the full suite.
+- `Constraints: ` no test skipped, deleted, or edited to pass, plus the constraints of the activity.
+- `Limit: N` hook blocks: the number of tasks plus some margin.
 
-Só o usuário recusa a meta, com palavras dele. Nesse caso, escreva `META ENCERRADA: recusada pelo usuário`.
+Only the user can refuse the goal, in the user's own words. In that case, write `META CLOSED: refused by the user`.
 
-## Fechamento
+## Closing
 
-Ao concluir, atendida ou não, marque a tarefa `META:` como `completed` e termine a resposta com `META ENCERRADA: <atendida|cancelada pelo usuário|limite>. <comando> <resultado>`. O comando de verificação precisa rodar depois da última edição de código.
+When the work ends, met or not, mark the `META:` task as `completed`. End the reply with `META CLOSED: <met|cancelled by the user|limit>. <command> <result>`. The verification command must run after the last code edit.
 
-## Sem a ferramenta
+## Without the tool
 
-1. Escreva a lista numerada e a linha `META:` na resposta, com as mesmas partes.
-2. Pergunte uma vez por sessão, com o `AskUserQuestion`, se pode ligar a ferramenta: adicionar `"env": { "CLAUDE_CODE_ENABLE_TODO_TOOLS": "1" }` ao `~/.claude/settings.json`.
-3. Com o ok, copie o arquivo para o scratchpad, adicione só a variável em `env` (crie a chave se faltar) e confirme que o JSON continua válido.
-4. Teste com `claude -p` numa pasta temporária: peça que confira se `TaskCreate`, `TaskUpdate`, `TaskList` e `TaskGet` existem, sem criar tarefa.
-5. Reporte o resultado e o caminho da cópia. A ferramenta aparece na próxima sessão. Se o usuário disse não ou o teste falhou, siga com a lista.
+1. Write the numbered list and the `META:` line in the reply, with the same parts.
+2. Ask once per session, with `AskUserQuestion`, if you can enable the tool: add `"env": { "CLAUDE_CODE_ENABLE_TODO_TOOLS": "1" }` to `~/.claude/settings.json`.
+3. With approval, copy the file to the scratchpad. Add only the variable in `env` (create the key if it is missing). Check that the JSON is still valid.
+4. Test with `claude -p` in a temporary folder. Ask it to check that `TaskCreate`, `TaskUpdate`, `TaskList`, and `TaskGet` exist, without creating a task.
+5. Report the result and the path of the copy. The tool appears in the next session. If the user said no or the test failed, continue with the list.

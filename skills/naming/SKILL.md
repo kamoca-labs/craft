@@ -1,48 +1,48 @@
 ---
 name: naming
-description: Clean Code, nomes que revelam intenção. Use quando variáveis, funções, classes, arquivos ou pastas têm nome abreviado, genérico (data, info, handle, manager, utils), enganoso, ou que só se entende lendo o código ou um comentário.
-argument-hint: "[arquivo ou escopo]"
+description: Clean Code, names that reveal intent. Use when variables, functions, classes, files or folders have an abbreviated name, a generic name (data, info, handle, manager, utils), a misleading name, or a name that needs the code or a comment to be understood.
+argument-hint: "[file or scope]"
 user-invocable: false
 ---
 
-# Nomes que revelam a intenção
+# Names that reveal intent
 
-**Regra**: o nome responde **por que existe, o que faz e como se usa**, sem precisar ler a implementação. Se o nome precisa de comentário, o nome está errado. Vale para variáveis, funções, tipos, arquivos e pastas.
+**Rule**: the name answers **why it exists, what it does and how to use it**, without the need to read the implementation. If the name needs a comment, the name is wrong. This applies to variables, functions, types, files and folders.
 
-## Por quê
+## Why
 
-- Nome é a documentação que sempre é lida e nunca fica desatualizada sozinha.
-- Nome bom deixa o erro visível: `const total = items.length` salta aos olhos.
-- Estrutura de pastas com nomes claros dispensa mapa do projeto.
+- A name is the documentation that people always read and that never gets outdated alone.
+- A good name makes an error visible: `const total = items.length` stands out.
+- A folder structure with clear names removes the need for a project map.
 
-## Sinais de violação
+## Violation signs
 
-- Abreviação: `usr`, `qtd`, `tmp`, `cb`, `e` (fora de um `catch` de duas linhas).
-- Genérico: `data`, `info`, `item`, `obj`, `result`, `handle`, `process`, `Manager`, `Helper`, `Utils`.
-- Palavra de enchimento: `theUser`, `userObject`, `userData` quando `user` basta.
-- Enganoso: `getUser` que cria quando não acha; `isValid` que também salva; `list` que é um `Set`.
-- Número no nome: `user2`, `handleClick2`.
-- Nomes diferentes para o mesmo conceito (`fetch`/`get`/`retrieve`) ou o mesmo nome para conceitos diferentes.
+- Abbreviation: `usr`, `qty`, `tmp`, `cb`, `e` (outside a two-line `catch`).
+- Generic: `data`, `info`, `item`, `obj`, `result`, `handle`, `process`, `Manager`, `Helper`, `Utils`.
+- Filler word: `theUser`, `userObject`, `userData` when `user` is enough.
+- Misleading: a `getUser` that creates the user when it does not find one, an `isValid` that also saves, a `list` that is a `Set`.
+- A number in the name: `user2`, `handleClick2`.
+- Different names for the same concept (`fetch`/`get`/`retrieve`), or the same name for different concepts.
 
-## Como aplicar
+## How to apply
 
-- **Booleano**: pergunta de sim ou não (`isOverdue`, `hasAttachment`, `canEdit`).
-- **Função**: verbo + objeto, dizendo o efeito (`sendInvoice`, `calculateDiscount`). Se o verbo honesto é "e", divida (`craft:functions`).
-- **Valor**: substantivo do domínio, com unidade quando houver (`timeoutMs`, `maxSizeMb`).
-- **Coleção**: plural (`tickets`); mapa diz a chave (`ticketsById`).
-- **Constante mágica** vira nome (`MAX_LOGIN_ATTEMPTS = 5`).
-- **Vocabulário**: o do negócio e do projeto. Um termo por conceito, no código todo.
-- Tamanho proporcional ao escopo: `i` num laço de três linhas, nome completo em algo exportado.
+- **Boolean**: a yes or no question (`isOverdue`, `hasAttachment`, `canEdit`).
+- **Function**: verb + object, which says the effect (`sendInvoice`, `calculateDiscount`). If the honest verb is "and", split it (`craft:functions`).
+- **Value**: a domain noun, with the unit when there is one (`timeoutMs`, `maxSizeMb`).
+- **Collection**: plural (`tickets`). A map says the key (`ticketsById`).
+- **Magic constant** becomes a name (`MAX_LOGIN_ATTEMPTS = 5`).
+- **Vocabulary**: the vocabulary of the business and the project. One term per concept, in all the code.
+- Length proportional to scope: `i` in a three-line loop, a full name for anything exported.
 
-## Exemplo
+## Example
 
 ```ts
-// antes
+// before
 function chk(d: Ticket[]) {
   return d.filter((x) => x.dt < Date.now() - 864e5 * 3 && x.st === 1)
 }
 
-// depois
+// after
 const STALE_AFTER_DAYS = 3
 
 function staleOpenTickets(tickets: Ticket[], now: Date) {
@@ -51,11 +51,11 @@ function staleOpenTickets(tickets: Ticket[], now: Date) {
 }
 ```
 
-## Limites
+## Limits
 
-- Convenções consolidadas valem: `i`/`j` em laços curtos, `id`, `url`, `req`/`res` onde o framework usa.
-- Renomear API pública quebra quem consome: faça com deprecação, não no meio de um refactor.
+- Established conventions are valid: `i`/`j` in short loops, `id`, `url`, `req`/`res` where the framework uses them.
+- Renaming a public API breaks its consumers. Do it with a deprecation, not in the middle of a refactor.
 
-## Pergunta de verificação
+## Check question
 
-Lendo só as assinaturas e nomes (sem corpo), dá para contar o que o módulo faz?
+If I read only the signatures and names (no bodies), can I tell what the module does?

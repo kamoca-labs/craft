@@ -1,73 +1,73 @@
 ---
 name: hook
-description: Transforma uma correção do usuário em hook do projeto, para o erro não se repetir. Use quando o usuário corrigir algo que você fez (comando, arquivo, padrão de código) e a regra puder ser checada pela entrada da ferramenta, ou quando pedirem para criar um hook ou uma regra garantida no projeto.
-argument-hint: "<comportamento que não pode se repetir>"
+description: Turns a user correction into a project hook, so the mistake does not repeat. Use when the user corrects something you did (command, file, code pattern) and the tool input can check the rule, or when asked to create a hook or a guaranteed rule in the project.
+argument-hint: "<behavior that must not repeat>"
 ---
 
-# Correção vira hook
+# Correction becomes a hook
 
-Correção lembrada se perde na próxima sessão; correção garantida por hook não volta. Sempre que o usuário corrigir você, delibere se a correção cabe num hook.
+A remembered correction is lost in the next session. A correction guaranteed by a hook does not come back. Each time the user corrects you, decide whether the correction fits a hook.
 
-## Quando vale um hook
+## When a hook is worth it
 
-Faça as três perguntas. Hook só com três sim:
+Ask the three questions. Create a hook only with three yes answers:
 
-1. **Repete?** A correção é sobre um padrão (todo commit, todo arquivo de migração, todo `docker compose`), não sobre um caso único.
-2. **É checável pela entrada?** Dá para decidir só com o que a ferramenta recebe (caminho, conteúdo, comando, saída do comando), por regex ou leitura simples de arquivo, sem julgamento.
-3. **Erra pouco?** O padrão negado não pega uso legítimo. Falso positivo trava o trabalho e custa mais que o erro que evita.
+1. **Does it repeat?** The correction is about a pattern (every commit, every migration file, every `docker compose`), not about a single case.
+2. **Can the input check it?** You can decide with only what the tool receives (path, content, command, command output), by regex or a simple file read, without judgment.
+3. **Is it rarely wrong?** The denied pattern does not catch legitimate use. A false positive blocks the work and costs more than the error it prevents.
 
-Confira cada pergunta contra a correção concreta antes de propor:
+Check each question against the concrete correction before you propose:
 
-| Correção | Repete? | Checável? | Erra pouco? | Resultado |
+| Correction | Repeats? | Checkable? | Rarely wrong? | Result |
 |---|---|---|---|---|
-| "commit sem `Co-Authored-By`" | sim, todo commit | sim, a mensagem está no comando `git commit` | sim, o trailer é literal | hook que nega (como o `git:no-co-author`) |
-| "nunca `git add .env`" | sim | sim, pelo comando | sim | hook que nega |
-| "esse nome de variável não diz nada" | sim | não, exige julgamento | não | skill `craft:naming` |
-| "neste arquivo, use a lib X" | não, caso único | sim | sim | só a correção |
+| "commit without `Co-Authored-By`" | yes, every commit | yes, the message is in the `git commit` command | yes, the trailer is literal | hook that denies (like `git:no-co-author`) |
+| "never `git add .env`" | yes | yes, by the command | yes | hook that denies |
+| "this variable name says nothing" | yes | no, it needs judgment | no | skill `craft:naming` |
+| "in this file, use lib X" | no, single case | yes | yes | only the correction |
 
-Se a resposta for não:
+If the answer is no:
 
-| Situação | Onde a correção fica |
+| Situation | Where the correction stays |
 |---|---|
-| Exige julgamento (design, nome bom, escolha de biblioteca) | skill do assunto, ou o CLAUDE.md se for contexto do projeto |
-| Caso único | só a correção, sem registro |
-| Contexto útil depois de um evento (ex.: suíte verde) | hook que **injeta** contexto, em vez de negar |
+| Needs judgment (design, good name, library choice) | skill of the subject, or CLAUDE.md if it is project context |
+| Single case | only the correction, no record |
+| Context that helps after an event (for example, green suite) | hook that **injects** context, instead of denying |
 
-**Proponha e espere o ok**: diga a correção, a regra, o evento (`PreToolUse`, `PostToolUse` ou `Stop`, e o matcher), um exemplo negado e um liberado. Hook é imposição; quem decide é o usuário.
+**Propose and wait for the ok**: state the correction, the rule, the event (`PreToolUse`, `PostToolUse` or `Stop`, and the matcher), one denied example and one allowed example. A hook is enforcement. The user decides.
 
-## Duas camadas
+## Two layers
 
-Escolha o evento pelo custo e pela certeza da checagem:
+Choose the event by the cost and the certainty of the check:
 
-| Checagem | Evento | Exemplo |
+| Check | Event | Example |
 |---|---|---|
-| Mecânica, barata e sem ambiguidade | `PreToolUse`: nega na hora, antes da ferramenta rodar | `git add .env`, `.only` num teste |
-| Cara, ou que pede o julgamento do modelo | `Stop`: roda uma vez no fim, sobre os arquivos tocados na sessão | lint de vários arquivos, heurística que pode errar |
+| Mechanical, cheap and unambiguous | `PreToolUse`: denies at once, before the tool runs | `git add .env`, `.only` in a test |
+| Expensive, or needs the judgment of the model | `Stop`: runs once at the end, over the files touched in the session | lint of many files, heuristic that can be wrong |
 
-- As duas camadas passam pelas três perguntas acima. No `Stop`, o hook acha o candidato, e o modelo julga cada achado.
-- Na dúvida entre as duas, escolha o `Stop`. Uma negação na hora interrompe o trabalho, então ela precisa estar certa.
-- O `Stop` lê só os arquivos tocados na sessão (pelo transcript ou pelo `git diff`), não o projeto inteiro.
-- O `Stop` não repete o achado que a camada do `PreToolUse` já reportou.
-- Para reportar, o `Stop` sai com `exit 2` e a lista de achados no stderr. Sem achado novo, ele sai com `exit 0`, em silêncio.
-- Se a entrada traz `stop_hook_active` verdadeiro, libere. Os achados já saíram uma vez.
+- Both layers pass through the three questions above. In `Stop`, the hook finds the candidate and the model judges each finding.
+- When in doubt between the two, choose `Stop`. An immediate denial interrupts the work, so it must be right.
+- `Stop` reads only the files touched in the session (from the transcript or from `git diff`), not the whole project.
+- `Stop` does not repeat a finding that the `PreToolUse` layer already reported.
+- To report, `Stop` exits with `exit 2` and the list of findings on stderr. With no new finding, it exits with `exit 0`, silent.
+- If the input has `stop_hook_active` true, allow. The findings already came out once.
 
-## Como escrever
+## How to write
 
-- **TypeScript**, rodado direto com `node` (Node 22.18+ executa `.ts` sem build), sem dependência: só `node:fs`, `node:path`, `node:test`. Mesmo em projeto PHP ou Python, o hook é TypeScript.
-- **Código em inglês**; a mensagem que o usuário lê vem do arquivo de tradução, na língua dele (`craft:i18n`).
-- **Siga o `craft:atdd`**: o teste do hook vem antes da regra e falha primeiro.
-- Uma regra por arquivo e por entrada no settings; nega só o padrão exato da correção.
-- Negar: mensagem no stderr e `exit 2` (a mensagem diz o que fazer em vez disso). Injetar: JSON com `hookSpecificOutput.additionalContext` no stdout e `exit 0`.
-- Na dúvida (arquivo ilegível, entrada inesperada), libere: hook quebrado não pode travar a sessão.
+- **TypeScript**, run directly with `node` (Node 22.18+ runs `.ts` without a build), no dependency: only `node:fs`, `node:path`, `node:test`. Even in a PHP or Python project, the hook is TypeScript.
+- **Code in English**. The message the user reads comes from the translation file, in the language of the user (`craft:i18n`).
+- **Follow `craft:atdd`**: the test of the hook comes before the rule and fails first.
+- One rule per file and per entry in settings. Deny only the exact pattern of the correction.
+- To deny: message on stderr and `exit 2` (the message says what to do instead). To inject: JSON with `hookSpecificOutput.additionalContext` on stdout and `exit 0`.
+- When in doubt (unreadable file, unexpected input), allow. A broken hook must not block the session.
 
-Layout no projeto (commitado, para valer para todo o time):
+Layout in the project (committed, so it applies to the whole team):
 
 ```
 .claude/
-  settings.json            # liga cada regra no evento
+  settings.json            # connects each rule to the event
   hooks/
     lib.ts                 # readInput, deny, message
-    locales/pt-BR.json     # mensagens para o usuário
+    locales/en.json        # messages for the user, one file per locale
     rules/<rule>.ts
     tests/<rule>.test.ts   # node --test .claude/hooks/tests/
 ```
@@ -97,29 +97,29 @@ if (/\bgit\s+add\b.*\.env\b/.test(input.tool_input.command || '')) {
 }
 ```
 
-Se o projeto já tem hooks, siga o layout e a lib que existem.
+If the project already has hooks, follow the layout and the lib that exist.
 
-## Depois de criar
+## After you create it
 
-- Rode os testes do hook e mostre um caso negado e um liberado.
-- Diga ao usuário que o hook vale a partir da próxima sessão.
-- Se a correção valia para todo projeto, não só este, sugira levá-la para um plugin.
+- Run the tests of the hook and show one denied case and one allowed case.
+- Tell the user that the hook applies from the next session.
+- If the correction applied to every project, not only this one, suggest moving it to a plugin.
 
-## Quando um hook do projeto nega
+## When a project hook denies
 
-Todo achado de um hook cai num destes três casos:
+Every finding of a hook falls into one of three cases:
 
-| Caso | O que fazer |
+| Case | What to do |
 |---|---|
-| Problema real | Corrija o que o hook apontou. |
-| Falso positivo com evidência | Registre a exceção mais estreita possível no repo, com o motivo. Diga a exceção na resposta. |
-| Dúvida | Deixe o achado de pé. Pergunte ao usuário uma vez, numa linha. |
+| Real problem | Fix what the hook pointed at. |
+| False positive with evidence | Record the narrowest possible exception in the repo, with the reason. State the exception in the reply. |
+| Doubt | Leave the finding standing. Ask the user once, in one line. |
 
-- Evidência é um fato que você consegue citar: uma fixture de teste, um exemplo proposital na doc, uma escolha que o usuário já confirmou.
-- O motivo segue o formato `"<quem decidiu>: <evidência>"`. Ex.: `"usuário confirmou: o seed usa nomes de cidade em português"`.
-- Escreva "usuário confirmou" só quando o usuário confirmou de fato.
-- A exceção mais estreita cobre um valor, uma linha ou um caminho. Exceção ampla (arquivo inteiro, regra inteira) só com o pedido do usuário.
-- Nunca use uma exceção para forçar a passagem de uma edição negada.
-- Registre a exceção onde a regra já aceita uma (uma lista na própria regra), com um teste do caso liberado. O motivo vai no body do commit.
+- Evidence is a fact you can cite: a test fixture, an intentional example in the docs, a choice the user already confirmed.
+- The reason follows the format `"<who decided>: <evidence>"`. Example: `"user confirmed: the seed uses city names in another language"`.
+- Write "user confirmed" only when the user really confirmed.
+- The narrowest exception covers one value, one line or one path. A wide exception (whole file, whole rule) needs a request from the user.
+- Never use an exception to force through a denied edit.
+- Record the exception where the rule already accepts one (a list in the rule itself), with a test of the allowed case. The reason goes in the body of the commit.
 
-Esta seção é uma política, não um mecanismo. Não crie código novo só para registrar exceções.
+This section is a policy, not a mechanism. Do not create new code only to record exceptions.

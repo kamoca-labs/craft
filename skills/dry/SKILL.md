@@ -1,65 +1,65 @@
 ---
 name: dry
-description: DRY (don't repeat yourself). Use quando a mesma regra de negócio, constante, texto, validação ou estilo aparece escrita em mais de um lugar, ou quando uma mudança de regra exige lembrar de editar vários arquivos, ou quando código genérico (formatar, converter, calcular data) nasce preso a um caso específico.
-argument-hint: "[arquivo ou escopo]"
+description: DRY (don't repeat yourself). Use when the same business rule, constant, text, validation or style appears in more than one place, a rule change needs edits in many files, or generic code (format, convert, date math) is tied to one case.
+argument-hint: "[file or scope]"
 user-invocable: false
 ---
 
-# DRY: cada conhecimento tem uma fonte só
+# DRY: each piece of knowledge has one source
 
-**Regra**: cada **conhecimento** (uma regra de negócio, um limite, um texto, um estilo, um formato) está escrito em **um lugar só**. DRY é sobre conhecimento, não sobre linhas parecidas.
+**Rule**: each piece of **knowledge** (a business rule, a limit, a text, a style, a format) is written in **one place only**. DRY is about knowledge, not about similar lines.
 
-## Por quê
+## Why
 
-- Mudar a regra vira editar um lugar, não caçar cópias.
-- Cópias divergem com o tempo e viram bug ("o limite é 10 MB no front e 5 MB no back").
+- A rule change means editing one place, not hunting for copies.
+- Copies drift apart with time and become bugs ("the limit is 10 MB in the front end and 5 MB in the back end").
 
-## Sinais de violação
+## Violation signs
 
-- O mesmo número mágico em dois arquivos (`10 * 1024 * 1024`).
-- A mesma validação no front e no back escrita à mão duas vezes.
-- O mesmo texto de mensagem copiado em vários componentes.
-- Mudança de regra que exigiu um PR tocando N arquivos com a mesma edição.
+- The same magic number in two files (`10 * 1024 * 1024`).
+- The same validation in the front end and the back end, written by hand twice.
+- The same message text copied in many components.
+- A rule change that needed a PR/MR with the same edit in N files.
 
-## Como aplicar
+## How to apply
 
-1. Confirme que é o **mesmo conhecimento**: se a regra de um mudar, a do outro tem que mudar junto? Só então extraia.
-2. Dê nome ao conhecimento (`MAX_ATTACHMENT_SIZE`, `isBusinessDay`).
-3. Coloque no lugar mais baixo que todos os usos alcançam.
-4. Para conhecimento que cruza fronteiras (front e back), prefira gerar de uma fonte (schema compartilhado, endpoint de config) a copiar.
+1. Confirm that it is the **same knowledge**. If the rule of one changes, must the rule of the other change too? Only then extract.
+2. Give the knowledge a name (`MAX_ATTACHMENT_SIZE`, `isBusinessDay`).
+3. Put it at the lowest level that all uses can reach.
+4. For knowledge that crosses boundaries (front end and back end), generate it from one source (shared schema, config endpoint) instead of copying it.
 
-## Exemplo
+## Example
 
 ```ts
-// antes: o limite em dois lugares, um dia diverge
+// before: the limit in two places, one day they drift apart
 if (file.size > 10 * 1024 * 1024) throw new TooLarge()
-// ...em outro arquivo
-const hint = 'Máximo de 10 MB'
+// ...in another file
+const hint = 'Maximum 10 MB'
 
-// depois
+// after
 export const MAX_ATTACHMENT_MB = 10
 if (file.size > MAX_ATTACHMENT_MB * 1024 * 1024) throw new TooLarge()
-const hint = `Máximo de ${MAX_ATTACHMENT_MB} MB`
+const hint = `Maximum ${MAX_ATTACHMENT_MB} MB`
 ```
 
-## Código genérico nasce reutilizável
+## Generic code is born reusable
 
-Código que não é específico da implementação (formatar, converter, validar formato, repetir chamada, calcular data) não espera a repetição. Ele nasce como função própria, num módulo do assunto (`date.ts`, `retry.ts`), onde o próximo caso a encontra:
+Code that is not specific to the implementation (format, convert, validate a format, retry a call, compute a date) does not wait for repetition. Write it as its own function, in a module for the subject (`date.ts`, `retry.ts`), where the next case finds it:
 
-- tem nome genérico;
-- recebe só o que usa;
-- não importa nada do caso atual.
+- it has a generic name.
+- it receives only what it uses.
+- it imports nothing from the current case.
 
-Escrita assim, a função custa as mesmas linhas, e a próxima feature a importa em vez de escrever de novo. A regra de negócio do caso fica com o caso.
+Written this way, the function costs the same number of lines. The next feature imports it instead of writing it again. The business rule of the case stays with the case.
 
 ```ts
-// antes: o cálculo genérico preso à regra do ticket
+// before: the generic calculation is tied to the ticket rule
 function isOverdue(ticket: Ticket) {
   const days = Math.floor((Date.now() - ticket.openedAt.getTime()) / 86_400_000)
   return days > ticket.slaDays
 }
 
-// depois: o cálculo genérico mora em date.ts e serve a qualquer caso
+// after: the generic calculation lives in date.ts and serves any case
 export function daysSince(date: Date) {
   return Math.floor((Date.now() - date.getTime()) / 86_400_000)
 }
@@ -69,23 +69,23 @@ function isOverdue(ticket: Ticket) {
 }
 ```
 
-Se o projeto já tem `date-fns`, use o `differenceInDays`, e não escreva o `daysSince` (`craft:kiss`).
+If the project already has `date-fns`, use `differenceInDays` and do not write `daysSince` (`craft:kiss`).
 
-## Duplicação acidental: não extraia
+## Accidental duplication: do not extract
 
 ```ts
 const userAge = (user: User) => yearsSince(user.birthDate)
 const contractAge = (contract: Contract) => yearsSince(contract.signedAt)
 ```
 
-Parecem iguais hoje, mas são regras diferentes: se o contrato passar a contar a partir da vigência, só uma muda. Juntá-las criaria um acoplamento falso.
+They look the same today, but they are different rules. If the contract starts to count from the effective date, only one changes. Merging them would create a false coupling.
 
-## Limites
+## Limits
 
-- **Regra de três**: na segunda repetição, anote; na terceira, extraia. Duplicação é mais barata que a abstração errada. A regra vale para juntar conhecimento que já está duplicado, não para o código genérico novo.
-- Teste pode repetir dados de forma explícita: legibilidade do teste vale mais que DRY (veja `craft:clean-tests`).
-- Extração que precisa de flag para tratar "o caso de um e o caso do outro" é sinal de que não era o mesmo conhecimento.
+- **Rule of three**: on the second repetition, take note. On the third, extract. Duplication costs less than the wrong abstraction. This rule applies to merging knowledge that is already duplicated. It does not apply to new generic code.
+- A test can repeat data in an explicit way. Test readability is worth more than DRY (see `craft:clean-tests`).
+- An extraction that needs a flag to handle "the case of one and the case of the other" shows that it was not the same knowledge.
 
-## Pergunta de verificação
+## Check question
 
-Se esta regra mudar amanhã, em quantos lugares eu edito? Deve ser um.
+If this rule changes tomorrow, in how many places do I edit? The answer must be one.

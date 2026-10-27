@@ -1,55 +1,55 @@
 ---
 name: arguments
-description: Clean Code, poucos argumentos e sem flag booleana. Use quando uma função tem mais de três parâmetros, parâmetros do mesmo tipo em sequência fáceis de trocar, um booleano que muda o comportamento, ou argumento de saída que a função modifica.
-argument-hint: "[arquivo ou escopo]"
+description: Clean Code, few arguments and no boolean flag. Use when a function has more than three parameters, same-type parameters in a row that are easy to swap, a boolean that changes behavior, or an output argument the function modifies.
+argument-hint: "[file or scope]"
 user-invocable: false
 ---
 
-# Poucos argumentos, sem flag booleana
+# Few arguments, no boolean flag
 
-**Regra**: o ideal é zero a dois argumentos; três exige justificativa; mais que isso vira **objeto de opções nomeadas**. Nunca passe um booleano para escolher entre dois comportamentos: são duas funções.
+**Rule**: the ideal is zero to two arguments. Three arguments need a reason. More than three become an **object of named options**. Never pass a boolean to choose between two behaviors. Write two functions.
 
-## Por quê
+## Why
 
-- Cada argumento é algo que o leitor precisa entender e que o teste precisa combinar.
-- `createUser('Ana', 'ana@x', true, false, 3)` não se lê na chamada; a ordem errada compila.
-- Flag booleana anuncia que a função faz duas coisas (`craft:functions`).
-- Argumento de saída (a função altera o objeto recebido) surpreende o chamador (`craft:side-effects`).
+- The reader must understand each argument, and the test must combine each argument.
+- `createUser('Ana', 'ana@x', true, false, 3)` is not readable at the call site. A wrong order still compiles.
+- A boolean flag shows that the function does two things (`craft:functions`).
+- An output argument (the function changes the object it receives) surprises the caller (`craft:side-effects`).
 
-## Sinais de violação
+## Violation signs
 
-- Quatro ou mais parâmetros posicionais.
-- Dois ou mais do mesmo tipo em sequência (`(from: Date, to: Date)` invertível).
-- `true`/`false`/`null` literal na chamada sem nome.
-- `if (flag)` logo no início dividindo a função em dois caminhos.
-- Função `void` que preenche o objeto que recebeu.
+- Four or more positional parameters.
+- Two or more parameters of the same type in a row (`(from: Date, to: Date)` can be reversed).
+- A literal `true`, `false` or `null` in the call, with no name.
+- An `if (flag)` at the start that splits the function into two paths.
+- A `void` function that fills the object it received.
 
-## Como aplicar
+## How to apply
 
-- Flag booleana: divida em duas funções com nomes próprios (`render(doc, true)` vira `renderPreview(doc)` e `renderFinal(doc)`).
-- Muitos argumentos relacionados: agrupe num tipo do domínio (`period: { start, end }`, `address`).
-- Muitas opções independentes: objeto de opções desestruturado, com padrões.
-- Argumento de saída: retorne o valor novo em vez de alterar o recebido.
+- Boolean flag: split into two functions with their own names (`render(doc, true)` becomes `renderPreview(doc)` and `renderFinal(doc)`).
+- Many related arguments: group them in a domain type (`period: { start, end }`, `address`).
+- Many independent options: use a destructured options object with defaults.
+- Output argument: return the new value instead of changing the received one.
 
-## Exemplo
+## Example
 
 ```ts
-// antes
-sendNotification(user, 'Fatura vencida', body, true, false)
+// before
+sendNotification(user, 'Invoice overdue', body, true, false)
 
 function sendNotification(user: User, title: string, body: string, urgent: boolean, email: boolean) { /* ... */ }
 
-// depois
-sendNotification({ to: user, title: 'Fatura vencida', body, priority: 'urgent', channel: 'push' })
+// after
+sendNotification({ to: user, title: 'Invoice overdue', body, priority: 'urgent', channel: 'push' })
 
 function sendNotification({ to, title, body, priority = 'normal', channel = 'push' }: Notification) { /* ... */ }
 ```
 
-## Limites
+## Limits
 
-- Objeto de opções não é desculpa para uma função que faz tudo: muitas opções independentes ainda podem indicar várias responsabilidades.
-- Funções matemáticas com ordem natural (`clamp(value, min, max)`, `point(x, y)`) ficam posicionais.
+- An options object is not an excuse for a function that does everything. Many independent options can still show many responsibilities.
+- Math functions with a natural order (`clamp(value, min, max)`, `point(x, y)`) stay positional.
 
-## Pergunta de verificação
+## Check question
 
-Lendo só a linha da chamada, sem abrir a função, eu sei o que cada valor significa?
+If I read only the call line, without opening the function, do I know what each value means?

@@ -1,37 +1,37 @@
 ---
 name: liskov-substitution
-description: L do SOLID, substituição de Liskov. Use quando há várias implementações de um mesmo contrato (interface, classe base, tipo de função) e alguma delas lança "não suportado", ignora parâmetros, muda o formato de retorno ou obriga quem chama a checar o tipo concreto.
-argument-hint: "[arquivo ou escopo]"
+description: L of SOLID, Liskov substitution. Use when several implementations share one contract (interface, base class, function type) and one of them throws "not supported", ignores parameters, changes the return format or forces the caller to check the concrete type.
+argument-hint: "[file or scope]"
 user-invocable: false
 ---
 
-# L: substituição de Liskov
+# L: Liskov substitution
 
-**Regra**: qualquer implementação de um contrato pode ocupar o lugar de outra **sem que quem chama perceba**. Mesma entrada aceita, mesmo formato de saída, mesmos erros possíveis, nenhuma surpresa.
+**Rule**: any implementation of a contract can take the place of another **without the caller noticing**. It accepts the same input, returns the same output format, throws the same possible errors and gives no surprises.
 
-Herdar ou implementar não é sobre "é um" no mundo real (quadrado é um retângulo); é sobre **comportamento** prometido no código.
+Inheriting or implementing is not about "is a" in the real world (a square is a rectangle). It is about the **behavior** that the code promises.
 
-## Por quê
+## Why
 
-- Quem chama confia no contrato, não na implementação. Trocar storage local por S3 não muda nenhum chamador.
-- Teste do contrato roda contra todas as implementações.
-- Sem isso, o polimorfismo vira `instanceof` espalhado.
+- The caller trusts the contract, not the implementation. A change from local storage to S3 changes no caller.
+- The contract test runs against all implementations.
+- Without this rule, polymorphism becomes `instanceof` checks spread across the code.
 
-## Sinais de violação
+## Signs of a violation
 
-- Implementação que lança `NotImplemented` / "não suportado" para um método do contrato.
-- `if (x instanceof Y)` ou checagem de tipo concreto em quem consome a abstração.
-- Uma implementação exige pré-condição a mais (só aceita arquivo até 5 MB) ou entrega menos (retorna `null` onde as outras lançam).
-- Sobrescrita que ignora parâmetro ou que muda efeito colateral esperado.
+- An implementation throws `NotImplemented` or "not supported" for a method of the contract.
+- `if (x instanceof Y)` or a concrete type check in the code that consumes the abstraction.
+- One implementation requires an extra precondition (it accepts only files up to 5 MB) or delivers less (it returns `null` where the others throw an error).
+- An override ignores a parameter or changes the expected side effect.
 
-## Como aplicar
+## How to apply
 
-1. Escreva o contrato explicitamente: entradas válidas, saída, erros.
-2. Para cada implementação, confira as quatro coisas: aceita pelo menos as mesmas entradas, entrega o mesmo formato, lança só os erros previstos, mantém os invariantes.
-3. Se uma implementação não cumpre, ela não pertence a esse contrato: separe o contrato (`craft:interface-segregation`) ou use composição.
-4. Rode a mesma suíte de contrato contra todas as implementações.
+1. Write the contract explicitly: valid inputs, output, errors.
+2. For each implementation, check four things. It accepts at least the same inputs. It returns the same format. It throws only the expected errors. It keeps the invariants.
+3. If an implementation does not comply, it does not belong to this contract. Split the contract (`craft:interface-segregation`) or use composition.
+4. Run the same contract suite against all implementations.
 
-## Exemplo
+## Example
 
 ```ts
 interface Storage {
@@ -39,13 +39,13 @@ interface Storage {
   get(key: string): Promise<Buffer>
 }
 
-// viola: quem chama precisa saber que este storage não grava
+// violates: the caller must know that this storage does not write
 class ReadOnlyCdnStorage implements Storage {
-  async put() { throw new Error('não suportado') }
+  async put() { throw new Error('not supported') }
   async get(key: string) { return fetchFromCdn(key) }
 }
 
-// corrige: contratos separados, cada um cumprido por inteiro
+// fix: separate contracts, each one fully met
 interface Reader { get(key: string): Promise<Buffer> }
 interface Writer { put(key: string, content: Buffer): Promise<void> }
 
@@ -54,11 +54,11 @@ class CdnReader implements Reader {
 }
 ```
 
-Teste de contrato reaproveitado:
+A reused contract test:
 
 ```ts
 for (const [name, make] of [['local', makeLocalStorage], ['s3', makeS3Storage]] as const) {
-  test(`${name} devolve o que gravou`, async () => {
+  test(`${name} returns what it stored`, async () => {
     const storage = make()
     await storage.put('a', Buffer.from('x'))
     assert.deepStrictEqual(await storage.get('a'), Buffer.from('x'))
@@ -66,11 +66,11 @@ for (const [name, make] of [['local', makeLocalStorage], ['s3', makeS3Storage]] 
 }
 ```
 
-## Limites
+## Limits
 
-- Só se aplica onde há **substituição de fato**: mais de uma implementação, ou dublê em teste.
-- Diferença de desempenho não viola o contrato, a não ser que o contrato prometa tempo.
+- This rule applies only where **real substitution** exists: more than one implementation, or a double in a test.
+- A difference in performance does not violate the contract, unless the contract promises a time.
 
-## Pergunta de verificação
+## Verification question
 
-Se eu trocar a implementação no ponto de injeção, algum chamador precisa mudar ou algum teste de contrato falha?
+If I swap the implementation at the injection point, does a caller need to change or does a contract test fail?

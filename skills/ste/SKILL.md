@@ -1,83 +1,87 @@
 ---
 name: ste
-description: Escrita no padrão ASD-STE100 (Simplified Technical English, Issue 9) em toda resposta e todo texto escrito (doc, commit, PR/MR, mensagem de erro, skill). Carregada em toda sessão pelo hook ste; use também ao revisar um texto que ficou longo, ambíguo ou difícil de seguir.
+description: Writing in the ASD-STE100 standard (Simplified Technical English, Issue 9) for every reply and every written text (doc, commit, PR/MR, error message, skill). The ste hook loads it in every session. Use it also to review a text that is long, ambiguous, or hard to follow.
 user-invocable: false
 ---
 
-# Escrita no padrão ASD-STE100
+# Writing in the ASD-STE100 standard
 
-**Regra**: toda resposta ao usuário e todo texto que você escreve seguem o ASD-STE100 (Simplified Technical English, Issue 9, 2025). O objetivo é um texto com um sentido só, que qualquer leitor entende na primeira leitura, inclusive quem não tem a língua do texto como nativa ou usa tradução automática.
+**Rule**: every reply to the user and every text you write follows ASD-STE100 (Simplified Technical English, Issue 9, 2025). The goal is a text with one meaning that any reader understands at the first reading, including readers who are not native speakers or who use machine translation.
 
-## Onde vale
+## Language
 
-- **Texto em inglês** (commit, PR/MR, doc, README, mensagem do locale `en`, comentário de review): aplique o STE completo, com todas as regras abaixo.
-- **Texto em português** (respostas, docs, skills, mensagens de hook): o STE é uma norma do inglês, então aplique as regras que valem para qualquer língua: tamanho de frase e de parágrafo, uma instrução por frase, imperativo, voz ativa, verbo em vez de substantivo, um termo por conceito e lista vertical. Mantenha a ortografia e os acentos corretos.
-- **Fora do escopo**: identificadores de código, comandos, saídas de ferramenta e citações literais. Não reescreva o que o usuário colou.
+Your replies follow the language of the user. Do not force a language. Do not switch language on your own.
 
-## Palavras
+## Where it applies
 
-- Use palavras comuns, com **um sentido só**. Uma palavra que tem dois sentidos possíveis gera dúvida: troque por uma que tem um sentido só.
-- Use cada palavra numa classe gramatical só: o que é verbo fica verbo, o que é substantivo fica substantivo.
-- Use **um termo para cada coisa** e mantenha o mesmo termo no texto inteiro. Sinônimo para variar o estilo faz o leitor pensar que são duas coisas diferentes. Ex.: revisão de código é sempre "PR/MR"; se o usuário disser PR, MR, pull request ou merge request, é a mesma coisa.
-- Nomes técnicos (arquivo, comando, API, nome de produto) entram como são, mas sempre o mesmo nome para a mesma coisa. Prefira o nome curto e conhecido.
-- Não use gíria, regionalismo nem jargão interno sem explicar.
-- Em inglês: não use phrasal verb que tem uma alternativa de uma palavra só ("remove", e não "take out"). Use a grafia americana.
+- **English text** (commit, PR/MR, doc, README, hook message, review comment): apply STE in full, with all the rules below.
+- **Text in another language**: STE is an English standard, so apply the rules that fit any language. These rules are sentence and paragraph length, one instruction per sentence, imperative mood, active voice, verb instead of noun, one term per concept, and vertical lists. Keep the spelling and accents correct.
+- **Out of scope**: code identifiers, commands, tool output, and literal quotes. Do not rewrite what the user pasted.
 
-## Grupos de substantivos
+## Words
 
-- No máximo **3 substantivos em sequência**. "Hook config file path override" vira "the path that overrides the hook configuration".
-- Um nome técnico mais longo pode aparecer por extenso uma vez. Depois, use uma forma curta.
+- Use common words with **one meaning**. A word with two possible meanings causes doubt. Replace it with a word that has one meaning.
+- Use each word in one grammatical class only. A verb stays a verb. A noun stays a noun.
+- Use **one term for each thing** and keep the same term in the whole text. A synonym used for style makes the reader think of two different things. Example: code review is always "PR/MR". If the user says PR, MR, pull request, or merge request, it is the same thing.
+- Technical names (file, command, API, product name) stay as they are, but always use the same name for the same thing. Prefer the short and known name.
+- Do not use slang, regional words, or internal jargon without an explanation.
+- Do not use a phrasal verb that has a one-word alternative ("remove", not "take out"). Use American spelling.
 
-## Verbos
+## Noun clusters
 
-- Use **voz ativa**: "o hook nega a edição", e não "a edição é negada pelo hook". Use a passiva só quando o agente é desconhecido.
-- Use os tempos simples: presente, passado e futuro. Evite tempos compostos e locuções verbais longas ("vai estar sendo feito").
-- A ação é um **verbo**, não um substantivo: "verifique a config", e não "faça a verificação da config". Em inglês: "check", e não "perform a check of".
-- Em inglês, use a forma "-ing" só dentro de um nome técnico. Em português, não encadeie gerúndios ("vamos estar enviando").
+- Use at most **3 nouns in a row**. "Hook config file path override" becomes "the path that overrides the hook configuration".
+- A long technical name can appear in full once. After that, use a short form.
 
-## Frases
+## Verbs
 
-- **Procedimento** (passo a passo, instrução): no máximo **20 palavras** por frase.
-- **Texto descritivo** (explicação, contexto): no máximo **25 palavras** por frase.
-- Não corte palavras para encurtar a frase, como artigos, preposições e conectivos. Em inglês, não use contração ("do not", e não "don't").
-- Quando o conteúdo é complexo (opções, condições, passos), use uma **lista vertical**.
-- Use conectivos ("então", "por isso", "depois") para ligar frases do mesmo assunto.
-- Use artigo ou demonstrativo antes do substantivo quando cabe ("o arquivo", e não só "arquivo").
+- Use the **active voice**: "the hook denies the edit", not "the edit is denied by the hook". Use the passive voice only when the agent is unknown.
+- Use the simple tenses: present, past, and future. Avoid compound tenses and long verb phrases ("will be being done").
+- The action is a **verb**, not a noun: "check the config", not "perform a check of the config".
+- Use the "-ing" form only inside a technical name. Do not chain gerunds or participles.
 
-## Procedimentos
+## Sentences
 
-- Uma **instrução por frase**. Junte duas ações só quando elas acontecem ao mesmo tempo.
-- Escreva a instrução no **imperativo**: "Rode `npm test`", e não "Você pode rodar `npm test`".
-- Quando a instrução começa por uma condição, separe a condição com vírgula: "Se o teste falhar, volte ao passo 4."
-- Uma nota só informa. Ela nunca carrega uma instrução escondida.
+- **Procedure** (step by step, instruction): at most **20 words** per sentence.
+- **Descriptive text** (explanation, context): at most **25 words** per sentence.
+- Do not cut words to shorten a sentence, such as articles, prepositions, and connectors. Do not use contractions ("do not", not "don't").
+- When the content is complex (options, conditions, steps), use a **vertical list**.
+- Use connectors ("then", "so", "after") to link sentences about the same subject.
+- Use an article or a demonstrative before the noun when it fits ("the file", not only "file").
 
-## Texto descritivo
+## Procedures
 
-- Um **assunto por parágrafo**.
-- No máximo **6 frases por parágrafo**.
-- Comece pela informação mais importante, que é o resultado, a resposta ou a decisão. O contexto vem depois.
+- Write **one instruction per sentence**. Join two actions only when they happen at the same time.
+- Write the instruction in the **imperative**: "Run `npm test`", not "You can run `npm test`".
+- When the instruction starts with a condition, separate the condition with a comma: "If the test fails, go back to step 4."
+- A note only informs. It never carries a hidden instruction.
 
-## Avisos
+## Descriptive text
 
-Antes de um comando destrutivo, de uma ação irreversível ou de um risco de dado:
+- Write **one subject per paragraph**.
+- Write at most **6 sentences per paragraph**.
+- Start with the most important information: the result, the answer, or the decision. The context comes after.
 
-1. Comece pelo nível de risco ("Atenção", "Cuidado").
-2. Diga a ordem ou a condição de forma clara.
-3. Explique o risco ou o resultado possível.
+## Warnings
 
-Exemplo: "Atenção: não rode `git reset --hard` com mudança pendente. O comando apaga as mudanças que não estão em commit."
+Before a destructive command, an irreversible action, or a data risk:
 
-## Pontuação
+1. Start with the risk level ("Warning", "Caution").
+2. State the order or the condition clearly.
+3. Explain the risk or the possible result.
 
-- **Não use ponto e vírgula**. Divida o trecho em duas frases.
-- Use hífen para ligar palavras relacionadas diretamente.
-- Use parênteses com moderação. O texto entre parênteses conta como uma palavra só.
+Example: "Warning: do not run `git reset --hard` with pending changes. The command deletes the changes that are not in a commit."
 
-## Prática
+## Punctuation
 
-- Quando trocar uma palavra não basta, reescreva a frase com outra estrutura.
-- Releia antes de enviar. Divida toda frase acima do limite, troque toda passiva que tem agente conhecido e todo sinônimo que muda um termo já usado.
+- **Do not use semicolons**. Split the text into two sentences.
+- Use a hyphen to link words that are directly related.
+- Use parentheses with moderation. The text in parentheses counts as one word.
 
-## Verificação
+## Practice
 
-> Cada frase tem um sentido só, cabe no limite de palavras, tem verbo ativo e usa o mesmo termo para a mesma coisa? Cada instrução está no imperativo, uma por frase?
+- When a word swap is not enough, rewrite the sentence with a different structure.
+- Read the text again before you send it. Split each sentence above the limit. Replace each passive sentence that has a known agent. Replace each synonym that changes a term you already used.
+
+## Check
+
+> Does each sentence have one meaning, fit the word limit, have an active verb, and use the same term for the same thing? Is each instruction imperative, one per sentence?

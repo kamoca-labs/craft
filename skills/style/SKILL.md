@@ -1,63 +1,63 @@
 ---
 name: style
-description: Modo estilo para mudança só visual (estilo, layout, espaçamento, cor, responsividade, posição de elementos, animação). Itera a tela com o usuário sem especificação Given/When/Then nem teste vermelho antes, e roda os testes dos arquivos tocados no fim. Use quando a mudança não toca comportamento. Comportamento vai para o craft:atdd.
-argument-hint: "<o que deve mudar na tela>"
+description: Style mode for a visual-only change (style, layout, spacing, color, responsiveness, element position, animation). Iterates the screen with the user without a Given/When/Then specification or a prior red test, and runs the tests of the touched files at the end. Use when the change does not touch behavior. Behavior goes to craft:atdd.
+argument-hint: "<what must change on the screen>"
 ---
 
-# Modo estilo
+# Style mode
 
-Mudança só visual não tem regra para testar antes. O usuário vê a tela e decide. Neste modo, você itera a tela com ele e verifica a quebra no fim.
+A visual-only change has no rule to test first. The user sees the screen and decides. In this mode, you iterate the screen with the user and check for breakage at the end.
 
-O hook `atdd-first` libera, com esta skill carregada, só os componentes de UI: `.vue`, `.tsx`, `.jsx`, `.svelte` e `.astro`. CSS, SCSS e Less sempre passam. Serviço, store, API e back-end continuam negados sem o `craft:atdd`.
+With this skill loaded, the `atdd-first` hook allows only UI components: `.vue`, `.tsx`, `.jsx`, `.svelte` and `.astro`. CSS, SCSS and Less always pass. Service, store, API and back-end stay denied without `craft:atdd`.
 
-## Como conduzir
+## How to proceed
 
-1. **Impeccable**: confira se a skill `impeccable` está na lista de skills da sessão.
-   - Se está, carregue o `/impeccable` com a ferramenta `Skill`. Siga as orientações dele para a parte visual.
-   - Se não está, peça ao usuário para instalar e espere a resposta. O comando oficial para o Claude Code é `/plugin marketplace add pbakaus/impeccable`. Depois, o usuário abre o `/plugin` e instala o Impeccable da lista. Fonte: `https://impeccable.style` e o repo `pbakaus/impeccable`.
-2. **Iteração**: faça a mudança visual que o usuário pede. Ele olha a tela e pede o ajuste seguinte. Não escreva especificação Given/When/Then nem teste vermelho antes.
-3. **Fechamento**: quando o usuário diz que a tela está ok, rode uma vez os testes filtrados dos arquivos tocados (componente e E2E). Assim você pega uma quebra. Faça no máximo uma rodada de correção e uma de confirmação. Depois, pare.
+1. **Impeccable**: check whether the `impeccable` skill is in the session skill list.
+   - If it is, load `/impeccable` with the `Skill` tool. Follow its guidance for the visual part.
+   - If it is not, ask the user to install it and wait for the answer. The official command for Claude Code is `/plugin marketplace add pbakaus/impeccable`. Then the user opens `/plugin` and installs Impeccable from the list. Source: `https://impeccable.style` and the repo `pbakaus/impeccable`.
+2. **Iteration**: make the visual change that the user asks for. The user looks at the screen and asks for the next adjustment. Do not write a Given/When/Then specification or a red test first.
+3. **Closing**: when the user says the screen is ok, run the filtered tests of the touched files once (component and E2E). This catches a breakage. Do at most one fix round and one confirmation round. Then stop.
 
-## Limite do modo
+## Limit of the mode
 
-O modo estilo cobre só a aparência. Se a mudança toca comportamento, ela sai do modo estilo e vai para o `craft:atdd`. Comportamento é:
+Style mode covers only appearance. If the change touches behavior, it leaves style mode and goes to `craft:atdd`. Behavior is:
 
-- um handler (click, submit, change, input)
-- um estado ou um dado
-- uma condição que mostra ou esconde conteúdo por regra
-- uma chamada de API
-- uma regra de negócio.
+- a handler (click, submit, change, input)
+- a state or a piece of data
+- a condition that shows or hides content by rule
+- an API call
+- a business rule.
 
-## Feature mista (tela com back-end)
+## Mixed feature (screen with back-end)
 
-Não decida a ordem sozinho. Pergunte ao usuário com o `AskUserQuestion`, com estas opções:
+Do not decide the order alone. Ask the user with `AskUserQuestion`, with these options:
 
-- **Back-end primeiro (recomendado)**: o ATDD cobre o contrato e a regra. Depois, o modo estilo itera a tela com o dado real.
-- **Tela primeiro**: o modo estilo itera a tela com dado fixo (mock). Depois, o ATDD faz o back-end e troca o mock pelo dado real.
-- **Por fatia**: cada cenário passa pelo ATDD. Depois, o visual daquele cenário passa pelo modo estilo, antes do cenário seguinte.
+- **Back-end first (recommended)**: ATDD covers the contract and the rule. Then style mode iterates the screen with the real data.
+- **Screen first**: style mode iterates the screen with fixed data (mock). Then ATDD builds the back-end and replaces the mock with the real data.
+- **By slice**: each scenario goes through ATDD. Then the visual part of that scenario goes through style mode, before the next scenario.
 
-Nos três casos, a lógica nunca entra sem teste. O hook `atdd-first` garante isso.
+In all three cases, logic never enters without a test. The `atdd-first` hook guarantees this.
 
-## Motion: nunca uma quebra brusca
+## Motion: never an abrupt break
 
-O usuário nunca vê um salto. Toda mudança na tela é gradual.
+The user never sees a jump. Every change on the screen is gradual.
 
-- **Entrada e saída animam.** Todo elemento que aparece, some ou muda de tamanho anima. Ele nunca surge nem some de repente. Exemplos: o modal que abre e fecha, o item que entra e sai de uma lista, o painel que expande e recolhe, a mensagem que aparece.
-- **O tamanho muda de forma gradual.** Para a altura automática, use uma destas técnicas:
-  - `grid-template-rows` de `0fr` para `1fr`
-  - `interpolate-size: allow-keywords`, onde o navegador tem suporte
-  - a View Transitions API.
-- **O modal combina duas propriedades.** Anime `opacity` junto com `transform: scale` ou `translate`.
-- **Evite animar a geometria fixa.** Não anime `top`, `left`, `width` e `height` com valor fixo em px quando uma das técnicas acima resolve.
-- **Duração e curva:** a duração fica entre 150 e 300 ms. A entrada usa ease-out. A saída usa ease-in. Não use bounce.
-- **Tokens num lugar só:** a duração e a curva ficam em tokens (variáveis CSS ou do tema), num arquivo só. Não escreva um valor solto em cada componente.
-- **`prefers-reduced-motion: reduce` é obrigatório.** Com essa preferência, a transição fica instantânea ou vira um fade curto. O conteúdo continua visível e utilizável.
-- **Sem salto de layout no carregamento.** Reserve o espaço do conteúdo antes de ele chegar. Prefira reservar a altura ou manter o conteúdo anterior até o novo chegar. O skeleton é só uma opção para propor ao usuário. Nunca use o skeleton como padrão.
+- **Entry and exit animate.** Every element that appears, disappears or changes size animates. It never shows up or vanishes suddenly. Examples: the modal that opens and closes, the item that enters and leaves a list, the panel that expands and collapses, the message that appears.
+- **Size changes gradually.** For automatic height, use one of these techniques:
+  - `grid-template-rows` from `0fr` to `1fr`
+  - `interpolate-size: allow-keywords`, where the browser supports it
+  - the View Transitions API.
+- **The modal combines two properties.** Animate `opacity` together with `transform: scale` or `translate`.
+- **Avoid animating fixed geometry.** Do not animate `top`, `left`, `width` and `height` with a fixed px value when one of the techniques above solves it.
+- **Duration and curve:** the duration is between 150 and 300 ms. Entry uses ease-out. Exit uses ease-in. Do not use bounce.
+- **Tokens in one place:** the duration and the curve live in tokens (CSS or theme variables), in one file. Do not write a loose value in each component.
+- **`prefers-reduced-motion: reduce` is mandatory.** With this preference, the transition is instant or becomes a short fade. The content stays visible and usable.
+- **No layout shift on load.** Reserve the space of the content before it arrives. Prefer to reserve the height or to keep the previous content until the new one arrives. The skeleton is only an option to propose to the user. Never use the skeleton as the default.
 
-## Verificação
+## Verification
 
-- O usuário disse que a tela está ok.
-- A mudança não toca comportamento, ou a parte de comportamento passou pelo `craft:atdd`.
-- Todo elemento que aparece, some ou muda de tamanho anima, e respeita o `prefers-reduced-motion`.
-- A duração e a curva vêm dos tokens.
-- Os testes filtrados dos arquivos tocados passam.
+- The user said the screen is ok.
+- The change does not touch behavior, or the behavior part went through `craft:atdd`.
+- Every element that appears, disappears or changes size animates, and respects `prefers-reduced-motion`.
+- The duration and the curve come from the tokens.
+- The filtered tests of the touched files pass.
