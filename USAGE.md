@@ -13,6 +13,7 @@
 - [English code, translated user-facing text](#english-code-translated-user-facing-text)
 - [Test id on every interactive element](#test-id-on-every-interactive-element)
 - [Writing in the ASD-STE100 standard](#writing-in-the-asd-ste100-standard)
+- [Research before you trust](#research-before-you-trust)
 - [A correction becomes a hook](#a-correction-becomes-a-hook)
 - [Project memory](#project-memory)
 - [When a hook is wrong](#when-a-hook-is-wrong)
@@ -191,6 +192,21 @@ There is no command. The `ste` hook injects the skill `craft:ste` in every sessi
 | "You might wanna take out the old file" | "Remove the old file." |
 
 Replies follow your language. English text follows the full standard. Text in another language follows the rules that fit any language: a sentence of at most 20 words in a procedure and 25 in a description, active voice, one imperative instruction per sentence, one term per concept, and no semicolons. Code, commands, and text pasted by the user stay as they are.
+
+## Research before you trust
+
+There is no command. Three hooks inject three skills in every session, and again after `/clear` and after compaction. Claude stops answering from memory:
+
+| Skill | What Claude does |
+|---|---|
+| `craft:verify` | Before it uses a version, an image tag, a package name, a flag, or an API that can change, Claude looks in the documentation, the registry, the CLI, or the web. It cites the source. Without a source, it writes "not verified" |
+| `craft:challenge` | Claude treats a claim of yours about a fact as wrong until a proof says it is right. If the proof contradicts you, Claude says so and shows the proof. A preference or a decision of yours is not a fact, so Claude does not challenge it |
+| `craft:state-of-the-art` | Before it implements something (a Dockerfile, a CI pipeline, a framework feature), Claude looks for the official best practices and the current recommendation of the community, applies them, and cites the sources. If the practice differs from the pattern of the repo, it asks you which one to follow |
+
+Example:
+
+> You: "Use the `node:16` image, it is the current LTS."
+> Claude: "This is not correct. Node 16 reached end of life. The current LTS is `<version>` (source: `<link>`). I use `node:<version>-slim`. Do you want to keep `node:16`?"
 
 ## A correction becomes a hook
 

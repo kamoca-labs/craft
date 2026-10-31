@@ -26,6 +26,24 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/tool.ts\"",
             "timeout": 10,
             "statusMessage": "craft:tool: Claude is the user's tool"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/verify.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:verify: verify facts before you trust them"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/challenge.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:challenge: the claim is wrong until a fact proves it"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/state-of-the-art.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:state-of-the-art: research current practice before you implement"
           }
         ]
       }

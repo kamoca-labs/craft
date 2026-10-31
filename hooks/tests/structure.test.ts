@@ -8,7 +8,7 @@ const rules = fs.readdirSync(path.join(HOOKS_DIR, 'rules')).map((file) => path.b
 const hooksJson = fs.readFileSync(path.join(HOOKS_DIR, 'hooks.json'), 'utf8')
 const wired = [...hooksJson.matchAll(/rules\/([\w-]+)\.ts/g)].map((match) => match[1])
 const SKILLS_DIR = path.join(HOOKS_DIR, '..', 'skills')
-const ALWAYS_ON = ['ste', 'tool']
+const ALWAYS_ON = ['ste', 'tool', 'verify', 'challenge', 'state-of-the-art']
 const STEPS = ['acceptance-criteria']
 const PRINCIPLES = fs.readdirSync(SKILLS_DIR).filter((skill) => !['craft', 'atdd', 'tasks', 'style', 'setup', 'hook', 'memory', ...ALWAYS_ON, ...STEPS].includes(skill)).sort()
 
