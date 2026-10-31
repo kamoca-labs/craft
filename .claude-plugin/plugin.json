@@ -2,5 +2,7 @@
   "name": "craft",
   "description": "/craft:setup prepares lint with limits. /craft:craft enforces the root rule (less code is better than more code), triages SOLID, KISS, YAGNI, DRY, and Clean Code, and loads only the skill of each principle with a signal. /craft:atdd runs the 7-step flow. /craft:hook turns a correction into a project hook. /craft:memory keeps long-term memory in .claude/memory/, inside the repo. Hooks require the flow before code, English code with user-facing text through i18n, data-testid on every interactive component element, tests without .skip or .only, E2E only in a container, tests always with a filter, and, without CI, the answer of the user about the full suite before a push or a PR/MR. They inject the triage when the suite turns green. They load in every session the writing in the ASD-STE100 standard, the project memory, the tasks with a goal, the posture of Claude as the tool of the user, and three research rules (verify facts that can change, challenge the claims of the user until a proof backs them, and research the current best practice before an implementation) (the meta-goal Stop hook holds the end of the turn until the goal is closed). They deny memory outside the project.",
   "version": "0.15.0",
+  "icon": "./assets/icon.png",
+  "license": "MIT",
   "author": { "name": "kamoca" }
 }
