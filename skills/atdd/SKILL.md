@@ -112,7 +112,7 @@ Filters by runner:
 
 - **Change without behavior** (config, doc, name, pure refactor): skip the loop. Refactor with `craft:craft`, with the suite green before and after.
 - **Uncertain specification**: do a spike, code written only to learn. Show the user what you learned. Then delete the spike code and start at step 1. Never reuse spike code in production.
-- **Visual change that a code test does not verify** (layout, animation): verify with a screenshot and write the test only for the behavior. If the change is only visual, use `craft:style`.
+- **Visual change that a functional test does not verify** (layout, color, dimensions, animation): inspect the rendered screen through `design:style` and write automated tests only for behavior. Never assert decorative CSS or exact visual geometry in unit, component, integration or E2E tests. Create a separate automated screenshot comparison suite only when the user explicitly requests it.
 - **External state that you cannot control**: isolate the boundary (`craft:dependency-inversion`) and test the rule with a test double. The boundary stays in the integration test.
 
 ## Example of step 1

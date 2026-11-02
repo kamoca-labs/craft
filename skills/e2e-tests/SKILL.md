@@ -53,10 +53,10 @@ The container gives the same browser, the same fonts and the same system in dev 
 
 | Forbidden assert in E2E | Where it goes |
 |---|---|
-| Style: color, background, `hover`, visual focus, font, size, position, shadow, CSS class | nowhere, or in a visual regression suite, if the project has one |
+| Style: color, background, hover styling, visual focus treatment, font, exact size, position, shadow, CSS class | rendered review through `design:style` or `design:review`; never in functional tests |
 | Animation, transition, time of a toast on screen | nowhere |
 | Exact wording of a label, title or message | verify that the message appears, not each word of it |
-| Layout: order of fields, number of columns, responsiveness | nowhere, or in the visual regression suite |
+| Layout: visual order of fields, number of columns, exact breakpoint geometry | rendered responsive review through the design plugin |
 | Field-by-field validation, each input combination, edge case of the rule | `craft:unit-tests` |
 | Intermediate state: spinner, button disabled during submit, step by step of a wizard | nowhere: verify only the final result |
 | What the user does not see: request sent, payload, store, `localStorage`, console | `craft:unit-tests`, in integration |
@@ -64,7 +64,8 @@ The container gives the same browser, the same fonts and the same system in dev 
 
 ## Signs of violation
 
-- `toHaveCSS`, `toHaveClass`, `getComputedStyle`, `hover()` followed by an assert.
+- `toHaveCSS`, `toHaveClass`, `getComputedStyle`, `hover()` followed by a styling assert.
+- Pixel geometry assertions (`boundingBox`, width, height, coordinates) used to prove decorative appearance, or automated screenshot comparisons added to a functional journey.
 - `toHaveText` with the whole sentence of a label or paragraph.
 - One test per form field (`'empty name shows error'`, `'invalid email shows error'`, `'short phone shows error'`).
 - Name that describes the screen, not the goal: `'products page'`, `'edit modal'`.
@@ -124,8 +125,9 @@ The validation of the name (empty, too long) goes to the unit test of the rule. 
 
 ## Limits
 
-- If the product **is** the visual (design editor, chart generator), the result of the goal can be visual. Even so, use a visual regression suite with screenshots, not `toHaveCSS` inside the E2E test.
+- Never assert decorative UI, even when reviewing a design editor or chart generator. Verify observable product behavior such as creating/exporting the artifact. Inspect the rendered artifact through the design plugin. Automated screenshot comparisons require an explicit user request and a separate visual suite; they do not belong inside the functional E2E journey.
 - If accessibility is a requirement, run an audit (example: `axe`) once per page in a separate suite. Do not spread accessibility asserts across the journeys.
+- Functional visibility, enabled state, keyboard interaction and focus destination are behavior, not styling. Include them when needed to prove the journey; do not inspect CSS classes, focus-ring color or dimensions as a substitute.
 - A step in the middle of the journey can have an assert when the next step depends on it and the failure is confusing without it. Example: confirm the URL after login before you continue.
 
 ## Verification question
