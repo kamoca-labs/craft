@@ -11,6 +11,7 @@
 - [Commands](#commands)
 - [Hooks](#hooks)
 - [Use cases](USAGE.md)
+- [Release notes](CHANGELOG.md)
 
 ## Installation
 
