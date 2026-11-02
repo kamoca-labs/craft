@@ -54,29 +54,49 @@ const COMPONENTS = ['src/components/Card.vue', 'src/components/Card.tsx', 'src/c
 
 test('style mode allows editing a UI component without the ATDD flow', () => {
   for (const file of COMPONENTS) {
-    assert.strictEqual(edit(file, SKILL_CALL('craft:style')).status, 0, file)
+    assert.strictEqual(edit(file, SKILL_CALL('design:style')).status, 0, file)
   }
 })
 
 test('style mode does not allow editing the back-end, and the message points to /craft:atdd', () => {
   for (const file of ['src/services/price.ts', 'app/Price.php']) {
-    const result = edit(file, SKILL_CALL('craft:style'))
+    const result = edit(file, SKILL_CALL('design:style'))
     assert.strictEqual(result.status, 2, file)
     assert.match(result.stderr, /\/craft:atdd/, file)
   }
 })
 
 test('mixed feature with both flows loaded allows the component and the service', () => {
-  const transcript = [SKILL_CALL('craft:style'), SLASH('craft:atdd')].join('\n')
+  const transcript = [SKILL_CALL('design:style'), SLASH('craft:atdd')].join('\n')
   for (const file of ['src/components/Card.vue', 'src/services/price.ts']) {
     assert.strictEqual(edit(file, transcript).status, 0, file)
   }
 })
 
-test('without any flow, a UI component is denied, and the message cites /craft:atdd and /craft:style', () => {
+test('without any flow, a UI component is denied, and the message cites /craft:atdd and /design:style', () => {
   for (const file of COMPONENTS) {
     const result = edit(file, '')
     assert.strictEqual(result.status, 2, file)
-    assert.match(result.stderr, /\/craft:atdd.*\/craft:style/, file)
+    assert.match(result.stderr, /\/craft:atdd.*\/design:style/, file)
   }
+})
+
+test('the design:style slash command allows a visual component edit', () => {
+  assert.strictEqual(edit('src/components/Card.vue', SLASH('design:style')).status, 0)
+})
+
+test('a formatted design:style skill call allows a visual component edit', () => {
+  const transcript = JSON.stringify({ type: 'assistant', message: { content: [{ type: 'tool_use', name: 'Skill', input: { skill: 'design:style' } }] } }, null, 2)
+  assert.strictEqual(edit('src/components/Card.vue', transcript).status, 0)
+})
+
+test('mentioning design:style or loading the design hub does not unlock code', () => {
+  const mention = JSON.stringify({ type: 'user', message: { content: 'follow design:style, "skill":"design:style"' } })
+  for (const transcript of [mention, SKILL_CALL('design:design')]) {
+    assert.strictEqual(edit('src/components/Card.vue', transcript).status, 2)
+  }
+})
+
+test('the removed craft:style flow does not unlock a component edit', () => {
+  assert.strictEqual(edit('src/components/Card.vue', SKILL_CALL('craft:style')).status, 2)
 })

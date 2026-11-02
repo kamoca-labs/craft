@@ -85,19 +85,19 @@ Step 1 becomes the scenario that reproduces the bug. Step 3 proves that the test
 ## Visual-only change with style mode
 
 ```
-/craft:style request card with more breathing room and a modal that opens smoothly
+/design:style request card with more breathing room and a modal that opens smoothly
 ```
 
-1. Claude loads `/impeccable`. If the skill is not installed, Claude asks for the installation and waits.
-2. It changes the screen. You look and ask for the next adjustment. There is no specification and no red test.
-3. You say the screen is ok. Claude runs the filtered tests of the touched component and E2E once, fixes once if something broke, and stops.
+1. Claude loads `/design:style` from the design plugin, which includes Impeccable. A separate Impeccable installation is not required. If design is unavailable, Claude reports the missing plugin.
+2. It creates a reviewable mockup artifact or a Figma/FigCraft design with the applicable screen states and responsive variants. You review and iterate until you explicitly approve it. Existing approval for the same artifact and scope is reused. Product implementation starts only after this gate; there is no prior red behavioral test for a visual-only change.
+3. It implements the approved screen and inspects the rendered result. When the screen is accepted, Claude runs relevant existing filtered functional checks once, fixes once if something broke, and stops. It does not add assertions for colors, exact sizes, CSS classes or animation timing. Rendered review covers appearance, breakpoints and applicable states.
 
 The `atdd-first` hook allows `Card.vue`. If Claude tries to edit `src/services/request.ts`, the hook denies the edit and points to `/craft:atdd`.
 
 ### Mixed feature: screen with back end
 
 ```
-/craft:style attachments screen with the 10 MB limit
+/design:style attachments screen with the 10 MB limit
 ```
 
 The limit is a rule. Claude asks for the order with `AskUserQuestion`:
@@ -131,7 +131,7 @@ No command is needed. Each time Claude runs tests and the output has no failure,
 
 Claude first looks for what it can delete (root rule). Then it triages all principles, loads only the skills with a signal, applies one at a time without a behavior change, and at the end runs the tests of the touched domains. It makes one triage round, one batch of fixes, and at most one confirmation round. Then it stops. The report says what changed per principle and which principles had no signal.
 
-If the change alters the UI (component, CSS, template), the report suggests `/impeccable audit` or `/impeccable harden` on the touched files. Claude does not run the command. Without the `impeccable` skill in the session, it suggests the installation from the official site, https://impeccable.style.
+If the change alters the UI (component, CSS, template), the report suggests `/design:review` on the touched files. Claude does not run it as a refactor side effect. The design plugin includes Impeccable; no separate upstream installation is required. If design is unavailable, Claude reports the missing plugin and the pending visual review.
 
 For one principle only, call its skill:
 
@@ -142,6 +142,8 @@ For one principle only, call its skill:
 ```
 
 `/craft:e2e-tests` deletes from the E2E suite each assert that does not stop the user from reaching the goal (style, `hover`, exact text, field by field). It moves the business rule to the unit test. The loading, empty, error, and no-permission states enter when the screen has them.
+
+The same appearance rule applies to unit, component and integration tests: never assert that the button is blue, 40 px tall, at a specific coordinate or assigned a decorative CSS class. Test actions, outcomes and accessible semantics. Screenshot comparisons are created only on an explicit request, in a separate visual suite.
 
 ## Combine with the git plugin
 
