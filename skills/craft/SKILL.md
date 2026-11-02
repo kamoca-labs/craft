@@ -56,11 +56,9 @@ The tests are green. If you are in the ATDD loop and a scenario remains, go back
 | `craft:unit-tests` | Unit and integration | Does any test verify a private method, a mock of a mock, a getter, the library or the appearance? |
 | `craft:test-ids` | Test id | Is any interactive element without `data-testid`, with a generic or position-based id, or does a component not pass the parent attributes through? |
 | `craft:e2e-tests` | E2E | Does any E2E test verify something that does not stop the user from reaching the goal (style, `hover`, exact text, field by field)? |
-| `impeccable` (external skill) | Interface | Does the change alter the UI (component, CSS, template)? |
+| `design:review` (design plugin) | Interface | Does the change alter the UI (component, CSS, template)? |
 
-The `impeccable` row does not load a skill. If the answer is yes, suggest `/impeccable audit` or `/impeccable harden` over the touched files to the user. Never run the command yourself.
-
-If the `impeccable` skill is not in the session skill list, suggest the installation from the official site, https://impeccable.style (repo `pbakaus/impeccable`). The site says to run `/plugin marketplace add pbakaus/impeccable` and to install **Impeccable** in `/plugin`, on the **Discover** tab.
+The `design:review` row does not load a skill. If the answer is yes, suggest `/design:review` over the touched files to the user. Never run it as a side effect of the refactor. The design plugin owns visual work and includes Impeccable; a separate Impeccable installation is not required. If design is unavailable, report the missing plugin and the unverified visual review.
 
 ## When principles conflict
 

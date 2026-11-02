@@ -21,7 +21,9 @@ Choose the layer of each test before you write it. Then load the skill of the la
 - Most tests stay in unit and integration. E2E has few tests, one for each critical journey.
 - The acceptance tests of ATDD stay in unit and integration. E2E comes after, with the feature ready.
 - An edge case never moves up to E2E.
-- Style, `hover`, color and animation have no functional test in any layer.
+- Never test decorative UI in any automated functional layer: color, background, exact width/height/position, fonts, shadows, CSS classes, hover styling or animation timing. A button being blue and 40 px tall is not a behavior contract.
+- UI behavior remains testable: an action works, content becomes visible, input is preserved after an error, a control is disabled by a rule, keyboard focus moves correctly and accessible semantics are exposed. Assert those outcomes rather than their CSS implementation.
+- Inspect appearance through `design:style` or `design:review`. Automated screenshot comparisons belong to a separate visual suite only when the user explicitly requests one; never add them to a functional suite by default.
 
 ## Why
 

@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import { CODE_FILE, deny, readInput } from '../lib.ts'
 
 const ATDD_LOADED = /"skill":"craft:atdd"|<command-name>\/craft:atdd<\/command-name>/
-const STYLE_LOADED = /"skill":"craft:style"|<command-name>\/craft:style<\/command-name>/
+const STYLE_LOADED = /"skill"\s*:\s*"design:style"|<command-name>\/design:style<\/command-name>/
 const UI_COMPONENT = /\.(vue|tsx|jsx|svelte|astro)$/
 
 const input = readInput()

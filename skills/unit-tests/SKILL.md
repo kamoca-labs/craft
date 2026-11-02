@@ -31,7 +31,7 @@ Choose the lowest level that catches the bug. Move up a level only when the bug 
 - Mock of everything: the test verifies that one mock called another mock.
 - `expect(repo.save).toHaveBeenCalledWith(...)` when the saved state or the return value is enough.
 - Test of a getter, setter, constant, a type that the compiler already checks, or of the framework and the library.
-- In the component: assert on a CSS class, style, `hover`, or a snapshot of the whole markup.
+- In the component: assert on a CSS class, color, exact dimensions/position, hover styling, animation timing, or a snapshot of the whole markup.
 - Ten cases with similar values that go through the same path of the rule.
 - Unit test that starts a database or makes a real request.
 
@@ -45,7 +45,7 @@ Choose the lowest level that catches the bug. Move up a level only when the bug 
    - one case at each limit that the rule has (`10 MB` passes, `10 MB + 1 byte` fails)
    - no case for a limit that the rule does not have
    - to find the classes, go through the [real-world edges](../atdd/SKILL.md#real-world-edges) of `craft:atdd`. Each edge that the rule treats differently is a class. An edge that the rule does not treat gets no case.
-5. **Component like the user**: find the element with `getByTestId` (`craft:test-ids`). Verify what appears and the event that leaves, not the appearance.
+5. **Component like the user**: find the element with `getByTestId` (`craft:test-ids`). Verify actions, observable content, emitted events, validation, preserved input and accessible semantics. Never assert that a button is blue or has a specific pixel size, or use decorative CSS as proof of behavior. Functional visibility, enabled/disabled state and keyboard focus can be tested through the public interface without checking styling.
 6. **Do not test what cannot break**: getter, constant, the library, the type.
 
 ## Example
@@ -78,6 +78,7 @@ test('attachment above 10 MB is rejected', async () => {
 - A contract test across implementations (`craft:liskov-substitution`) can call each concrete implementation.
 - A mock of an internal collaborator is acceptable when the collaborator is slow or not deterministic and there is no boundary to inject. Record the reason in the name of the double (`slowPdfRendererStub`).
 - A small and stable snapshot (an output JSON, an error message) is acceptable. A snapshot of the whole markup is not.
+- Appearance is inspected through `design:style` or `design:review`. Do not add automated screenshot comparisons unless the user explicitly requests a separate visual suite.
 
 ## Verification question
 

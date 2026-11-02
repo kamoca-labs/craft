@@ -10,7 +10,7 @@ const wired = [...hooksJson.matchAll(/rules\/([\w-]+)\.ts/g)].map((match) => mat
 const SKILLS_DIR = path.join(HOOKS_DIR, '..', 'skills')
 const ALWAYS_ON = ['ste', 'tool', 'verify', 'challenge', 'state-of-the-art']
 const STEPS = ['acceptance-criteria']
-const PRINCIPLES = fs.readdirSync(SKILLS_DIR).filter((skill) => !['craft', 'atdd', 'tasks', 'style', 'setup', 'hook', 'memory', ...ALWAYS_ON, ...STEPS].includes(skill)).sort()
+const PRINCIPLES = fs.readdirSync(SKILLS_DIR).filter((skill) => !['craft', 'atdd', 'tasks', 'setup', 'hook', 'memory', ...ALWAYS_ON, ...STEPS].includes(skill)).sort()
 
 test('every rule has a dedicated hook in hooks.json', () => {
   assert.deepStrictEqual(rules.filter((rule) => !wired.includes(rule)), [])
