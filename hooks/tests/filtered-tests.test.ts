@@ -46,3 +46,23 @@ test('a consent before the last code edit or a refusal does not allow the full s
   assert.strictEqual(bash('pnpm vitest run', [answer(FULL_SUITE_LOCAL), codeEdit('src/upload.ts')]).status, 2)
   assert.strictEqual(bash('pnpm vitest run', [answer(SKIP_FULL_SUITE)]).status, 2)
 })
+
+test('runner text inside a heredoc or a quoted string is not a test run', () => {
+  const commands = [
+    'git commit -m "fix: make npm test faster"',
+    "git commit -m \"$(cat <<'EOF'\nfix: run pytest in CI\nEOF\n)\"",
+    'echo "run pnpm vitest run"',
+    'cat > notes.md <<EOF\nnpm test\nEOF',
+  ]
+  for (const command of commands) {
+    assert.strictEqual(bash(command).status, 0, command)
+  }
+})
+
+test('a quoted test path still counts as a filter', () => {
+  assert.strictEqual(bash("node --test 'hooks/tests/*.test.ts'").status, 0)
+})
+
+test('a full suite inside sh -c is still denied', () => {
+  assert.strictEqual(bash('docker compose exec -T app sh -c "npm test"').status, 2)
+})

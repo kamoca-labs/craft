@@ -1,4 +1,4 @@
-import { consentGiven, deny, FULL_SUITE_LOCAL, readInput, TEST_RUNNER } from '../lib.ts'
+import { consentGiven, deny, FULL_SUITE_LOCAL, readInput, shellCode, TEST_RUNNER } from '../lib.ts'
 
 const FILTER_FLAG = /(^|\s)(-k|-t|-run|-p|--filter|--group|--test-name-pattern|--testNamePattern|--testPathPattern|--findRelatedTests|related)(\s|=|$)|::/
 const TEST_PATH = /(^|\s)(?!\.\/\.\.\.(\s|$))[^\s-]\S*(\/|\.(test|spec)\.|_test\.|Test\.php|test_)\S*/
@@ -16,6 +16,6 @@ function runsFullSuite(command: string): boolean {
 
 const input = readInput()
 
-if (runsFullSuite(input.tool_input.command || '') && !consentGiven(input.transcript_path, [FULL_SUITE_LOCAL])) {
+if (runsFullSuite(shellCode(input.tool_input.command || '')) && !consentGiven(input.transcript_path, [FULL_SUITE_LOCAL])) {
   deny('filtered-tests', input)
 }
