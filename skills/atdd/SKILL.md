@@ -67,7 +67,7 @@ Order: the preparatory refactor, then the behavior, then the refactor of step 6.
 - At the end of each step, say which step finished and the result. Example: "Step 3 (Red): 2 failing, `expected 'error' got undefined`".
 - If a test fails in step 5 or 7, go back to step 4 or fix the refactor. Never change the test to make it pass, unless the specification changed.
 - Never disable, skip or delete a test to make the suite pass. The `test-skip` hook denies `.skip`, `.only` and similar.
-- Code is English only, including the test identifiers. The test name and test data can be in the language of the project. Text that the user sees goes in the translation file, in the language of the user, through the i18n of the stack. See `craft:i18n`. The `english-code` hook denies anything that breaks this rule.
+- Code is English only, including the test identifiers. The test name and test data can be in the language of the project. Text that the user sees goes in the translation file, in the language of the user, through the i18n of the stack. See `craft:english-code` and `craft:i18n`. The `english-code` hook denies anything that breaks this rule.
 - If the user corrects something you did, decide with `craft:hook` whether the correction becomes a project hook.
 - Record any decision or choice made on the way (library, format, business rule) in the repo. Use CLAUDE.md for context for the model, `.claude/memory/` for learning from the conversation (`craft:memory`), and `docs/` for the team. Always use a relative path. Never use the local memory of Claude or an absolute path.
 - Follow the test runner and the environment of the project (container, `package.json` script, `artisan test`).

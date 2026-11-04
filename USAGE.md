@@ -169,7 +169,7 @@ The `english-code` hook denies non-English text in a code file:
 | text in another language in a `.md`, `.json`, or `.po` file | allowed (not code) |
 | `it('rejects an attachment above the limit')` in `tests/Feature/AttachmentTest.php` | allowed (test file: `tests/`, `test/`, `__tests__/`, `spec/`, `*.test.*`, `*.spec.*`, `*_test.*`, `test_*.py`) |
 
-The hook does not detect English text written directly in the code for the user (`<button>Save</button>`). The triage of `/craft:craft` catches it through the skill `craft:i18n`. A project without i18n gets a proposal for the default library of the stack, with your approval before the installation. The same skill catches dates, numbers, and currencies formatted by hand (use `Intl`), fixed width in a text container, and `margin-left` where `margin-inline-start` fits.
+The hook does not detect English text written directly in the code for the user (`<button>Save</button>`). The triage of `/craft:craft` catches it through the skill `craft:i18n`. A project without i18n gets a proposal for the default library of the stack, with your approval before the installation. The same skill catches dates, numbers, and currencies formatted by hand (use `Intl`). The skill `craft:i18n-layout` catches a fixed width in a text container, and `margin-left` where `margin-inline-start` fits. The skill `craft:english-code` covers names, comments, and logs in another language.
 
 ## Test id on every interactive element
 

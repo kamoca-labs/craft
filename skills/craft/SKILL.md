@@ -43,7 +43,9 @@ The tests are green. If you are in the ATDD loop and a scenario remains, go back
 | `craft:kiss` | KISS | Is there a simpler way that passes the same tests? |
 | `craft:yagni` | YAGNI | Is there an option, parameter, layer or abstraction without a current use? |
 | `craft:dry` | DRY | Is the same business rule, text or style written in two places, or is generic code tied to one case? |
-| `craft:i18n` | English and i18n | Is there code outside English, user-visible text written directly in code, a date or number formatted by hand, or a fixed width on a text container? |
+| `craft:english-code` | English code | Is any identifier, comment, log or internal message outside English? |
+| `craft:i18n` | i18n | Is user-visible text written directly in code, or a date, number or currency formatted by hand? |
+| `craft:i18n-layout` | Layout for translation | Does a text container have a fixed width, or does the CSS use a physical direction (left, right)? |
 | `craft:naming` | Names | Does any name need the code (or a comment) to be understood? |
 | `craft:functions` | Functions | Does any function do more than one thing or mix abstraction levels? |
 | `craft:arguments` | Arguments | More than three parameters, or a boolean that changes the behavior? |
