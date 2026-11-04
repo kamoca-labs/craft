@@ -48,18 +48,7 @@ If the current code makes the change hard, refactor **before** step 2. First mak
 
 - The suite must be green before and after.
 - The refactor does not change behavior and follows `craft:craft`.
-- The refactor goes in its own commit, before the behavior commits.
-
-## Commits
-
-Never mix a structural change and a behavior change in the same commit. The semantic commit type shows which one it is:
-
-| Change | Type | When |
-|---|---|---|
-| Structural: the behavior does not change | `refactor`, `perf` | preparatory refactor and step 6 |
-| Behavior | `feat`, `fix` | steps 2 to 5 |
-
-Order: the preparatory refactor, then the behavior, then the refactor of step 6.
+- The refactor is a structural change. `git:commit` keeps it in its own commit, before the behavior commits.
 
 ## Rules
 
