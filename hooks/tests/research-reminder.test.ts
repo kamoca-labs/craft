@@ -24,3 +24,10 @@ test('hooks.json runs the research reminder on every UserPromptSubmit', () => {
 
   assert.ok(commands.some((command: string) => command.includes('rules/research-reminder.ts')), JSON.stringify(commands))
 })
+
+test('the research reminder asks for a native feature or a vetted package before own code', () => {
+  const reminder = injected(sandbox().prompt('research-reminder', 'parse this date'))
+
+  assert.match(reminder!, /native/)
+  assert.match(reminder!, /vetted package/)
+})

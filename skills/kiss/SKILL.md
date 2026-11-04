@@ -26,7 +26,7 @@ user-invocable: false
 ## How to apply
 
 1. Ask: what is the most direct way to satisfy **these** tests?
-2. Reuse before you write. Prefer, in this order: code that the project already has, a language feature, a platform or framework feature, an installed dependency, your own code.
+2. Reuse before you write, in the order of "Reuse before you build" in `craft:state-of-the-art`: the project, a native feature, a vetted package, your own code.
 3. Replace the clever with the explicit, even if it is one or two lines longer.
 4. Remove derived state: compute it on the spot.
 

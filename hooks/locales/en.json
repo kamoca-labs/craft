@@ -14,7 +14,7 @@
   "context.memory-catalog": "## Current catalog (.claude/memory/MEMORY.md)",
   "context.memory-empty": "The project has no memory yet. Create .claude/memory/MEMORY.md with the first memory.",
   "context.tasks-reminder": "[craft:tasks] Before the first tool call, count the actions in this prompt. Two or more actions, or a new action during work in progress: create one task per action with TaskCreate. Keep one task in_progress. Mark it completed with the result.",
-  "context.research-reminder": "[craft:state-of-the-art] Before code, config or infra: research the official docs and how experts do it today. Cite the sources.",
+  "context.research-reminder": "[craft:state-of-the-art] Before code, config or infra: research the official docs and how experts do it today. Reuse: native first, then a vetted package, then own code. Cite sources.",
   "context.memory-reminder": "[craft:memory] Before the turn ends: a correction, a decision or a fact that a future session needs goes to .claude/memory/ now.",
   "context.refactor-on-green": "[craft:refactor-on-green] The tests are green. If a scenario of the ATDD loop remains, go back to step 2 with the next one. When all scenarios are green, load craft:craft with the Skill tool and do step 6 (refactor).",
   "context.codebase-map": "[craft:codebase-map] What already exists in the project. Reuse it before you write new code. Read a file only when you need its details:",
