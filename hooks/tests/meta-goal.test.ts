@@ -39,6 +39,10 @@ test('allows the stop after the closure', () => {
   assert.strictEqual(stop([META, bashRun(COMMAND), assistantText('META CLOSED: met.')]), null)
 })
 
+test('allows the stop when the closure is only in the last reply', () => {
+  assert.strictEqual(stop([META, bashRun(COMMAND)], `META CLOSED: met. ${COMMAND} exits with 0.`), null)
+})
+
 test('a new goal after a closed one blocks again', () => {
   const closed = [META, assistantText('META CLOSED: met.'), taskCreate('META: something else', 'Verification: `pnpm build` exits with 0.')]
   assert.match(stop(closed).reason, /Run `pnpm build`/)
