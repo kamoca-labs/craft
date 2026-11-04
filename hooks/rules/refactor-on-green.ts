@@ -1,4 +1,4 @@
-import { inject, message, output, readInput, shellCode, TEST_RUNNER } from '../lib.ts'
+import { inject, message, output, readInput, testRunArguments } from '../lib.ts'
 
 const FAILURE = new RegExp([
   /\b[1-9]\d* (failed|failing)\b/,
@@ -24,11 +24,14 @@ const SUCCESS = new RegExp([
   /\bOK \(\d+ tests?|^OK, but /m,
   /^ok\s+\S+\s+(\(cached\)|[\d.]+s)/m,
   /\bBUILD SUCCESS(FUL)?\b/,
+  /^Ran [1-9]\d* tests? in [\s\S]*^OK\b/m,
+  /\bPassed!\s+-\s+Failed:\s+0\b/,
+  /\b[1-9]\d* examples?, 0 failures\b/,
 ].map((pattern) => pattern.source).join('|'), 'm')
 
 const input = readInput()
 const runOutput = output(input)
 
-if (TEST_RUNNER.test(shellCode(input.tool_input.command || '')) && SUCCESS.test(runOutput) && !FAILURE.test(runOutput)) {
+if (testRunArguments(input.tool_input.command || '') !== null && SUCCESS.test(runOutput) && !FAILURE.test(runOutput)) {
   inject('refactor-on-green', input, message('context.refactor-on-green'))
 }

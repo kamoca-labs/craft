@@ -26,7 +26,7 @@ test('recognizes the success summary of each runner', () => {
   const summaries = [
     'Tests  12 passed (12)', 'Tests:       3 passed, 3 total', 'Tests:    5 passed (10 assertions)', 'OK (5 tests, 10 assertions)',
     '5 passed in 0.31s', 'ok  \texample.com/pkg\t0.012s', 'test result: ok. 5 passed; 0 failed', '\u2139 pass 5\n\u2139 fail 0',
-    '# pass 5\n# fail 0', '5 passing (20ms)', ' 5 pass\n 0 fail', 'Tests run: 5, Failures: 0, Errors: 0, Skipped: 0\nBUILD SUCCESS',
+    '# pass 5\n# fail 0', '5 passing (20ms)', 'Ran 5 tests in 0.002s\n\nOK', 'Passed!  - Failed:     0, Passed:     5', '5 examples, 0 failures', ' 5 pass\n 0 fail', 'Tests run: 5, Failures: 0, Errors: 0, Skipped: 0\nBUILD SUCCESS',
   ]
   for (const stdout of summaries) {
     assert.ok(injected(sandbox().run(RULE, { command: 'npm test', stdout })), `not recognized: ${stdout}`)
@@ -110,3 +110,16 @@ test('every injection becomes a real case in the log', () => {
   assert.deepStrictEqual(captured.inject, ['refactor-on-green'])
   assert.strictEqual(captured.tool_input.command, 'npm test')
 })
+
+test('recognizes monorepo, wrapper and JVM forms', () => {
+  for (const command of ['pnpm --filter api test', 'yarn workspace api test', 'make test', './gradlew test', 'mvn clean test', 'python -m unittest', 'bundle exec rspec']) {
+    assert.ok(injected(sandbox().run(RULE, { command, stdout: '5 passed' })), command)
+  }
+})
+
+test('a command that only reads or installs does not inject', () => {
+  for (const command of ['cat /tmp/jest.log', 'npm install -D vitest']) {
+    assert.strictEqual(injected(sandbox().run(RULE, { command, stdout: '5 passed' })), null, command)
+  }
+})
+

@@ -66,3 +66,47 @@ test('a quoted test path still counts as a filter', () => {
 test('a full suite inside sh -c is still denied', () => {
   assert.strictEqual(bash('docker compose exec -T app sh -c "npm test"').status, 2)
 })
+
+test('a command that only reads, installs or asks for help is not a test run', () => {
+  const commands = [
+    'cat jest.config.js', 'cat vitest.config.ts', 'cat phpunit.xml', 'cat pytest.ini', 'cat /tmp/jest.log',
+    'npm install -D vitest', 'pnpm add -D vitest', 'pip install pytest', 'composer require --dev pestphp/pest',
+    'pytest --version', 'which vitest', 'npx vitest --help',
+  ]
+  for (const command of commands) {
+    assert.strictEqual(bash(command).status, 0, command)
+  }
+})
+
+test('denies the full suite in monorepo, wrapper and JVM forms', () => {
+  const commands = [
+    'pnpm --filter api test', 'pnpm -r test', 'npm -w api test', 'npm --prefix api test', 'yarn workspace api test',
+    'npx turbo run test', 'make test', 'npm t', './gradlew test', './mvnw test', 'mvn clean test', 'mvn verify',
+    'npx mocha', 'python -m unittest', 'cargo nextest run', 'cargo +nightly test', 'deno test', 'dotnet test',
+    'bundle exec rspec', 'cd api && CI=1 npm test', 'docker compose exec app bash -lc "php artisan test"',
+  ]
+  for (const command of commands) {
+    assert.strictEqual(bash(command).status, 2, command)
+  }
+})
+
+test('a flag value, a redirect or the whole test folder is not a filter', () => {
+  const commands = [
+    'go test -p 4 ./...', 'pytest -p no:cacheprovider', 'npx vitest run --config ./vitest.config.ts',
+    'npm test > /tmp/out.log', 'pytest tests/', 'phpunit -c app/phpunit.xml',
+  ]
+  for (const command of commands) {
+    assert.strictEqual(bash(command).status, 2, command)
+  }
+})
+
+test('allows a filtered run of the JVM, mocha, unittest and rspec runners', () => {
+  const commands = [
+    './gradlew test --tests UploadTest', 'mvn test -Dtest=UploadTest', 'npx mocha test/upload.test.js',
+    'python -m unittest tests.test_upload', 'bundle exec rspec spec/upload_spec.rb',
+  ]
+  for (const command of commands) {
+    assert.strictEqual(bash(command).status, 0, command)
+  }
+})
+

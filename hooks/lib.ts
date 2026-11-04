@@ -22,20 +22,40 @@ const MESSAGES: Record<string, string> = JSON.parse(fs.readFileSync(path.join(im
 export const CODE_FILE = /\.(ts|tsx|js|jsx|mjs|cjs|vue|svelte|astro|php|py|go|rs|java|kt|rb|cs)$/
 export const TEST_FILE = /(^|\/)(tests?|__tests__|specs?)\/|[._](test|spec)\.\w+$|(^|\/)test_[^/]+\.py$/
 
-export const TEST_RUNNER = new RegExp([
-  /\b(npx|pnpm( exec)?|bunx)\s+(vitest|jest)\b/,
-  /(^|[\s;&|/])(vitest|jest|pest|phpunit|pytest)\b/,
-  /\b(npm|pnpm|yarn|bun|composer)(\s+run)?\s+test\b/,
+const TEST_RUNNER = new RegExp([
+  /\b(npx|pnpm( exec)?|bunx)\s+(vitest|jest|mocha)\b/,
+  /(^|[\s;&|/])(vitest|jest|pest|phpunit|pytest|mocha|rspec)(?=\s|$|")/,
+  /\b(npm|pnpm|yarn|bun)(\s+--?[\w-]+(\s+[^-\s]\S*)?)*\s+(run\s+)?test\b/,
+  /\b(npm\s+t|composer(\s+run)?\s+test|yarn\s+workspace\s+\S+\s+(run\s+)?test)\b/,
+  /\b(turbo|nx)\s+(run\s+)?test\b/,
+  /\bmake\s+test\b/,
   /\bartisan\s+test\b/,
   /\bnode\s+--test\b/,
-  /\b(go|cargo|mvn|gradle)\s+test\b/,
+  /\bpython3?\s+-m\s+(pytest|unittest)\b/,
+  /\bcargo\s+(\+\S+\s+)?(test|nextest\s+run)\b/,
+  /\b(go|deno|dotnet)\s+test\b/,
+  /(^|[\s;&|/])(mvnw?|gradlew?)(\s+\S+)*?\s+(test|verify)\b/,
 ].map((pattern) => pattern.source).join('|'))
+
+const LAUNCHER = /^(npm|pnpm|pnpx|npx|yarn|bun|bunx|composer|php|artisan|python3?|uv|poetry|go|cargo|mvnw?|gradlew?|make|docker|podman|sh|bash|zsh|node|deno|dotnet|bundle|turbo|nx|vitest|jest|pest|phpunit|pytest|mocha|rspec)$/
+const COMMAND_PREFIX = /^[\s({$"']*((\w+=\S*|env|sudo|time|exec)\s+)*/
+const SETUP = /\b(npm|pnpm|yarn|bun|composer|uv|poetry)\s+(install|i|add|ci|require|remove|uninstall|update|upgrade)\b|\s--(help|version)\b|\s-[hV](\s|$)/
+const SEGMENT = /&&|\|\||[;|\n]/
 
 const HEREDOC = /<<-?\s*(['"]?)(\w+)\1[^\n]*\n[\s\S]*?(\n\s*\2\s*(\n|$)|$)/g
 const QUOTED = /(\s-\w*c\s+)?('[^']*'|"(?:\\.|[^"\\])*")/g
 
 export function shellCode(command: string): string {
   return command.replace(HEREDOC, '\n').replace(QUOTED, (quoted, shellFlag) => (shellFlag || !/\s/.test(quoted) ? quoted : "''"))
+}
+
+export function testRunArguments(command: string): string | null {
+  for (const segment of shellCode(command).split(SEGMENT)) {
+    const program = segment.replace(COMMAND_PREFIX, '').split(/\s/)[0].split('/').at(-1) || ''
+    const match = LAUNCHER.test(program) && !SETUP.test(segment) ? TEST_RUNNER.exec(segment) : null
+    if (match) return segment.slice(match.index + match[0].length)
+  }
+  return null
 }
 
 export function addedText({ tool_input }: HookInput): string {
