@@ -1,6 +1,6 @@
 ---
 name: e2e-tests
-description: E2E (end-to-end) tests cover only the user journey, enter only with the feature ready and run only in a container. Use when you write, generate or review an E2E test (Playwright, Cypress, Dusk, Selenium) that checks style, hover, color, animation, exact text, field-by-field validation, an intermediate state or a detail the user does not see. Also use when the E2E suite grows with one test per screen or per field, when an E2E test appears before the feature is ready, or when an E2E test runs outside a container.
+description: E2E (end-to-end) tests cover only the user journey, enter only with the feature ready and run only in a container. Use when you write, generate or review an E2E test (Playwright, Cypress, Dusk, Selenium) that checks appearance, exact text, field-by-field validation, an intermediate state or a detail the user does not see. Also use when the E2E suite grows with one test per screen or per field, when an E2E test appears before the feature is ready, or when an E2E test runs outside a container.
 argument-hint: "[file or scope]"
 user-invocable: false
 ---
@@ -9,12 +9,12 @@ user-invocable: false
 
 **Rule**: an E2E test proves that the user **can reach a goal** in the real system. It follows the journey from start to end and verifies only the result that proves the goal. Everything else stays out of E2E.
 
-Example: "if I create an item, the item appears in the list" is E2E. "On hover, the button changes its background color" is not.
+Example: "if I create an item, the item appears in the list" is E2E.
 
 ## Why
 
 - The E2E test is the slowest, the most expensive and the most fragile of the suite. Each extra test costs minutes of CI and one more point of failure.
-- A style or detail assert breaks on every layout change, but the system keeps working. The team learns to ignore the red.
+- An assert on a detail breaks on every layout change, but the system keeps working. The team learns to ignore the red.
 - AI tends to generate exhaustive tests: one for each field, one for each state, one for each variation. This volume hides the journeys that matter.
 - The business rule and the edge cases have faster and more precise coverage in the unit test (`craft:unit-tests`).
 
@@ -53,10 +53,9 @@ The container gives the same browser, the same fonts and the same system in dev 
 
 | Forbidden assert in E2E | Where it goes |
 |---|---|
-| Style: color, background, hover styling, visual focus treatment, font, exact size, position, shadow, CSS class | rendered review through `design:style` or `design:review`; never in functional tests |
+| Appearance | no functional test: see [`craft:clean-tests`](../clean-tests/SKILL.md#behavior-not-appearance) |
 | Animation, transition, time of a toast on screen | nowhere |
 | Exact wording of a label, title or message | verify that the message appears, not each word of it |
-| Layout: visual order of fields, number of columns, exact breakpoint geometry | rendered responsive review through the design plugin |
 | Field-by-field validation, each input combination, edge case of the rule | `craft:unit-tests` |
 | Intermediate state: spinner, button disabled during submit, step by step of a wizard | nowhere: verify only the final result |
 | What the user does not see: request sent, payload, store, `localStorage`, console | `craft:unit-tests`, in integration |
@@ -64,8 +63,7 @@ The container gives the same browser, the same fonts and the same system in dev 
 
 ## Signs of violation
 
-- `toHaveCSS`, `toHaveClass`, `getComputedStyle`, `hover()` followed by a styling assert.
-- Pixel geometry assertions (`boundingBox`, width, height, coordinates) used to prove decorative appearance, or automated screenshot comparisons added to a functional journey.
+- An assert on appearance ([`craft:clean-tests`](../clean-tests/SKILL.md#behavior-not-appearance)).
 - `toHaveText` with the whole sentence of a label or paragraph.
 - One test per form field (`'empty name shows error'`, `'invalid email shows error'`, `'short phone shows error'`).
 - Name that describes the screen, not the goal: `'products page'`, `'edit modal'`.
@@ -99,13 +97,7 @@ Ask this question for **each assert**:
 ## Example
 
 ```ts
-// before: 4 tests, none proves that the user creates an item
-test('save button changes color on hover', async ({ page }) => {
-  await page.goto('/items/new')
-  await page.locator('.btn-primary').hover()
-  await expect(page.locator('.btn-primary')).toHaveCSS('background-color', 'rgb(37, 99, 235)')
-})
-
+// before: 3 tests, none proves that the user creates an item
 test('empty name shows error', async ({ page }) => { /* ... */ })
 test('name with 256 characters shows error', async ({ page }) => { /* ... */ })
 test('spinner appears when saving', async ({ page }) => { /* ... */ })
@@ -121,13 +113,11 @@ test('user creates an item and sees it in the list', async ({ page }) => {
 })
 ```
 
-The validation of the name (empty, too long) goes to the unit test of the rule. The hover, the color and the spinner leave the suite.
+The validation of the name (empty, too long) goes to the unit test of the rule. The spinner leaves the suite.
 
 ## Limits
 
-- Never assert decorative UI, even when reviewing a design editor or chart generator. Verify observable product behavior such as creating/exporting the artifact. Inspect the rendered artifact through the design plugin. Automated screenshot comparisons require an explicit user request and a separate visual suite; they do not belong inside the functional E2E journey.
 - If accessibility is a requirement, run an audit (example: `axe`) once per page in a separate suite. Do not spread accessibility asserts across the journeys.
-- Functional visibility, enabled state, keyboard interaction and focus destination are behavior, not styling. Include them when needed to prove the journey; do not inspect CSS classes, focus-ring color or dimensions as a substitute.
 - A step in the middle of the journey can have an assert when the next step depends on it and the failure is confusing without it. Example: confirm the URL after login before you continue.
 
 ## Verification question

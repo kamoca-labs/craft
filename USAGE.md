@@ -143,9 +143,9 @@ For one principle only, call its skill:
 /craft:e2e-tests tests/e2e/
 ```
 
-`/craft:e2e-tests` deletes from the E2E suite each assert that does not stop the user from reaching the goal (style, `hover`, exact text, field by field). It moves the business rule to the unit test. The loading, empty, error, and no-permission states enter when the screen has them.
+`/craft:e2e-tests` deletes from the E2E suite each assert that does not stop the user from reaching the goal (appearance, exact text, field by field). It moves the business rule to the unit test. The loading, empty, error, and no-permission states enter when the screen has them.
 
-The same appearance rule applies to unit, component and integration tests: never assert that the button is blue, 40 px tall, at a specific coordinate or assigned a decorative CSS class. Test actions, outcomes and accessible semantics. Screenshot comparisons are created only on an explicit request, in a separate visual suite.
+The same rule applies to unit, component and integration tests: a functional test checks behavior, not appearance. `craft:clean-tests` owns this rule, and the other test skills point to it. Screenshot comparisons are created only on an explicit request, in a separate visual suite.
 
 ## Combine with the git plugin
 

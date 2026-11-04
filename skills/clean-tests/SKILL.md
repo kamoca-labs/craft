@@ -21,9 +21,16 @@ Choose the layer of each test before you write it. Then load the skill of the la
 - Most tests stay in unit and integration. E2E has few tests, one for each critical journey.
 - The acceptance tests of ATDD stay in unit and integration. E2E comes after, with the feature ready.
 - An edge case never moves up to E2E.
-- Never test decorative UI in any automated functional layer: color, background, exact width/height/position, fonts, shadows, CSS classes, hover styling or animation timing. A button being blue and 40 px tall is not a behavior contract.
-- UI behavior remains testable: an action works, content becomes visible, input is preserved after an error, a control is disabled by a rule, keyboard focus moves correctly and accessible semantics are exposed. Assert those outcomes rather than their CSS implementation.
-- Inspect appearance through `design:style` or `design:review`. Automated screenshot comparisons belong to a separate visual suite only when the user explicitly requests one; never add them to a functional suite by default.
+
+## Behavior, not appearance
+
+This section owns the rule for every test layer. The other skills only point here.
+
+- A functional test (unit, component, integration, E2E) checks behavior: what the user can do, and the result that the user gets.
+- Behavior includes these outcomes: an action works, content appears, input stays after an error, a rule disables a control, focus moves to the right element, and the element has the correct accessible role and name.
+- Appearance is not behavior, so no functional test checks it. Review the appearance on the rendered screen with `design:review`.
+- Sign of a violation in an existing test: the assert reads a style, a CSS class or a pixel size. Replace it with the behavior that it was meant to prove, or delete it.
+- A screenshot comparison suite exists only when the user asks for it. It stays separate from the functional suite.
 
 ## Why
 

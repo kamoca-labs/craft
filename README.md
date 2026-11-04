@@ -45,7 +45,7 @@ Plugin commands always carry the prefix, so the hub is `/craft:craft`, not `/cra
 
 Visual-only work has moved to `/design:style` in the design plugin, which includes Impeccable. Design first prepares a reviewable mockup with applicable screen states and responsive variants, iterates on it and obtains explicit approval before product implementation. Existing approval for the same artifact and scope is reused. The craft hook recognizes the loaded flow for UI component files; behavior still follows `/craft:atdd`. There is no longer a `/craft:style` command.
 
-Automated unit, component, integration and E2E tests verify behavior, public semantics and usable interaction. They never assert decorative UI such as a blue background, exact pixel size, CSS class or animation timing. Appearance and responsive composition are inspected through the design plugin. A separate screenshot comparison suite is created only on an explicit request.
+Automated unit, component, integration and E2E tests verify behavior, public semantics and usable interaction, not appearance. `craft:clean-tests` owns this rule. Appearance and responsive composition are inspected through the design plugin. A separate screenshot comparison suite is created only on an explicit request.
 
 ### One skill per principle
 
