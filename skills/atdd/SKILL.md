@@ -71,7 +71,7 @@ Order: the preparatory refactor, then the behavior, then the refactor of step 6.
 - If the user corrects something you did, decide with `craft:hook` whether the correction becomes a project hook.
 - Record any decision or choice made on the way (library, format, business rule) in the repo. Use CLAUDE.md for context for the model, `.claude/memory/` for learning from the conversation (`craft:memory`), and `docs/` for the team. Always use a relative path. Never use the local memory of Claude or an absolute path.
 - Follow the test runner and the environment of the project (container, `package.json` script, `artisan test`).
-- Write the E2E test only when the feature is ready: all its cycles are green and the full flow works on screen. Write one test for each new journey and run it in a container (`craft:e2e-tests`). The `e2e-container` hook denies E2E on the host. An E2E test in the middle of the cycle fails because the screen is incomplete, creates noise and delays delivery.
+- Write the E2E test only when the feature is ready: all its cycles are green and the full flow works on screen. Write one test for each new journey and run it in a container (`craft:e2e-tests`, `craft:e2e-container`). The `e2e-container` hook denies E2E on the host. An E2E test in the middle of the cycle fails because the screen is incomplete, creates noise and delays delivery.
 
 ## Filtered execution
 

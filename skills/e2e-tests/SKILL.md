@@ -1,6 +1,6 @@
 ---
 name: e2e-tests
-description: E2E (end-to-end) tests cover only the user journey, enter only with the feature ready and run only in a container. Use when you write, generate or review an E2E test (Playwright, Cypress, Dusk, Selenium) that checks appearance, exact text, field-by-field validation, an intermediate state or a detail the user does not see. Also use when the E2E suite grows with one test per screen or per field, when an E2E test appears before the feature is ready, or when an E2E test runs outside a container.
+description: E2E (end-to-end) tests cover only the user journey and enter only with the feature ready. Use when you write, generate or review an E2E test (Playwright, Cypress, Dusk, Selenium) that checks appearance, exact text, field-by-field validation, an intermediate state or a detail the user does not see. Also use when the E2E suite grows with one test per screen or per field, or when an E2E test appears before the feature is ready.
 argument-hint: "[file or scope]"
 user-invocable: false
 ---
@@ -28,14 +28,7 @@ Example: "if I create an item, the item appears in the list" is E2E.
 
 ## Where to run
 
-**Only in a container**, never on the host. The `e2e-container` hook denies the E2E runner outside `docker run`, `docker exec` and `docker compose run/exec`.
-
-- Use the official image of the runner, in the same version as the package of the project. Playwright: `mcr.microsoft.com/playwright:v<version>-noble`. Cypress: `cypress/included:<version>`.
-- Declare an `e2e` service in the dev compose file, in the same network as the app. The test reaches the app by the service name (`http://app:3000`), not by `localhost`.
-- Run with `docker compose run --rm e2e` or with the `test:e2e` script of the project, which calls this command.
-- If the project does not have the `e2e` service yet, create the service before you run the test. Never run `npx playwright test` or `npx cypress run` directly on the host.
-
-The container gives the same browser, the same fonts and the same system in dev and in CI. So a test that passes on one machine also passes in CI.
+Only in a container. Follow `craft:e2e-container`.
 
 ## What goes in
 
@@ -72,7 +65,6 @@ The container gives the same browser, the same fonts and the same system in dev 
 - Locator by CSS, XPath, `nth-child` or generated class.
 - Test that depends on another test having run before.
 - E2E written before the feature is ready, or used as the red test of ATDD.
-- `npx playwright test`, `npx cypress run` or another E2E runner run directly on the host.
 
 ## Cut question
 
@@ -122,4 +114,4 @@ The validation of the name (empty, too long) goes to the unit test of the rule. 
 
 ## Verification question
 
-Does each E2E test have the name of a user goal, and does each assert in it fail only when the user is blocked from reaching that goal? Was the feature ready when the test was born, and does it run in a container?
+Does each E2E test have the name of a user goal, and does each assert in it fail only when the user is blocked from reaching that goal? Was the feature ready when the test was born?
