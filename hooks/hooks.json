@@ -62,6 +62,12 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/research-reminder.ts\"",
             "timeout": 10,
             "statusMessage": "craft:research-reminder: official docs and expert practice"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/memory-reminder.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:memory-reminder: save what a future session needs"
           }
         ]
       }
