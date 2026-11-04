@@ -17,6 +17,12 @@
           },
           {
             "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/codebase-map.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:codebase-map: what already exists"
+          },
+          {
+            "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/tasks.ts\"",
             "timeout": 10,
             "statusMessage": "craft:tasks: tasks and goal"
