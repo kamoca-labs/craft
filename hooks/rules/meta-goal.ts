@@ -17,8 +17,9 @@ const declarationText = (block: TranscriptBlock) => `${block.input?.subject || '
 const declaration = assistantBlocks.filter(({ block }) => declared(block)).at(-1)
 if (!declaration) process.exit(0)
 
-const closed = assistantBlocks.some(({ block, index }) => index > declaration.index && block.type === 'text' && CLOSURE.test(block.text || ''))
-const asksUser = (input.last_assistant_message || '').trim().endsWith('?')
+const lastMessage = input.last_assistant_message || ''
+const closed = CLOSURE.test(lastMessage) || assistantBlocks.some(({ block, index }) => index > declaration.index && block.type === 'text' && CLOSURE.test(block.text || ''))
+const asksUser = lastMessage.trim().endsWith('?')
 const text = declarationText(declaration.block)
 const limit = Number(text.match(LIMIT)?.[1] || DEFAULT_LIMIT)
 const blocked = entries.filter((entry, index) => index > declaration.index && entry.type === 'user' && JSON.stringify(entry).includes('[craft:meta-goal]')).length
