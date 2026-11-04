@@ -1,9 +1,8 @@
 import assert from 'node:assert'
 import { spawnSync } from 'node:child_process'
-import fs from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
-import { injected, sandbox } from './helpers.ts'
+import { injected, sandbox, userPromptCommands } from './helpers.ts'
 
 const REMINDER_LIMIT = 300
 
@@ -31,9 +30,7 @@ test('an empty stdin does not block the prompt and still gets the same reminder'
 })
 
 test('hooks.json runs the reminder on every UserPromptSubmit', () => {
-  const hooks = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', 'hooks.json'), 'utf8')).hooks
-
-  const commands = (hooks.UserPromptSubmit || []).flatMap((group: { hooks: { command: string }[] }) => group.hooks.map((hook) => hook.command))
+  const commands = userPromptCommands()
 
   assert.ok(commands.some((command: string) => command.includes('rules/tasks-reminder.ts')), JSON.stringify(commands))
 })

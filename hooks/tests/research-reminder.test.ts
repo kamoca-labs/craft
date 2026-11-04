@@ -1,8 +1,6 @@
 import assert from 'node:assert'
-import fs from 'node:fs'
-import path from 'node:path'
 import { test } from 'node:test'
-import { injected, sandbox } from './helpers.ts'
+import { injected, sandbox, userPromptCommands } from './helpers.ts'
 
 const REMINDER_LIMIT = 200
 
@@ -22,9 +20,7 @@ test('the research reminder has 200 characters or fewer', () => {
 })
 
 test('hooks.json runs the research reminder on every UserPromptSubmit', () => {
-  const hooks = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', 'hooks.json'), 'utf8')).hooks
-
-  const commands = hooks.UserPromptSubmit.flatMap((group: { hooks: { command: string }[] }) => group.hooks.map((hook) => hook.command))
+  const commands = userPromptCommands()
 
   assert.ok(commands.some((command: string) => command.includes('rules/research-reminder.ts')), JSON.stringify(commands))
 })

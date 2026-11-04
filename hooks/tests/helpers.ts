@@ -46,3 +46,8 @@ export function injected(result: SpawnSyncReturns<string>): string | null {
   if (!result.stdout.trim()) return null
   return JSON.parse(result.stdout).hookSpecificOutput.additionalContext
 }
+
+export function userPromptCommands(): string[] {
+  const hooks = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', 'hooks.json'), 'utf8')).hooks
+  return hooks.UserPromptSubmit.flatMap((group: { hooks: { command: string }[] }) => group.hooks.map((hook) => hook.command))
+}
