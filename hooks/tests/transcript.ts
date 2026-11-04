@@ -8,7 +8,7 @@ export const SKIP_FULL_SUITE = 'Continue without the full suite'
 
 let toolUseCount = 0
 
-function toolUse(name: string, input: object) {
+export function toolUse(name: string, input: object) {
   const id = `toolu_${++toolUseCount}`
   return { id, line: JSON.stringify({ type: 'assistant', message: { content: [{ type: 'tool_use', id, name, input }] } }) }
 }

@@ -6,6 +6,7 @@
   "deny.e2e-container": "an E2E test runs only in a container, never on the host. Run it with the e2e service of the compose file: docker compose run --rm e2e <command>. If the project has no e2e service yet, create it with the official image of the runner at the version of the package (mcr.microsoft.com/playwright:v<version>-noble, cypress/included:<version>). See craft:e2e-tests.",
   "deny.filtered-tests": "run only the tests that the change can break, with a filter: the test file or folder, related, --filter, -k, -t, -run. The full suite runs in CI. Without CI, it runs locally only before a push or a PR/MR, with the consent of the user through AskUserQuestion (Run the full suite locally / Continue without the full suite). For the filtered run, see craft:atdd.",
   "deny.push-gate": "the project has no CI, so no place runs the full suite after the push. Before a push or a PR/MR, ask the user with AskUserQuestion if you must run the full suite locally. Use the exact options Run the full suite locally and Continue without the full suite. If the user chooses to run it, run the suite and push only when it is green. See craft:atdd.",
+  "deny.research-first": "research before you create infra or pin a version. Find the official guide and the expert practice for the subject (craft:state-of-the-art), and check the version in the registry (craft:verify). Use WebSearch, WebFetch, Context7, or a registry command (npm view, docker manifest inspect). Cite the sources in the reply. Then edit again.",
   "consent.full-suite-local": "Run the full suite locally",
   "consent.skip-full-suite": "Continue without the full suite",
   "capture.injected": "{rule} injected context",
@@ -13,6 +14,7 @@
   "context.memory-catalog": "## Current catalog (.claude/memory/MEMORY.md)",
   "context.memory-empty": "The project has no memory yet. Create .claude/memory/MEMORY.md with the first memory.",
   "context.tasks-reminder": "[craft:tasks] Before the first tool call, count the actions in this prompt. Two or more actions, or a new action during work in progress: create one task per action with TaskCreate. Keep one task in_progress. Mark it completed with the result.",
+  "context.research-reminder": "[craft:state-of-the-art] Before code, config or infra: research the official docs and how experts do it today. Cite the sources.",
   "context.memory-truncated": "(The catalog is cut here. Read the rest in .claude/memory/MEMORY.md.)",
   "block.meta-verify": "[craft:meta-goal] The goal is not closed. Run `{command}` after the last code edit, with a success result. Cite the command and the result in the reply. Then close the goal.",
   "block.meta-close": "[craft:meta-goal] Goal met. Mark the META task as completed. End the reply with META CLOSED: met, the verification command, and the result."

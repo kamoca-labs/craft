@@ -56,6 +56,12 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/tasks-reminder.ts\"",
             "timeout": 10,
             "statusMessage": "craft:tasks-reminder: one task per action"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/research-reminder.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:research-reminder: official docs and expert practice"
           }
         ]
       }
@@ -92,6 +98,12 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/atdd-first.ts\"",
             "timeout": 10,
             "statusMessage": "craft:atdd-first: flow loaded before code?"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/research-first.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:research-first: research before infra and versions?"
           },
           {
             "type": "command",

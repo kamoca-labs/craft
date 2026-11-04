@@ -39,7 +39,7 @@ export function addedText({ tool_input }: HookInput): string {
 export const FULL_SUITE_LOCAL = MESSAGES['consent.full-suite-local']
 export const SKIP_FULL_SUITE = MESSAGES['consent.skip-full-suite']
 
-export type TranscriptBlock = { type: string, id?: string, name?: string, text?: string, is_error?: boolean, tool_use_id?: string, input?: { file_path?: string, command?: string, subject?: string, description?: string } }
+export type TranscriptBlock = { type: string, id?: string, name?: string, text?: string, is_error?: boolean, tool_use_id?: string, input?: { file_path?: string, command?: string, subject?: string, description?: string, subagent_type?: string } }
 export type TranscriptEntry = { type: string, message?: { role?: string, content?: string | TranscriptBlock[] }, toolUseResult?: { answers?: Record<string, string> } }
 
 export function blocks(entry: TranscriptEntry): TranscriptBlock[] {
