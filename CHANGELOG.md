@@ -2,6 +2,12 @@
 
 Notes reconstructed from repository commits and manifest versions. Historical dates identify version changes in Git, not previously published releases. Versions absent from the recorded history are not invented. Categories without changes are omitted.
 
+## 0.16.1 (2026-11-04)
+
+### Improvements
+
+- The commit policy (a structural change and a behavior change never share a commit) moves from `/craft:atdd` to `/git:commit` 0.8.0. The preparatory refactor in `/craft:atdd` points to `/git:commit`.
+
 ## 0.16.0 — 2026-11-02
 
 ### Breaking changes
