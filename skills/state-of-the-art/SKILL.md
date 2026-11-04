@@ -25,10 +25,14 @@ Every request to implement or to create something that has a known good practice
 ## Steps
 
 1. **Name the subject.** Example: "Dockerfile for a Node API".
-2. **Research the practice.** Follow `craft:verify` for the order of the sources. Look for both of these:
-   - the official guide of best practices for the subject
-   - the current recommendation of the community: the documentation of the maintainers, well-known guides, and recent discussions
-3. **Apply what you found.** Use the practice, not your memory. Example for a Docker image: the official best-practices guide and the documentation of the base image. They give a multi-stage build, a user that is not root, a small base image, and a fixed tag.
+2. **Research the practice.** Follow `craft:verify` for the order of the sources. Look for all three:
+   - **The official guide**: the syntax, the versions, and the best practices of the vendor.
+   - **The expert practice**: how the maintainers and recognized practitioners organize the work. The official guide shows what is possible. The expert shows the layout, the conventions, and what never to do. Use these sources:
+     - the official example repositories (for Docker, `docker/awesome-compose`)
+     - the linter of the subject, because its rules encode the expert practice (`hadolint` for a Dockerfile, `actionlint` for GitHub Actions)
+     - talks and posts of the maintainers
+   - **The current discussion**: recent issues, release notes, and well-known guides.
+3. **Apply what you found.** Use the practice, not your memory. Example for Docker: the official guide gives the syntax and the tag of the base image. The expert practice gives the organization: one Dockerfile per service, a multi-stage build, a `.dockerignore`, a user that is not root, a fixed tag, and no `hadolint` warning.
 4. **Cite the sources.** Name each practice that you applied and put the link next to it.
 
 ## When the practice conflicts with the repo

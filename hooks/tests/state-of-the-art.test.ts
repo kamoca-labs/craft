@@ -15,3 +15,10 @@ test('every session source injects the state-of-the-art skill as SessionStart co
     assert.ok(additionalContext.length < CONTEXT_LIMIT, source)
   }
 })
+
+test('the state-of-the-art skill asks for the expert practice and the linter of the subject', () => {
+  const additionalContext = JSON.parse(sandbox().start('state-of-the-art', 'startup').stdout).hookSpecificOutput.additionalContext
+
+  assert.match(additionalContext, /expert practice/)
+  assert.match(additionalContext, /linter of the subject/)
+})
