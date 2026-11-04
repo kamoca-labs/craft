@@ -16,6 +16,7 @@
   "context.tasks-reminder": "[craft:tasks] Before the first tool call, count the actions in this prompt. Two or more actions, or a new action during work in progress: create one task per action with TaskCreate. Keep one task in_progress. Mark it completed with the result.",
   "context.research-reminder": "[craft:state-of-the-art] Before code, config or infra: research the official docs and how experts do it today. Cite the sources.",
   "context.memory-reminder": "[craft:memory] Before the turn ends: a correction, a decision or a fact that a future session needs goes to .claude/memory/ now.",
+  "context.refactor-on-green": "[craft:refactor-on-green] The tests are green. If a scenario of the ATDD loop remains, go back to step 2 with the next one. When all scenarios are green, load craft:craft with the Skill tool and do step 6 (refactor).",
   "context.memory-truncated": "(The catalog is cut here. Read the rest in .claude/memory/MEMORY.md.)",
   "block.meta-verify": "[craft:meta-goal] The goal is not closed. Run `{command}` after the last code edit, with a success result. Cite the command and the result in the reply. Then close the goal.",
   "block.meta-close": "[craft:meta-goal] Goal met. Mark the META task as completed. End the reply with META CLOSED: met, the verification command, and the result."

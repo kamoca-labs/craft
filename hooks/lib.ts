@@ -31,6 +31,13 @@ export const TEST_RUNNER = new RegExp([
   /\b(go|cargo|mvn|gradle)\s+test\b/,
 ].map((pattern) => pattern.source).join('|'))
 
+const HEREDOC = /<<-?\s*(['"]?)(\w+)\1[^\n]*\n[\s\S]*?(\n\s*\2\s*(\n|$)|$)/g
+const QUOTED = /(\s-\w*c\s+)?('[^']*'|"(?:\\.|[^"\\])*")/g
+
+export function shellCode(command: string): string {
+  return command.replace(HEREDOC, '\n').replace(QUOTED, (quoted, shellFlag) => (shellFlag || !/\s/.test(quoted) ? quoted : "''"))
+}
+
 export function addedText({ tool_input }: HookInput): string {
   const edits = tool_input.edits?.map((edit) => edit.new_string) || []
   return [tool_input.content, tool_input.new_string, ...edits].filter(Boolean).join('\n')

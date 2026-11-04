@@ -112,7 +112,7 @@ In all three options, the rule enters only with a test. The hook denies the serv
 
 ## Automatic refactor after green
 
-No command is needed. Each time Claude runs tests and the output has no failure, the `refactor-on-green` hook injects the `craft` triage as context:
+No command is needed. Each time Claude runs tests and the output has a success summary and no failure, the `refactor-on-green` hook injects a short reminder. When all scenarios are green, Claude loads the `craft` triage:
 
 | Command run | Output | Injects? |
 |---|---|---|
@@ -121,6 +121,8 @@ No command is needed. Each time Claude runs tests and the output has no failure,
 | `pnpm vitest run \| tail` | `Tests  1 failed \| 20 passed` | no (the pipe hides the failure) |
 | `node --test ...` | `# fail 1` | no |
 | `grep -rn describe tests/` | any | no (it does not run tests) |
+| `node --test ... \| tail -5` | only the stack of an assertion | no (no success summary) |
+| `python3 - <<'EOF'` with `npm test` in the text | any | no (the runner is only text) |
 
 ## Refactor on demand
 
