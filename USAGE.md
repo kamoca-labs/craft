@@ -256,6 +256,6 @@ If Claude tries to write to the local auto memory (`~/.claude/projects/<project>
 | `push-gate` denied the push in a project with CI | a CI with a config outside the list | Add the path to `CI_CONFIGS` with a test in `push-gate.test.ts` |
 | It did not inject with a green suite | a test runner that the hook does not know | Write the case in `cases.json` with `"inject": ["refactor-on-green"]` and add the runner to `TEST_RUNNER` |
 
-Before you change the hook, classify the finding (`craft:hook`). Real problem: fix it. False positive with evidence: make the narrowest possible exception, with the reason `"<who decided>: <evidence>"` in the commit. Doubt: ask the user once. A wide exception (a whole file, a whole rule) needs a request from the user.
+Before you change the hook, classify the finding (`craft:hook-denied`). Real problem: fix it. False positive with evidence: make the narrowest possible exception, with the reason `"<who decided>: <evidence>"` in the commit. Doubt: ask the user once. A wide exception (a whole file, a whole rule) needs a request from the user.
 
 The full procedure is in [turn a real case into a test](https://github.com/kamoca-labs/marketplace/blob/main/USAGE.md#turn-a-real-case-into-a-test).
