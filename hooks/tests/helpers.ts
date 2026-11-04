@@ -14,6 +14,7 @@ export type Sandbox = {
   run: (rule: string, toolRun: ToolRun) => SpawnSyncReturns<string>
   start: (rule: string, source: string) => SpawnSyncReturns<string>
   pre: (rule: string, toolName: string, toolInput: object) => SpawnSyncReturns<string>
+  prompt: (rule: string, text: string) => SpawnSyncReturns<string>
 }
 
 export function sandbox(): Sandbox {
@@ -36,7 +37,8 @@ export function sandbox(): Sandbox {
   const start = (rule: string, source: string) => execute(rule, { hook_event_name: 'SessionStart', source })
   const pre = (rule: string, toolName: string, toolInput: object) =>
     execute(rule, { hook_event_name: 'PreToolUse', tool_name: toolName, tool_input: toolInput })
-  return { casesLog, projectDir, run, start, pre }
+  const prompt = (rule: string, text: string) => execute(rule, { hook_event_name: 'UserPromptSubmit', prompt: text })
+  return { casesLog, projectDir, run, start, pre, prompt }
 }
 
 export function injected(result: SpawnSyncReturns<string>): string | null {

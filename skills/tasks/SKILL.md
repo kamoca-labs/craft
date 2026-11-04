@@ -6,11 +6,11 @@ argument-hint: "[what to do]"
 
 # Tasks and goal
 
-Every session uses tasks, and a goal when a criterion exists. The `meta-goal` hook holds the end of the turn until the goal is closed. A purely informative question gets no task and no goal.
+Every session uses tasks, and a goal when a criterion exists. The `meta-goal` hook holds the end of the turn until the goal is closed. The `tasks-reminder` hook repeats the task rule on every prompt.
 
 ## Tasks
 
-1. If the request has more than one activity or step, create one task per activity with `TaskCreate`. In ATDD, after the user approves the specification, create one task per scenario, plus the refactor and the passing again.
+1. Before the first tool call, count the actions in the prompt. An analysis, a check, or a comparison is an action too. With two or more actions, or with a new action during work in progress, create one task per action with `TaskCreate`. In ATDD, after the user approves the specification, create one task per scenario, plus the refactor and the passing again.
 2. If `TaskCreate` appears only by name, load its schema with `ToolSearch` (`select:TaskCreate,TaskUpdate`).
 3. Keep one task in `in_progress`. Mark a task `completed` with the result of the command.
 4. A new scenario in the loop means the specification changed. Ask the user for approval before you continue.

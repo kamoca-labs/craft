@@ -12,6 +12,7 @@
   "deny.memory-outside-project": "memory belongs to the project, in .claude/memory/, inside the repo. Write the file there and add the line to .claude/memory/MEMORY.md. Local memory (~/.claude/projects/) is valid only on this machine and the team cannot see it. See craft:memory.",
   "context.memory-catalog": "## Current catalog (.claude/memory/MEMORY.md)",
   "context.memory-empty": "The project has no memory yet. Create .claude/memory/MEMORY.md with the first memory.",
+  "context.tasks-reminder": "[craft:tasks] Before the first tool call, count the actions in this prompt. Two or more actions, or a new action during work in progress: create one task per action with TaskCreate. Keep one task in_progress. Mark it completed with the result.",
   "context.memory-truncated": "(The catalog is cut here. Read the rest in .claude/memory/MEMORY.md.)",
   "block.meta-verify": "[craft:meta-goal] The goal is not closed. Run `{command}` after the last code edit, with a success result. Cite the command and the result in the reply. Then close the goal.",
   "block.meta-close": "[craft:meta-goal] Goal met. Mark the META task as completed. End the reply with META CLOSED: met, the verification command, and the result."
