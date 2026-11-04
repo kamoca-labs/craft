@@ -43,7 +43,7 @@ Test files are outside the limits of lines per function and per file (a `describ
 
 Vue or React frontend: ask whether the production build must remove `data-testid`. If yes, configure the plugin of the stack listed in `craft:test-ids`. Never remove the attribute from the build that runs the E2E.
 
-Test runner: the one the project already uses. If there is none, use the default of the stack (vitest, pest, pytest, `go test`, `cargo test`). Check that it runs filtered (see the filtered run in `craft:atdd`).
+Test runner: the one the project already uses. If there is none, use the default of the stack (vitest, pest, pytest, `go test`, `cargo test`). Check that it runs filtered (`craft:filtered-tests`).
 
 ## CLAUDE.md
 

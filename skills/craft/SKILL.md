@@ -90,4 +90,4 @@ Common conflicts:
 - [ ] Every optimization has a measurement before and after and beat another form.
 - [ ] Refactor commit separate from the behavior commit.
 - [ ] Same behavior (no test was edited to pass).
-- [ ] Tests of the touched domains run again, with a filter, and green. The full suite runs in CI, or locally only with the consent of the user (see the filtered run in `craft:atdd`).
+- [ ] Tests of the touched domains run again, with a filter, and green. The full suite runs in CI, or locally only with the consent of the user (`craft:filtered-tests`).

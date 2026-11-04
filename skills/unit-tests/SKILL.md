@@ -44,7 +44,7 @@ Choose the lowest level that catches the bug. Move up a level only when the bug 
    - one case for each equivalence class (valid, invalid, empty)
    - one case at each limit that the rule has (`10 MB` passes, `10 MB + 1 byte` fails)
    - no case for a limit that the rule does not have
-   - to find the classes, go through the [real-world edges](../atdd/SKILL.md#real-world-edges) of `craft:atdd`. Each edge that the rule treats differently is a class. An edge that the rule does not treat gets no case.
+   - to find the classes, go through the real-world edges (`craft:real-world-edges`). Each edge that the rule treats differently is a class. An edge that the rule does not treat gets no case.
 5. **Component like the user**: find the element with `getByTestId` (`craft:test-ids`). Verify actions, observable content, emitted events, validation, preserved input and accessible semantics. Test behavior, not appearance ([`craft:clean-tests`](../clean-tests/SKILL.md#behavior-not-appearance)).
 6. **Do not test what cannot break**: getter, constant, the library, the type.
 
