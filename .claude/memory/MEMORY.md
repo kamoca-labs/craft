@@ -1,0 +1,1 @@
+- [Session rules enforcement](project_session-rules-enforcement.md): tasks, memory and state-of-the-art need hooks that enforce them; add craft:code
