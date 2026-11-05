@@ -15,7 +15,7 @@ The whole suite grows with the project and starts to cost minutes without tellin
 | 6 (between refactors) | the tests of the refactored file or module |
 | 7 | the tests of the touched domains: the ones for the changed files (`git diff --name-only main...`) and the ones for the modules that import those files |
 
-Run every test with a filter. The `filtered-tests` hook denies the full suite without the consent of the user.
+Run every test with a filter. The `filtered-tests` hook denies the full suite without the consent of the user. A small project, with 1 to 10 test files in git, can run its full suite: it takes seconds.
 
 The full suite runs this way:
 
