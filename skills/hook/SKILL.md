@@ -22,7 +22,7 @@ Check each question against the concrete correction before you propose:
 |---|---|---|---|---|
 | "commit without `Co-Authored-By`" | yes, every commit | yes, the message is in the `git commit` command | yes, the trailer is literal | hook that denies (like `git:no-co-author`) |
 | "never `git add .env`" | yes | yes, by the command | yes | hook that denies |
-| "this variable name says nothing" | yes | no, it needs judgment | no | skill `craft:naming` |
+| "this variable name says nothing" | yes | no, it needs judgment | no | skill `../craft/references/naming.md` |
 | "in this file, use lib X" | no, single case | yes | yes | only the correction |
 
 If the answer is no:
@@ -54,7 +54,7 @@ Choose the event by the cost and the certainty of the check:
 ## How to write
 
 - **TypeScript**, run directly with `node` (Node 22.18+ runs `.ts` without a build), no dependency: only `node:fs`, `node:path`, `node:test`. Even in a PHP or Python project, the hook is TypeScript.
-- **Code in English**. The message the user reads comes from the translation file, in the language of the user (`craft:i18n`).
+- **Code in English**. The message the user reads comes from the translation file, in the language of the user (`../craft/references/i18n.md`).
 - **Follow `craft:atdd`**: the test of the hook comes before the rule and fails first.
 - One rule per file and per entry in settings. Deny only the exact pattern of the correction.
 - To deny: message on stderr and `exit 2` (the message says what to do instead). To inject: JSON with `hookSpecificOutput.additionalContext` on stdout and `exit 0`.
@@ -105,21 +105,4 @@ If the project already has hooks, follow the layout and the lib that exist.
 - Tell the user that the hook applies from the next session.
 - If the correction applied to every project, not only this one, suggest moving it to a plugin.
 
-## When a project hook denies
-
-Every finding of a hook falls into one of three cases:
-
-| Case | What to do |
-|---|---|
-| Real problem | Fix what the hook pointed at. |
-| False positive with evidence | Record the narrowest possible exception in the repo, with the reason. State the exception in the reply. |
-| Doubt | Leave the finding standing. Ask the user once, in one line. |
-
-- Evidence is a fact you can cite: a test fixture, an intentional example in the docs, a choice the user already confirmed.
-- The reason follows the format `"<who decided>: <evidence>"`. Example: `"user confirmed: the seed uses city names in another language"`.
-- Write "user confirmed" only when the user really confirmed.
-- The narrowest exception covers one value, one line or one path. A wide exception (whole file, whole rule) needs a request from the user.
-- Never use an exception to force through a denied edit.
-- Record the exception where the rule already accepts one (a list in the rule itself), with a test of the allowed case. The reason goes in the body of the commit.
-
-This section is a policy, not a mechanism. Do not create new code only to record exceptions.
+When a project hook denies an action or reports a finding, follow `references/hook-denied.md`.

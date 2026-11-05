@@ -23,11 +23,11 @@ These are the same numbers that the craft skills use as a sign, so the linter an
 
 | Limit | Value | Skill that fixes the violation |
 |---|---|---|
-| Lines per function | 20 (not counting blank lines and comments) | `craft:functions` |
-| Lines per file/class | 200 | `craft:single-responsibility` |
-| Parameters | 3 | `craft:arguments` |
-| Nesting | 2 levels | `craft:guard-clauses` |
-| Cyclomatic complexity | 10 | `craft:functions`, `craft:guard-clauses` |
+| Lines per function | 20 (not counting blank lines and comments) | `../craft/references/functions.md` |
+| Lines per file/class | 200 | `../craft/references/single-responsibility.md` |
+| Parameters | 3 | `../craft/references/arguments.md` |
+| Nesting | 2 levels | `../craft/references/guard-clauses.md` |
+| Cyclomatic complexity | 10 | `../craft/references/functions.md`, `../craft/references/guard-clauses.md` |
 
 Test files are outside the limits of lines per function and per file (a `describe` is long by nature).
 
@@ -41,9 +41,9 @@ Test files are outside the limits of lines per function and per file (a `describ
 | Go | golangci-lint (`.golangci.yml`) | `funlen`, `gocyclo`, `nestif`, `lll` |
 | Rust | Clippy (`clippy.toml`) | `too-many-lines-threshold`, `too-many-arguments-threshold`, `cognitive-complexity-threshold` |
 
-Vue or React frontend: ask whether the production build must remove `data-testid`. If yes, configure the plugin of the stack listed in `craft:test-ids`. Never remove the attribute from the build that runs the E2E.
+Vue or React frontend: ask whether the production build must remove `data-testid`. If yes, configure the plugin of the stack listed in `../craft/references/test-ids.md`. Never remove the attribute from the build that runs the E2E.
 
-Test runner: the one the project already uses. If there is none, use the default of the stack (vitest, pest, pytest, `go test`, `cargo test`). Check that it runs filtered (see the filtered run in `craft:atdd`).
+Test runner: the one the project already uses. If there is none, use the default of the stack (vitest, pest, pytest, `go test`, `cargo test`). Check that it runs filtered (`../atdd/references/filtered-tests.md`).
 
 ## CLAUDE.md
 

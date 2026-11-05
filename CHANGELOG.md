@@ -2,6 +2,68 @@
 
 Notes reconstructed from repository commits and manifest versions. Historical dates identify version changes in Git, not previously published releases. Versions absent from the recorded history are not invented. Categories without changes are omitted.
 
+## 0.17.0 (2026-11-05)
+
+### Breaking changes
+
+- Only five skills are visible to Claude: `atdd`, `craft`, `audit`, `hook` and `setup`. The listing of craft drops from 40 descriptions (10,548 characters) to 5 (1,317 characters), as `SKILLS-ARCHITECTURE.md` plans. `node scripts/skill-budget.ts` prints the count.
+- The principles and the step guides are reference files. Claude reads them with `Read`, so `craft:<name>` no longer loads with the `Skill` tool:
+  - `craft:acceptance-criteria` → `skills/atdd/references/acceptance-criteria.md`
+  - `craft:e2e-container` → `skills/atdd/references/e2e-container.md`
+  - `craft:filtered-tests` → `skills/atdd/references/filtered-tests.md`
+  - `craft:real-world-edges` → `skills/atdd/references/real-world-edges.md`
+  - `craft:arguments` → `skills/craft/references/arguments.md`
+  - `craft:clean-tests` → `skills/craft/references/clean-tests.md`
+  - `craft:comments` → `skills/craft/references/comments.md`
+  - `craft:dependency-inversion` → `skills/craft/references/dependency-inversion.md`
+  - `craft:dry` → `skills/craft/references/dry.md`
+  - `craft:e2e-tests` → `skills/craft/references/e2e-tests.md`
+  - `craft:english-code` → `skills/craft/references/english-code.md`
+  - `craft:errors` → `skills/craft/references/errors.md`
+  - `craft:functions` → `skills/craft/references/functions.md`
+  - `craft:guard-clauses` → `skills/craft/references/guard-clauses.md`
+  - `craft:i18n-layout` → `skills/craft/references/i18n-layout.md`
+  - `craft:i18n` → `skills/craft/references/i18n.md`
+  - `craft:interface-segregation` → `skills/craft/references/interface-segregation.md`
+  - `craft:kiss` → `skills/craft/references/kiss.md`
+  - `craft:liskov-substitution` → `skills/craft/references/liskov-substitution.md`
+  - `craft:naming` → `skills/craft/references/naming.md`
+  - `craft:open-closed` → `skills/craft/references/open-closed.md`
+  - `craft:performance` → `skills/craft/references/performance.md`
+  - `craft:side-effects` → `skills/craft/references/side-effects.md`
+  - `craft:single-responsibility` → `skills/craft/references/single-responsibility.md`
+  - `craft:test-ids` → `skills/craft/references/test-ids.md`
+  - `craft:unit-tests` → `skills/craft/references/unit-tests.md`
+  - `craft:yagni` → `skills/craft/references/yagni.md`
+  - `craft:hook-denied` → `skills/hook/references/hook-denied.md`
+- The rules that load in every session are files that a hook injects. They are no longer skills:
+  - `craft:challenge` → `rules/challenge.md`
+  - `craft:state-of-the-art` → `rules/state-of-the-art.md`
+  - `craft:ste` → `rules/ste.md`
+  - `craft:tool` → `rules/tool.md`
+  - `craft:verify` → `rules/verify.md`
+- `/craft:memory` and `/craft:tasks` are commands for the user only (`disable-model-invocation: true`). The hooks still inject their rules in every session.
+- The `atdd-first` hook is gone. The `test-first` hook takes its place.
+
+### Improvements
+
+- The SessionStart rules are short, about 7,200 characters instead of 17,300. The full ASD-STE100 text is in `rules/ste-standard.md`.
+- A new `change` rule asks Claude to search every caller, keep the public signature, keep the existing tests, check the inputs that break the rule, and test behavior only. A visual-only change gets no test.
+- One `reminder` hook replaces `tasks-reminder`, `research-reminder` and `memory-reminder`, with one line of 200 characters or less.
+- A project with 1 to 10 test files can run its full suite.
+- A request with one action gets no task and no goal, except the ATDD flow.
+- A `test-first` hook denies a production code edit while no test file was edited in the session. It replaces `atdd-first`, which also required loading `/craft:atdd`.
+- The refactor triage enters only for a change of 20 code lines or more.
+- The memory rule forbids secrets, credentials and personal data again.
+
+### Fixes
+
+- Keep valid transcript entries when a JSONL line is incomplete or malformed.
+- Do not count denied test edits, failed skill calls, or flow names quoted in ordinary text as test-first prerequisites.
+- Check every recognized test invocation in a compound command before allowing an unfiltered suite.
+- Require a successful verification result for the goal reminder, and do not count an `echo` of the verification command as execution.
+- Record the scope, findings, regression checks, and limits in [AUDIT.md](AUDIT.md).
+
 ## 0.16.1 (2026-11-04)
 
 ### Improvements

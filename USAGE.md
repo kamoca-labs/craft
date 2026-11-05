@@ -44,12 +44,12 @@ Claude detects the stack, shows the plan (dependencies, configs, limits), and **
 
 2. It writes the test of **one** scenario and runs it: `Step 3 (Red): 1 failing, expected 422 got 201`.
 3. It writes the minimum code: `Step 5 (Passing): 1 passing`. If the specification has another scenario, it goes back to step 2 with the next one.
-4. With all scenarios green, the hook injects the triage. Claude loads only what has a signal and refactors: `Step 6 (Refactor): craft:dry, limit unified in MAX_ATTACHMENT_SIZE. No signal in the others`. When performance has a signal, Claude measures the current form, compares at least two forms, and puts the table in the `perf` commit.
+4. With all scenarios green, the hook injects the triage. Claude loads only what has a signal and refactors: `Step 6 (Refactor): dry, limit unified in MAX_ATTACHMENT_SIZE. No signal in the others`. When performance has a signal, Claude measures the current form, compares at least two forms, and puts the table in the `perf` commit.
 5. It runs the tests of the touched domains: `Step 7 (Passing again): 34 passing in tests/Feature/Request and tests/Unit/Attachment`.
 
 ## Tasks and goal
 
-In step 1, `/craft:atdd` loads the skill `craft:acceptance-criteria`: each `Then` states an observable value, and each scenario names the test that proves it. After you approve the specification, it follows `craft:tasks`, which the hook already injected in the session. Claude creates one task per scenario (`TaskCreate`), plus the refactor and the passing again. You follow the list with `Ctrl+T`.
+In step 1, `/craft:atdd` reads `references/acceptance-criteria.md`: each `Then` states an observable value, and each scenario names the test that proves it. After you approve the specification, it follows the tasks rule, which the hook already injected in the session. Claude creates one task per scenario (`TaskCreate`), plus the refactor and the passing again. You follow the list with `Ctrl+T`.
 
 When the `TaskCreate` tool is on, Claude finds the criterion by itself (the scenarios, your request, or the project scripts) and sets the goal without asking. If no command can prove the result, it creates only the tasks. You can also call `/craft:tasks <what to do>`. The first task of the list is the `META:` task:
 
@@ -72,7 +72,7 @@ When the work ends, the final reply always carries the closing, met or not: the 
 
 ### Several activities in the same request
 
-Outside ATDD, Claude also follows `craft:tasks` when your request has more than one activity ("fix the login, update the README, and start the service"). It splits the request into tasks, shows the list, and sets the goal. The verification of the goal is one command that proves the final state of all activities.
+Outside ATDD, Claude also follows the tasks rule when your prompt has two or more actions, or adds a new action during the work. The `reminder` hook repeats this rule on every prompt. Example: "fix the login, update the README, and start the service". Claude splits the request into tasks, shows the list, and sets the goal. The verification of the goal is one command that proves the final state of all activities.
 
 ## Bug fix with ATDD
 
@@ -92,8 +92,6 @@ Step 1 becomes the scenario that reproduces the bug. Step 3 proves that the test
 2. It creates a reviewable mockup artifact or a Figma/FigCraft design with the applicable screen states and responsive variants. You review and iterate until you explicitly approve it. Existing approval for the same artifact and scope is reused. Product implementation starts only after this gate; there is no prior red behavioral test for a visual-only change.
 3. It implements the approved screen and inspects the rendered result. When the screen is accepted, Claude runs relevant existing filtered functional checks once, fixes once if something broke, and stops. It does not add assertions for colors, exact sizes, CSS classes or animation timing. Rendered review covers appearance, breakpoints and applicable states.
 
-The `atdd-first` hook allows `Card.vue`. If Claude tries to edit `src/services/request.ts`, the hook denies the edit and points to `/craft:atdd`.
-
 ### Mixed feature: screen with back end
 
 ```
@@ -108,11 +106,11 @@ The limit is a rule. Claude asks for the order with `AskUserQuestion`:
 | Screen first | Style mode iterates on the screen with fixed data. Then `/craft:atdd` builds the back end and replaces the mock with real data |
 | By slice | Each scenario goes through `/craft:atdd`, and its visual part goes through style mode before the next scenario |
 
-In all three options, the rule enters only with a test. The hook denies the service without `/craft:atdd`.
+In all three options, the rule enters only with a test. If Claude tries to change the service before any test, the `test-first` hook denies the edit and asks for the failing test first.
 
 ## Automatic refactor after green
 
-No command is needed. Each time Claude runs tests and the output has no failure, the `refactor-on-green` hook injects the `craft` triage as context:
+No command is needed. Each time Claude runs tests and the output has a success summary and no failure, the `refactor-on-green` hook injects a short reminder. When all scenarios are green, Claude loads the `craft` triage:
 
 | Command run | Output | Injects? |
 |---|---|---|
@@ -121,6 +119,8 @@ No command is needed. Each time Claude runs tests and the output has no failure,
 | `pnpm vitest run \| tail` | `Tests  1 failed \| 20 passed` | no (the pipe hides the failure) |
 | `node --test ...` | `# fail 1` | no |
 | `grep -rn describe tests/` | any | no (it does not run tests) |
+| `node --test ... \| tail -5` | only the stack of an assertion | no (no success summary) |
+| `python3 - <<'EOF'` with `npm test` in the text | any | no (the runner is only text) |
 
 ## Refactor on demand
 
@@ -133,17 +133,17 @@ Claude first looks for what it can delete (root rule). Then it triages all princ
 
 If the change alters the UI (component, CSS, template), the report suggests `/design:review` on the touched files. Claude does not run it as a refactor side effect. The design plugin includes Impeccable; no separate upstream installation is required. If design is unavailable, Claude reports the missing plugin and the pending visual review.
 
-For one principle only, call its skill:
+For one principle only, ask for it by name. Claude reads its reference in `skills/craft/references/`:
 
 ```
-/craft:errors app/Services/PaymentGateway.php
-/craft:clean-tests tests/Feature/UploadTest.php
-/craft:e2e-tests tests/e2e/
+apply the errors principle to app/Services/PaymentGateway.php
+clean the tests in tests/Feature/UploadTest.php
+review the E2E suite in tests/e2e/
 ```
 
-`/craft:e2e-tests` deletes from the E2E suite each assert that does not stop the user from reaching the goal (style, `hover`, exact text, field by field). It moves the business rule to the unit test. The loading, empty, error, and no-permission states enter when the screen has them.
+The E2E review (`e2e-tests.md`) deletes from the E2E suite each assert that does not stop the user from reaching the goal (appearance, exact text, field by field). It moves the business rule to the unit test. The loading, empty, error, and no-permission states enter when the screen has them.
 
-The same appearance rule applies to unit, component and integration tests: never assert that the button is blue, 40 px tall, at a specific coordinate or assigned a decorative CSS class. Test actions, outcomes and accessible semantics. Screenshot comparisons are created only on an explicit request, in a separate visual suite.
+The same rule applies to unit, component and integration tests: a functional test checks behavior, not appearance. `skills/craft/references/clean-tests.md` owns this rule, and the other test references point to it. Screenshot comparisons are created only on an explicit request, in a separate visual suite.
 
 ## Combine with the git plugin
 
@@ -167,7 +167,7 @@ The `english-code` hook denies non-English text in a code file:
 | text in another language in a `.md`, `.json`, or `.po` file | allowed (not code) |
 | `it('rejects an attachment above the limit')` in `tests/Feature/AttachmentTest.php` | allowed (test file: `tests/`, `test/`, `__tests__/`, `spec/`, `*.test.*`, `*.spec.*`, `*_test.*`, `test_*.py`) |
 
-The hook does not detect English text written directly in the code for the user (`<button>Save</button>`). The triage of `/craft:craft` catches it through the skill `craft:i18n`. A project without i18n gets a proposal for the default library of the stack, with your approval before the installation. The same skill catches dates, numbers, and currencies formatted by hand (use `Intl`), fixed width in a text container, and `margin-left` where `margin-inline-start` fits.
+The hook does not detect English text written directly in the code for the user (`<button>Save</button>`). The triage of `/craft:craft` catches it through the reference `i18n.md`. A project without i18n gets a proposal for the default library of the stack, with your approval before the installation. The same reference catches dates, numbers, and currencies formatted by hand (use `Intl`). The reference `i18n-layout.md` catches a fixed width in a text container, and `margin-left` where `margin-inline-start` fits. The reference `english-code.md` covers names, comments, and logs in another language.
 
 ## Test id on every interactive element
 
@@ -177,7 +177,7 @@ The `test-id` hook denies an interactive element without `data-testid` in `.vue`
 |---|---|
 | `<button @click="save">Save</button>` | denied: `<button data-testid="profile-save-button" @click="save">` |
 | `<Card onClick={open}>` | denied: the handler makes the component interactive |
-| `` <li :data-testid="`item-${index}`"> `` | the hook allows it, but the triage of `/craft:craft` catches the index through the skill `craft:test-ids`: use the SKU |
+| `` <li :data-testid="`item-${index}`"> `` | the hook allows it, but the triage of `/craft:craft` catches the index through the reference `test-ids.md`: use the SKU |
 | `<button class="btn" v-bind="$attrs">` in a `BaseButton.vue` | allowed (the test id arrives through the parent) |
 | `<button>Save</button>` in `src/components/Form.test.tsx` | allowed (test file) |
 
@@ -185,7 +185,7 @@ The test finds the element with `getByTestId` first. Removing the attribute in t
 
 ## Writing in the ASD-STE100 standard
 
-There is no command. The `ste` hook injects the skill `craft:ste` in every session, and again after `/clear` and after compaction. From then on, replies, docs, commits, and PRs/MRs follow ASD-STE100 (Simplified Technical English, Issue 9):
+There is no command. The `ste` hook injects the rule `rules/ste.md` in every session, and again after `/clear` and after compaction. From then on, replies, docs, commits, and PRs/MRs follow ASD-STE100 (Simplified Technical English, Issue 9):
 
 | Before | After |
 |---|---|
@@ -201,9 +201,9 @@ There is no command. Three hooks inject three skills in every session, and again
 
 | Skill | What Claude does |
 |---|---|
-| `craft:verify` | Before it uses a version, an image tag, a package name, a flag, or an API that can change, Claude looks in the documentation, the registry, the CLI, or the web. It cites the source. Without a source, it writes "not verified" |
-| `craft:challenge` | Claude treats a claim of yours about a fact as wrong until a proof says it is right. If the proof contradicts you, Claude says so and shows the proof. A preference or a decision of yours is not a fact, so Claude does not challenge it |
-| `craft:state-of-the-art` | Before it implements something (a Dockerfile, a CI pipeline, a framework feature), Claude looks for the official best practices and the current recommendation of the community, applies them, and cites the sources. If the practice differs from the pattern of the repo, it asks you which one to follow |
+| `rules/verify.md` | Before it uses a version, an image tag, a package name, a flag, or an API that can change, Claude looks in the documentation, the registry, the CLI, or the web. It cites the source. Without a source, it writes "not verified" |
+| `rules/challenge.md` | Claude treats a claim of yours about a fact as wrong until a proof says it is right. If the proof contradicts you, Claude says so and shows the proof. A preference or a decision of yours is not a fact, so Claude does not challenge it |
+| `rules/state-of-the-art.md` | Before it implements something (a Dockerfile, a CI pipeline, a framework feature), Claude looks for the official best practices and the current recommendation of the community, applies them, and cites the sources. If the practice differs from the pattern of the repo, it asks you which one to follow |
 
 Example:
 
@@ -220,7 +220,7 @@ You correct Claude (for example, "do not run `git add .env`"). Claude judges if 
 
 ## Project memory
 
-No command is required. The `memory` hook loads the skill `craft:memory` and the catalog in every session. When a conversation brings something that matters for the next one, Claude writes it in the project:
+No command is required. The `memory` hook loads the memory rule and the catalog in every session. When a conversation brings something that matters for the next one, Claude writes it in the project:
 
 ```
 .claude/memory/
@@ -247,13 +247,12 @@ If Claude tries to write to the local auto memory (`~/.claude/projects/<project>
 | Error | Example | What to do |
 |---|---|---|
 | It injected with a red suite | a new runner with a failure format that the hook does not know | Take the line from `~/.claude/hook-cases.jsonl`, paste it in `hooks/tests/cases.json` with `"inject": []`, and add the pattern to `FAILURE` |
-| `atdd-first` denied an edit that does not change behavior | a config adjustment in a code extension | Load `/craft:atdd` anyway. If the file is not code, add the exception to `CODE_FILE` with a test in `atdd-first.test.ts` |
 | `english-code` denied text that is neither user-facing text nor code | domain data (a city name in a seed) | Move the data to JSON or CSV. If a translation folder has another name, add it to `TRANSLATION_FOLDER` with a test in `english-code.test.ts` |
 | `test-id` denied an element that is not interactive | a decorative anchor `<a>`, or a loose `>` in an attribute without quotes | Add the `data-testid` anyway. If the tag reading is wrong, fix `OPENING_TAG` with a test in `test-id.test.ts` |
 | `filtered-tests` denied a run that is already filtered | a filter that the hook does not know | Add the filter to `FILTER_FLAG` or `TEST_PATH` with a test in `filtered-tests.test.ts` |
 | `push-gate` denied the push in a project with CI | a CI with a config outside the list | Add the path to `CI_CONFIGS` with a test in `push-gate.test.ts` |
 | It did not inject with a green suite | a test runner that the hook does not know | Write the case in `cases.json` with `"inject": ["refactor-on-green"]` and add the runner to `TEST_RUNNER` |
 
-Before you change the hook, classify the finding (`craft:hook`). Real problem: fix it. False positive with evidence: make the narrowest possible exception, with the reason `"<who decided>: <evidence>"` in the commit. Doubt: ask the user once. A wide exception (a whole file, a whole rule) needs a request from the user.
+Before you change the hook, classify the finding (`skills/hook/references/hook-denied.md`). Real problem: fix it. False positive with evidence: make the narrowest possible exception, with the reason `"<who decided>: <evidence>"` in the commit. Doubt: ask the user once. A wide exception (a whole file, a whole rule) needs a request from the user.
 
 The full procedure is in [turn a real case into a test](https://github.com/kamoca-labs/marketplace/blob/main/USAGE.md#turn-a-real-case-into-a-test).

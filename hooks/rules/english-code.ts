@@ -1,6 +1,5 @@
-import { addedText, CODE_FILE, deny, readInput, TEST_FILE } from '../lib.ts'
+import { addedText, CODE_FILE, deny, readInput, TEST_FILE, TRANSLATION_FOLDER } from '../lib.ts'
 
-const TRANSLATION_FOLDER = /(^|\/)(lang|locales?|i18n|l10n|translations?)\//
 const NON_ASCII_LETTER = /(?![\x00-\x7F])\p{L}/u
 
 const input = readInput()

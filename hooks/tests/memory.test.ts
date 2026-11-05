@@ -56,3 +56,9 @@ test('session start is not logged as a use case', () => {
   box.start(RULE, 'startup')
   assert.strictEqual(fs.existsSync(box.casesLog), false)
 })
+
+test('the memory rule forbids secrets, credentials and personal data', () => {
+  const context = JSON.parse(sandbox().start('memory', 'startup').stdout).hookSpecificOutput.additionalContext
+  assert.match(context, /Never save a secret, a credential, or personal data/)
+  assert.match(context, /save without a request/)
+})

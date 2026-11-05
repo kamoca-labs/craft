@@ -17,6 +17,18 @@
           },
           {
             "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/codebase-map.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:codebase-map: what already exists"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/change.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:change: callers, signature, edges, tests"
+          },
+          {
+            "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/tasks.ts\"",
             "timeout": 10,
             "statusMessage": "craft:tasks: tasks and goal"
@@ -44,6 +56,18 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/state-of-the-art.ts\"",
             "timeout": 10,
             "statusMessage": "craft:state-of-the-art: research current practice before you implement"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/reminder.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:reminder: tasks, research"
           }
         ]
       }
@@ -77,9 +101,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/atdd-first.ts\"",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/test-first.ts\"",
             "timeout": 10,
-            "statusMessage": "craft:atdd-first: flow loaded before code?"
+            "statusMessage": "craft:test-first: a test before the code?"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/research-first.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:research-first: research before infra and versions?"
           },
           {
             "type": "command",

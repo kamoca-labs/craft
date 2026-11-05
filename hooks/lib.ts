@@ -20,16 +20,53 @@ const CASES_LOG = process.env.HOOK_CASES_LOG || path.join(os.homedir(), '.claude
 const MESSAGES: Record<string, string> = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, 'locales', 'en.json'), 'utf8'))
 
 export const CODE_FILE = /\.(ts|tsx|js|jsx|mjs|cjs|vue|svelte|astro|php|py|go|rs|java|kt|rb|cs)$/
+export const TRANSLATION_FOLDER = /(^|\/)(lang|locales?|i18n|l10n|translations?)\//
 export const TEST_FILE = /(^|\/)(tests?|__tests__|specs?)\/|[._](test|spec)\.\w+$|(^|\/)test_[^/]+\.py$/
 
-export const TEST_RUNNER = new RegExp([
-  /\b(npx|pnpm( exec)?|bunx)\s+(vitest|jest)\b/,
-  /(^|[\s;&|/])(vitest|jest|pest|phpunit|pytest)\b/,
-  /\b(npm|pnpm|yarn|bun|composer)(\s+run)?\s+test\b/,
+const TEST_RUNNER = new RegExp([
+  /\b(npx|pnpm( exec)?|bunx)\s+(vitest|jest|mocha)\b/,
+  /(^|[\s;&|/])(vitest|jest|pest|phpunit|pytest|mocha|rspec)(?=\s|$|")/,
+  /\b(npm|pnpm|yarn|bun)(\s+--?[\w-]+(\s+[^-\s]\S*)?)*\s+(run\s+)?test\b/,
+  /\b(npm\s+t|composer(\s+run)?\s+test|yarn\s+workspace\s+\S+\s+(run\s+)?test)\b/,
+  /\b(turbo|nx)\s+(run\s+)?test\b/,
+  /\bmake\s+test\b/,
   /\bartisan\s+test\b/,
   /\bnode\s+--test\b/,
-  /\b(go|cargo|mvn|gradle)\s+test\b/,
+  /\bpython3?\s+-m\s+(pytest|unittest)\b/,
+  /\bcargo\s+(\+\S+\s+)?(test|nextest\s+run)\b/,
+  /\b(go|deno|dotnet)\s+test\b/,
+  /(^|[\s;&|/])(mvnw?|gradlew?)(\s+\S+)*?\s+(test|verify)\b/,
 ].map((pattern) => pattern.source).join('|'))
+
+const LAUNCHER = /^(npm|pnpm|pnpx|npx|yarn|bun|bunx|composer|php|artisan|python3?|uv|poetry|go|cargo|mvnw?|gradlew?|make|docker|podman|sh|bash|zsh|node|deno|dotnet|bundle|turbo|nx|vitest|jest|pest|phpunit|pytest|mocha|rspec)$/
+const COMMAND_PREFIX = /^[\s({$"']*((\w+=\S*|env|sudo|time|exec)\s+)*/
+const SETUP = /\b(npm|pnpm|yarn|bun|composer|uv|poetry)\s+(install|i|add|ci|require|remove|uninstall|update|upgrade)\b|\s--(help|version)\b|\s-[hV](\s|$)/
+const SEGMENT = /&&|\|\||[;|\n]/
+
+const HEREDOC = /<<-?\s*(['"]?)(\w+)\1[^\n]*\n[\s\S]*?(\n\s*\2\s*(\n|$)|$)/g
+const QUOTED = /(\s-\w*c\s+)?('[^']*'|"(?:\\.|[^"\\])*")/g
+
+export function shellCode(command: string): string {
+  return command.replace(HEREDOC, '\n').replace(QUOTED, (quoted, shellFlag) => (shellFlag || !/\s/.test(quoted) ? quoted : "''"))
+}
+
+export function shellCommands(command: string): string[] {
+  return shellCode(command).split(SEGMENT).map((segment) => segment.trim()).filter(Boolean)
+}
+
+export function testRunsArguments(command: string): string[] {
+  const runs: string[] = []
+  for (const segment of shellCommands(command)) {
+    const program = segment.replace(COMMAND_PREFIX, '').split(/\s/)[0].split('/').at(-1) || ''
+    const match = LAUNCHER.test(program) && !SETUP.test(segment) ? TEST_RUNNER.exec(segment) : null
+    if (match) runs.push(segment.slice(match.index + match[0].length))
+  }
+  return runs
+}
+
+export function testRunArguments(command: string): string | null {
+  return testRunsArguments(command)[0] ?? null
+}
 
 export function addedText({ tool_input }: HookInput): string {
   const edits = tool_input.edits?.map((edit) => edit.new_string) || []
@@ -39,7 +76,7 @@ export function addedText({ tool_input }: HookInput): string {
 export const FULL_SUITE_LOCAL = MESSAGES['consent.full-suite-local']
 export const SKIP_FULL_SUITE = MESSAGES['consent.skip-full-suite']
 
-export type TranscriptBlock = { type: string, id?: string, name?: string, text?: string, is_error?: boolean, tool_use_id?: string, input?: { file_path?: string, command?: string, subject?: string, description?: string } }
+export type TranscriptBlock = { type: string, id?: string, name?: string, text?: string, is_error?: boolean, tool_use_id?: string, input?: { file_path?: string, command?: string, subject?: string, description?: string, subagent_type?: string, skill?: string } }
 export type TranscriptEntry = { type: string, message?: { role?: string, content?: string | TranscriptBlock[] }, toolUseResult?: { answers?: Record<string, string> } }
 
 export function blocks(entry: TranscriptEntry): TranscriptBlock[] {
@@ -49,7 +86,14 @@ export function blocks(entry: TranscriptEntry): TranscriptBlock[] {
 
 export function readTranscript(transcriptPath: string): TranscriptEntry[] {
   try {
-    return fs.readFileSync(transcriptPath, 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line))
+    return fs.readFileSync(transcriptPath, 'utf8').split('\n').filter(Boolean).flatMap((line) => {
+      try {
+        const entry = JSON.parse(line)
+        return entry && typeof entry === 'object' ? [entry] : []
+      } catch {
+        return []
+      }
+    })
   } catch {
     return []
   }
@@ -73,7 +117,7 @@ export function consentGiven(transcriptPath: string | undefined, labels: string[
 }
 
 export function message(key: string, params: Record<string, string> = {}): string {
-  return MESSAGES[key].replace(/\{(\w+)\}/g, (_, name) => params[name])
+  return withPluginRoot(MESSAGES[key]).replace(/\{(\w+)\}/g, (match, name) => params[name] ?? match)
 }
 
 export function readInput(): HookInput {
@@ -84,9 +128,17 @@ export function output({ tool_response }: HookInput): string {
   return [tool_response?.stdout, tool_response?.stderr].filter(Boolean).join('\n')
 }
 
+function withPluginRoot(text: string): string {
+  return text.replaceAll('${CLAUDE_PLUGIN_ROOT}', process.env.CLAUDE_PLUGIN_ROOT || '')
+}
+
+export function ruleBody(rule: string): string {
+  return withPluginRoot(fs.readFileSync(path.join(process.env.CLAUDE_PLUGIN_ROOT || '', 'rules', `${rule}.md`), 'utf8'))
+}
+
 export function skillBody(skill: string): string {
   const file = path.join(process.env.CLAUDE_PLUGIN_ROOT || '', 'skills', skill, 'SKILL.md')
-  return fs.readFileSync(file, 'utf8').replace(/^---\n[\s\S]*?\n---\n+/, '')
+  return withPluginRoot(fs.readFileSync(file, 'utf8').replace(/^---\n[\s\S]*?\n---\n+/, ''))
 }
 
 function capture(useCase: object) {

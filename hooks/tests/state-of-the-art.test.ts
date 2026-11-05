@@ -15,3 +15,21 @@ test('every session source injects the state-of-the-art skill as SessionStart co
     assert.ok(additionalContext.length < CONTEXT_LIMIT, source)
   }
 })
+
+test('the state-of-the-art skill asks for the expert practice and the linter of the subject', () => {
+  const additionalContext = JSON.parse(sandbox().start('state-of-the-art', 'startup').stdout).hookSpecificOutput.additionalContext
+
+  assert.match(additionalContext, /expert practice/)
+  assert.match(additionalContext, /linter of the subject/)
+})
+
+test('the state-of-the-art skill orders reuse: native feature, then a vetted package, then own code', () => {
+  const additionalContext = JSON.parse(sandbox().start('state-of-the-art', 'startup').stdout).hookSpecificOutput.additionalContext
+  const native = additionalContext.search(/a native feature/i)
+  const vetted = additionalContext.search(/a vetted package/i)
+  const own = additionalContext.search(/your own code/i)
+
+  assert.ok(native > -1 && native < vetted && vetted < own, `${native} ${vetted} ${own}`)
+  assert.match(additionalContext, /deps\.dev/)
+  assert.match(additionalContext, /last 12 months/)
+})

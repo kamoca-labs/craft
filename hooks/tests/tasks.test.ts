@@ -15,3 +15,16 @@ test('every session source injects the tasks skill as SessionStart context', () 
     assert.ok(additionalContext.length < CONTEXT_LIMIT, source)
   }
 })
+
+test('the tasks skill has no exception that lets a request skip the tasks', () => {
+  const additionalContext = JSON.parse(sandbox().start('tasks', 'startup').stdout).hookSpecificOutput.additionalContext
+
+  assert.doesNotMatch(additionalContext, /purely informative/)
+  assert.doesNotMatch(additionalContext, /If the request has more than one activity/)
+})
+
+test('the ATDD flow keeps one task per scenario and the goal, even for one request', () => {
+  const additionalContext = JSON.parse(sandbox().start('tasks', 'startup').stdout).hookSpecificOutput.additionalContext
+  assert.match(additionalContext, /The ATDD flow is the exception/)
+  assert.match(additionalContext, /one task per scenario/)
+})

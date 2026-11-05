@@ -8,7 +8,7 @@ export const SKIP_FULL_SUITE = 'Continue without the full suite'
 
 let toolUseCount = 0
 
-function toolUse(name: string, input: object) {
+export function toolUse(name: string, input: object) {
   const id = `toolu_${++toolUseCount}`
   return { id, line: JSON.stringify({ type: 'assistant', message: { content: [{ type: 'tool_use', id, name, input }] } }) }
 }
@@ -42,7 +42,7 @@ export function bashRun(command: string, failed = false): string {
 
 export const userText = (text: string) => JSON.stringify({ type: 'user', message: { content: text } })
 
-export function runRule(rule: string, toolInput: object, transcript: string[] = [], projectFiles: string[] = [], extra: object = {}) {
+export function runRule(rule: string, toolInput: object, transcript: string[] = [], projectFiles: string[] = [], extra: object = {}, gitRepo = false) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'craft-hooks-'))
   const transcriptPath = path.join(dir, 'transcript.jsonl')
   const projectDir = path.join(dir, 'project')
@@ -52,6 +52,7 @@ export function runRule(rule: string, toolInput: object, transcript: string[] = 
     fs.writeFileSync(path.join(projectDir, file), '')
   }
   fs.mkdirSync(projectDir, { recursive: true })
+  if (gitRepo) spawnSync('git', ['init', '-q'], { cwd: projectDir })
   return spawnSync('node', [path.join(import.meta.dirname, '..', 'rules', `${rule}.ts`)], {
     input: JSON.stringify({ tool_name: 'Bash', tool_input: toolInput, transcript_path: transcriptPath, cwd: projectDir, ...extra }),
     encoding: 'utf8',
