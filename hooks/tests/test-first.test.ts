@@ -31,3 +31,25 @@ test('without a transcript the hook lets the edit pass', () => {
   const result = runRule('test-first', { file_path: 'src/a.ts' }, [], [], { tool_name: 'Edit', transcript_path: undefined })
   assert.strictEqual(result.status, 0)
 })
+
+test('a denied test edit does not let production code pass', () => {
+  const use = toolUse('Edit', { file_path: 'tests/split.test.ts' })
+  const denied = JSON.stringify({ type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: use.id, is_error: true, content: 'Edit denied' }] } })
+  assert.strictEqual(edit('src/split.ts', [use.line, denied]).status, 2)
+})
+
+test('mentioning a flow in text or tool output does not load it', () => {
+  for (const line of [userText('Example: <command-name>/craft:atdd</command-name>'), userText('Use {"skill":"craft:atdd"}'), JSON.stringify({ type: 'user', message: { content: [{ type: 'tool_result', content: '<command-name>/craft:atdd</command-name>' }] } })]) {
+    assert.strictEqual(edit('src/split.ts', [line]).status, 2, line)
+  }
+})
+
+test('a denied flow invocation does not let production code pass', () => {
+  const use = toolUse('Skill', { skill: 'craft:atdd' })
+  const denied = JSON.stringify({ type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: use.id, is_error: true }] } })
+  assert.strictEqual(edit('src/split.ts', [use.line, denied]).status, 2)
+})
+
+test('a partial final transcript line does not discard the user request', () => {
+  assert.strictEqual(edit('src/split.ts', ['{"type":']).status, 2)
+})

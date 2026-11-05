@@ -50,13 +50,22 @@ export function shellCode(command: string): string {
   return command.replace(HEREDOC, '\n').replace(QUOTED, (quoted, shellFlag) => (shellFlag || !/\s/.test(quoted) ? quoted : "''"))
 }
 
-export function testRunArguments(command: string): string | null {
-  for (const segment of shellCode(command).split(SEGMENT)) {
+export function shellCommands(command: string): string[] {
+  return shellCode(command).split(SEGMENT).map((segment) => segment.trim()).filter(Boolean)
+}
+
+export function testRunsArguments(command: string): string[] {
+  const runs: string[] = []
+  for (const segment of shellCommands(command)) {
     const program = segment.replace(COMMAND_PREFIX, '').split(/\s/)[0].split('/').at(-1) || ''
     const match = LAUNCHER.test(program) && !SETUP.test(segment) ? TEST_RUNNER.exec(segment) : null
-    if (match) return segment.slice(match.index + match[0].length)
+    if (match) runs.push(segment.slice(match.index + match[0].length))
   }
-  return null
+  return runs
+}
+
+export function testRunArguments(command: string): string | null {
+  return testRunsArguments(command)[0] ?? null
 }
 
 export function addedText({ tool_input }: HookInput): string {
@@ -67,7 +76,7 @@ export function addedText({ tool_input }: HookInput): string {
 export const FULL_SUITE_LOCAL = MESSAGES['consent.full-suite-local']
 export const SKIP_FULL_SUITE = MESSAGES['consent.skip-full-suite']
 
-export type TranscriptBlock = { type: string, id?: string, name?: string, text?: string, is_error?: boolean, tool_use_id?: string, input?: { file_path?: string, command?: string, subject?: string, description?: string, subagent_type?: string } }
+export type TranscriptBlock = { type: string, id?: string, name?: string, text?: string, is_error?: boolean, tool_use_id?: string, input?: { file_path?: string, command?: string, subject?: string, description?: string, subagent_type?: string, skill?: string } }
 export type TranscriptEntry = { type: string, message?: { role?: string, content?: string | TranscriptBlock[] }, toolUseResult?: { answers?: Record<string, string> } }
 
 export function blocks(entry: TranscriptEntry): TranscriptBlock[] {
@@ -77,7 +86,14 @@ export function blocks(entry: TranscriptEntry): TranscriptBlock[] {
 
 export function readTranscript(transcriptPath: string): TranscriptEntry[] {
   try {
-    return fs.readFileSync(transcriptPath, 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line))
+    return fs.readFileSync(transcriptPath, 'utf8').split('\n').filter(Boolean).flatMap((line) => {
+      try {
+        const entry = JSON.parse(line)
+        return entry && typeof entry === 'object' ? [entry] : []
+      } catch {
+        return []
+      }
+    })
   } catch {
     return []
   }

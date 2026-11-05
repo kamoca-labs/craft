@@ -32,6 +32,13 @@ test('allows a filtered run', () => {
   }
 })
 
+test('checks every test run in a compound command', () => {
+  for (const separator of [' && ', '; ', '\n', ' || ']) {
+    assert.strictEqual(bash(`node --test tests/a.test.ts${separator}npm test`).status, 2, separator)
+    assert.strictEqual(bash(`node --test tests/a.test.ts${separator}node --test tests/b.test.ts`).status, 0, separator)
+  }
+})
+
 test('allows the full suite after the user consents', () => {
   assert.strictEqual(bash('pnpm vitest run', [answer(FULL_SUITE_LOCAL)]).status, 0)
 })

@@ -1,6 +1,6 @@
 import assert from 'node:assert'
 import { test } from 'node:test'
-import { assistantText, bashRun, codeEdit, runRule, taskCreate, userText } from './transcript.ts'
+import { assistantText, bashRun, codeEdit, runRule, taskCreate, toolUse, userText } from './transcript.ts'
 
 const COMMAND = 'pnpm vitest run tests/unit/attachment'
 const META = taskCreate('META: the 3 scenarios pass', `Verification: \`${COMMAND}\` exits with code 0.\nLimit: 2 blocks.`)
@@ -28,6 +28,14 @@ test('blocks when the verification command failed', () => {
 
 test('asks for the closure when the verification passed after the last edit', () => {
   assert.match(stop([META, codeEdit('src/upload.ts'), bashRun(COMMAND)]).reason, /Goal met/)
+})
+
+test('a verification call without a result is not success', () => {
+  assert.match(stop([META, toolUse('Bash', { command: COMMAND }).line]).reason, /Run/)
+})
+
+test('quoting the verification command does not execute it', () => {
+  assert.match(stop([META, bashRun(`echo '${COMMAND}'`)]).reason, /Run/)
 })
 
 test('a goal declared as assistant text works like the task', () => {

@@ -1,4 +1,4 @@
-import { blocks, isCodeEdit, message, readInput, readTranscript, type TranscriptBlock } from '../lib.ts'
+import { blocks, isCodeEdit, message, readInput, readTranscript, shellCommands, type TranscriptBlock } from '../lib.ts'
 
 const DEFAULT_LIMIT = 6
 const DECLARATION = /^META:/m
@@ -28,8 +28,10 @@ if (closed || asksUser || blocked >= limit) process.exit(0)
 const command = text.match(VERIFICATION)?.[1]
 const lastEdit = Math.max(-1, ...entries.flatMap((entry, index) => (blocks(entry).some(isCodeEdit) ? [index] : [])))
 const failedIds = new Set(entries.flatMap((entry) => blocks(entry).filter((block) => block.type === 'tool_result' && block.is_error).map((block) => block.tool_use_id)))
+const completedIds = new Set(entries.flatMap((entry) => blocks(entry).filter((block) => block.type === 'tool_result' && !block.is_error).map((block) => block.tool_use_id)))
 const verified = !command || assistantBlocks.some(({ block, index }) =>
-  index > Math.max(lastEdit, declaration.index) && block.type === 'tool_use' && block.name === 'Bash' && (block.input?.command || '').includes(command) && !failedIds.has(block.id))
+  index > Math.max(lastEdit, declaration.index) && block.type === 'tool_use' && block.name === 'Bash' && completedIds.has(block.id) && !failedIds.has(block.id) &&
+  ((block.input?.command || '').trim() === command.trim() || shellCommands(block.input?.command || '').includes(command.trim())))
 
 const reason = verified ? message('block.meta-close') : message('block.meta-verify', { command: command || '' })
 process.stdout.write(JSON.stringify({ decision: 'block', reason }))
