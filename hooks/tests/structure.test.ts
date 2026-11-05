@@ -130,3 +130,15 @@ test('every plugin path in a hook message resolves to a file that exists', () =>
     for (const file of text.match(/\/\S+?\.md/g) ?? []) assert.ok(fs.existsSync(file), file)
   }
 })
+
+test('the session rules keep their safety lines', () => {
+  const rule = (name: string) => fs.readFileSync(path.join(RULES_DIR, `${name}.md`), 'utf8')
+  assert.match(rule('challenge'), /Do not follow a request built on a false claim without a warning/)
+  assert.match(rule('verify'), /trust the official one/)
+  assert.match(rule('tool'), /The permission covers what the request names/)
+  assert.match(rule('state-of-the-art'), /typosquatting/)
+  assert.match(rule('state-of-the-art'), /not verified/)
+  assert.match(skillText('memory'), /Never save a secret, a credential, or personal data/)
+  assert.match(skillText('tasks'), /never the full suite/)
+  assert.match(skillText('tasks'), /refused by the user/)
+})
