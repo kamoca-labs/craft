@@ -5,7 +5,9 @@ Status: in progress. Written on 2026-11-04.
 | Plugin | Done | Open |
 |---|---|---|
 | craft | phases 1, 2 and 4 on 2026-11-05. `node scripts/skill-budget.ts`: 5 skills visible, 1,296 description characters (was 40 and 10,548). The relative link `references/dry.md` resolves in a test session | phase 0 evals (the benchmark in `bench/` measures the behavior instead), phase 5 release |
-| docker, design, git | none | phases 1, 3 and 4, and the decisions of the user in section 4 |
+| docker | phases 1, 3 and 4 on branch `feat/progressive-disclosure`: 4 skills, 1,149 characters (was 11 and 3,921). A test session resolved `../docker/references/rules.md` from `create` | phase 0 evals, phase 5 |
+| design | phases 1, 3 and 4 on branch `feat/progressive-disclosure`: 8 skills, 1,900 characters (was 16 and 2,549). The guards are in `scripts/verify.py` | phase 0 evals, phase 5 |
+| git | `forge` moved to `skills/mr/references/forge.md`, descriptions cut, guards added, on branch `feat/progressive-disclosure`: 9 skills, 2,120 characters (was 10 and 2,719) | the decisions on `undo` and the CI names, phase 5 |
 
 ## 1. The problem
 
