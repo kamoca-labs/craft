@@ -92,8 +92,6 @@ Step 1 becomes the scenario that reproduces the bug. Step 3 proves that the test
 2. It creates a reviewable mockup artifact or a Figma/FigCraft design with the applicable screen states and responsive variants. You review and iterate until you explicitly approve it. Existing approval for the same artifact and scope is reused. Product implementation starts only after this gate; there is no prior red behavioral test for a visual-only change.
 3. It implements the approved screen and inspects the rendered result. When the screen is accepted, Claude runs relevant existing filtered functional checks once, fixes once if something broke, and stops. It does not add assertions for colors, exact sizes, CSS classes or animation timing. Rendered review covers appearance, breakpoints and applicable states.
 
-The `atdd-first` hook allows `Card.vue`. If Claude tries to edit `src/services/request.ts`, the hook denies the edit and points to `/craft:atdd`.
-
 ### Mixed feature: screen with back end
 
 ```
@@ -249,7 +247,6 @@ If Claude tries to write to the local auto memory (`~/.claude/projects/<project>
 | Error | Example | What to do |
 |---|---|---|
 | It injected with a red suite | a new runner with a failure format that the hook does not know | Take the line from `~/.claude/hook-cases.jsonl`, paste it in `hooks/tests/cases.json` with `"inject": []`, and add the pattern to `FAILURE` |
-| `atdd-first` denied an edit that does not change behavior | a config adjustment in a code extension | Load `/craft:atdd` anyway. If the file is not code, add the exception to `CODE_FILE` with a test in `atdd-first.test.ts` |
 | `english-code` denied text that is neither user-facing text nor code | domain data (a city name in a seed) | Move the data to JSON or CSV. If a translation folder has another name, add it to `TRANSLATION_FOLDER` with a test in `english-code.test.ts` |
 | `test-id` denied an element that is not interactive | a decorative anchor `<a>`, or a loose `>` in an attribute without quotes | Add the `data-testid` anyway. If the tag reading is wrong, fix `OPENING_TAG` with a test in `test-id.test.ts` |
 | `filtered-tests` denied a run that is already filtered | a filter that the hook does not know | Add the filter to `FILTER_FLAG` or `TEST_PATH` with a test in `filtered-tests.test.ts` |

@@ -107,12 +107,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/atdd-first.ts\"",
-            "timeout": 10,
-            "statusMessage": "craft:atdd-first: flow loaded before code?"
-          },
-          {
-            "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/research-first.ts\"",
             "timeout": 10,
             "statusMessage": "craft:research-first: research before infra and versions?"
