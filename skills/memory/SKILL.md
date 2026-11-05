@@ -7,15 +7,8 @@ disable-model-invocation: true
 
 # Project memory
 
-All memory belongs to the project, in `.claude/memory/` inside the repo, so the team sees it in git. Never write memory to `~/.claude/projects/<project>/memory/`. The `memory-outside-project` hook denies it.
+Memory belongs to the project, in `.claude/memory/` inside the repo. Never write it to `~/.claude/projects/` (a hook denies it).
 
-- **Read**: before you act, check if a catalog line below touches the subject. If it does, read the file. Check that a file, a function, or a flag that a memory names still exists.
-- **Save**: at the end of an interaction, save what a future conversation needs: a user correction or a confirmed approach (`feedback`), a decision or a constraint that the code does not show (`project`), or where to find outside information (`reference`).
-- Do not save what the code, git, CLAUDE.md, or `docs/` already say, what matters only for this conversation, secrets, or a personal preference.
-
-To save:
-
-1. Update the memory that already covers the fact, if one exists.
-2. Write one file per fact in `.claude/memory/<type>_<subject>.md`, with the frontmatter `name`, `description`, and `type`. For `feedback` and `project`, add the lines `**Why:**` and `**How to apply:**`.
-3. Add one line to `MEMORY.md`: `- [Title](<file>.md): <hook>`. The catalog has no other content.
-4. Write absolute dates. Delete a memory that became wrong, with its line.
+- Before you act, read the memory file of a catalog line that touches the subject.
+- Save only a user correction, a confirmed approach, or a decision that the code and git do not show. One file per fact: `.claude/memory/<type>_<subject>.md` with `name`, `description` and `type` (`feedback`, `project`, `reference`), plus `**Why:**` and `**How to apply:**`.
+- Add one line to `MEMORY.md`: `- [Title](<file>.md): <hook>`. Update a memory that already covers the fact. Delete a wrong one.
