@@ -72,7 +72,7 @@ When the work ends, the final reply always carries the closing, met or not: the 
 
 ### Several activities in the same request
 
-Outside ATDD, Claude also follows the tasks rule when your prompt has two or more actions, or adds a new action during the work. The `reminder` hook repeats this rule on every prompt. An analysis or a comparison counts as an action. Example: "fix the login, update the README, and start the service". Claude splits the request into tasks, shows the list, and sets the goal. The verification of the goal is one command that proves the final state of all activities.
+Outside ATDD, Claude also follows the tasks rule when your prompt has two or more actions, or adds a new action during the work. The `reminder` hook repeats this rule on every prompt. Example: "fix the login, update the README, and start the service". Claude splits the request into tasks, shows the list, and sets the goal. The verification of the goal is one command that proves the final state of all activities.
 
 ## Bug fix with ATDD
 

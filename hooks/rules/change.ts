@@ -1,3 +1,3 @@
-import { addContext, message } from '../lib.ts'
+import { addContext, ruleBody } from '../lib.ts'
 
-addContext('SessionStart', message('context.change'))
+addContext('SessionStart', ruleBody('change'))

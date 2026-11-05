@@ -12,7 +12,7 @@ const SKILLS_DIR = path.join(HOOKS_DIR, '..', 'skills')
 const RULES_DIR = path.join(HOOKS_DIR, '..', 'rules')
 const ENTRY = ['atdd', 'audit', 'craft', 'hook', 'setup']
 const USER_ONLY = ['memory', 'tasks']
-const ALWAYS_ON = ['challenge', 'state-of-the-art', 'ste', 'tool', 'verify']
+const ALWAYS_ON = ['challenge', 'change', 'state-of-the-art', 'ste', 'tool', 'verify']
 const DESCRIPTION_LIMIT = 300
 const skills = fs.readdirSync(SKILLS_DIR).sort()
 const skillText = (skill: string) => fs.readFileSync(path.join(SKILLS_DIR, skill, 'SKILL.md'), 'utf8')
@@ -80,7 +80,7 @@ test('every reference is linked from a SKILL.md and links no other reference', (
   const skillFiles = skills.map(skillText).join('\n')
   for (const reference of references) {
     assert.ok(skillFiles.includes(`references/${reference.file}`), `${reference.skill}/${reference.file} is not linked`)
-    assert.doesNotMatch(reference.text, /\]\([^)]*references\/[\w-]+\.md/, `${reference.skill}/${reference.file} links a reference`)
+    assert.doesNotMatch(reference.text, /references\/[\w-]+\.md/, `${reference.skill}/${reference.file} names the path of another reference`)
   }
 })
 

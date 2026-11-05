@@ -18,4 +18,4 @@ Code that works only with perfect data breaks in the hands of the user. In step 
 - An edge that the feature does not have does not become a scenario. Example: a rule with no network has no timeout edge.
 - The edge scenario follows the loop like the others: one per turn.
 
-The `../../craft/references/unit-tests.md` skill uses this same list to find the equivalence classes.
+The unit-tests reference of `craft:craft` uses this same list to find the equivalence classes.
