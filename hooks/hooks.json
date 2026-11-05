@@ -23,6 +23,12 @@
           },
           {
             "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/change.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:change: callers, signature, edges, tests"
+          },
+          {
+            "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/tasks.ts\"",
             "timeout": 10,
             "statusMessage": "craft:tasks: tasks and goal"

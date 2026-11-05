@@ -43,7 +43,7 @@ Order: the preparatory refactor, then the behavior, then the refactor of step 6.
 
 - Never write production code without a failing test that requires it.
 - At the end of each step, say which step finished and the result. Example: "Step 3 (Red): 2 failing, `expected 'error' got undefined`".
-- If a test fails in step 5 or 7, go back to step 4 or fix the refactor. Never change the test to make it pass, unless the specification changed.
+- If a test fails in step 5 or 7, go back to step 4 or fix the refactor. Never change a test to make it pass, unless the specification changed. A failing existing test shows a caller that the change broke: keep the test and fix the code.
 - Never disable, skip or delete a test to make the suite pass. The `test-skip` hook denies `.skip`, `.only` and similar.
 - Code in English and user text in the translation file: `craft:english-code` and `craft:i18n`.
 - A correction from the user can become a project hook: `craft:hook`.
@@ -56,7 +56,8 @@ Order: the preparatory refactor, then the behavior, then the refactor of step 6.
 - **Change without behavior** (config, doc, name, pure refactor): skip the loop. Refactor with `craft:craft`, with the suite green before and after.
 - **Uncertain specification**: do a spike, code written only to learn. Show the user what you learned. Then delete the spike code and start at step 1. Never reuse spike code in production.
 - **Visual change without behavior**: review the rendered screen with `design:style`. Write automated tests only for behavior ([`craft:clean-tests`](../clean-tests/SKILL.md#behavior-not-appearance)).
-- **External state that you cannot control**: isolate the boundary (`craft:dependency-inversion`) and test the rule with a test double. The boundary stays in the integration test.
+- **External state that you cannot control**: isolate the boundary (`craft:dependency-inversion`) and test the rule with a test double. Inject the double as an optional last parameter with a default, so the public signature and its callers stay the same. The boundary stays in the integration test.
+- **Change without a test**: a visual-only change (style, color, spacing, layout, animation, decorative markup), a text, a rename, or a config value. Do not write a test for it.
 
 ## Example of step 1
 
