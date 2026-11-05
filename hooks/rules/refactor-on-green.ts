@@ -1,4 +1,9 @@
-import { inject, message, output, readInput, testRunArguments } from '../lib.ts'
+import { execFileSync } from 'node:child_process'
+import fs from 'node:fs'
+import path from 'node:path'
+import { CODE_FILE, inject, message, output, readInput, testRunArguments } from '../lib.ts'
+
+const SMALL_CHANGE = 20
 
 const FAILURE = new RegExp([
   /\b[1-9]\d* (failed|failing)\b/,
@@ -29,9 +34,32 @@ const SUCCESS = new RegExp([
   /\b[1-9]\d* examples?, 0 failures\b/,
 ].map((pattern) => pattern.source).join('|'), 'm')
 
+function git(root: string, args: string[]): string {
+  return execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 3000 })
+}
+
+function changedLines(root: string): number {
+  const tracked = git(root, ['diff', 'HEAD', '--numstat']).split('\n')
+    .map((line) => line.split('\t'))
+    .filter(([, , file]) => file && CODE_FILE.test(file))
+    .reduce((sum, [added, deleted]) => sum + (Number(added) || 0) + (Number(deleted) || 0), 0)
+  const untracked = git(root, ['ls-files', '--others', '--exclude-standard']).split('\n')
+    .filter((file) => CODE_FILE.test(file))
+    .reduce((sum, file) => sum + fs.readFileSync(path.join(root, file), 'utf8').split('\n').length, 0)
+  return tracked + untracked
+}
+
+function largeChange(root: string): boolean {
+  try {
+    return changedLines(root) >= SMALL_CHANGE
+  } catch {
+    return true
+  }
+}
+
 const input = readInput()
 const runOutput = output(input)
 
-if (testRunArguments(input.tool_input.command || '') !== null && SUCCESS.test(runOutput) && !FAILURE.test(runOutput)) {
+if (testRunArguments(input.tool_input.command || '') !== null && SUCCESS.test(runOutput) && !FAILURE.test(runOutput) && largeChange(process.env.CLAUDE_PROJECT_DIR || process.cwd())) {
   inject('refactor-on-green', input, message('context.refactor-on-green'))
 }

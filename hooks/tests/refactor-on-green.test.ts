@@ -1,4 +1,5 @@
 import assert from 'node:assert'
+import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import { test } from 'node:test'
 import { injected, sandbox } from './helpers.ts'
@@ -123,3 +124,19 @@ test('a command that only reads or installs does not inject', () => {
   }
 })
 
+
+test('a small change does not inject, a large change does', () => {
+  const repo = (lines: number) => {
+    const box = sandbox()
+    fs.mkdirSync(box.projectDir, { recursive: true })
+    const run = (...args: string[]) => spawnSync('git', args, { cwd: box.projectDir })
+    run('init', '-q')
+    fs.writeFileSync(`${box.projectDir}/a.ts`, 'export const a = 1\n')
+    run('add', '.')
+    run('-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-qm', 'seed')
+    fs.writeFileSync(`${box.projectDir}/a.ts`, Array.from({ length: lines }, (_, index) => `export const a${index} = ${index}`).join('\n'))
+    return injected(box.run(RULE, { command: 'npm test', stdout: '# pass 3\n# fail 0' }))
+  }
+  assert.strictEqual(repo(3), null)
+  assert.ok(repo(30))
+})
