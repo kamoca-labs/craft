@@ -122,10 +122,10 @@ function runClaude(cell: Cell, task: Task, dir: string, logDir: string): Promise
 }
 
 function testOrder(events: Record<string, any>[], dir: string) {
-  const outputs = new Map<string, { failed: boolean }>()
+  const outputs = new Map<string, { denied: boolean, failed: boolean }>()
   for (const event of events.filter((item) => item.type === 'user')) {
     for (const block of event.message?.content ?? []) {
-      if (block.type === 'tool_result') outputs.set(block.tool_use_id, { failed: Boolean(block.is_error) || FAILED_RUN.test(JSON.stringify(block.content)) })
+      if (block.type === 'tool_result') outputs.set(block.tool_use_id, { denied: Boolean(block.is_error), failed: Boolean(block.is_error) || FAILED_RUN.test(JSON.stringify(block.content)) })
     }
   }
   let testEdit = -1
@@ -134,8 +134,9 @@ function testOrder(events: Record<string, any>[], dir: string) {
   const blocks = events.filter((event) => event.type === 'assistant').flatMap((event) => event.message?.content ?? []).filter((block: any) => block.type === 'tool_use')
   blocks.forEach((block: any, index: number) => {
     const file = path.relative(dir, path.resolve(dir, block.input?.file_path || ''))
-    if (/^(Edit|MultiEdit|Write)$/.test(block.name) && TEST_PATH.test(file) && testEdit < 0) testEdit = index
-    else if (/^(Edit|MultiEdit|Write)$/.test(block.name) && SOURCE_PATH.test(file) && !TEST_PATH.test(file) && sourceEdit < 0) sourceEdit = index
+    const edits = /^(Edit|MultiEdit|Write)$/.test(block.name) && !outputs.get(block.id)?.denied
+    if (edits && TEST_PATH.test(file) && testEdit < 0) testEdit = index
+    else if (edits && SOURCE_PATH.test(file) && !TEST_PATH.test(file) && sourceEdit < 0) sourceEdit = index
     const runsTests = block.name === 'Bash' && /--test|\btest\b/.test(block.input?.command || '')
     if (runsTests && testEdit >= 0 && sourceEdit < 0 && outputs.get(block.id)?.failed) redRun = true
   })
@@ -320,7 +321,13 @@ if (values.compare) {
 if (values.report) {
   const stampDir = path.resolve(values.report)
   const results = (fs.readdirSync(stampDir, { recursive: true }) as string[]).filter((file) => file.endsWith('cell.json') && !file.includes('workspace'))
-    .map((file) => JSON.parse(fs.readFileSync(path.join(stampDir, file), 'utf8')) as Result)
+    .map((file) => {
+      const cell = JSON.parse(fs.readFileSync(path.join(stampDir, file), 'utf8')) as Result
+      const transcript = path.join(stampDir, path.dirname(file), 'transcript.jsonl')
+      if (!fs.existsSync(transcript)) return cell
+      const events = fs.readFileSync(transcript, 'utf8').split('\n').filter(Boolean).map((line) => { try { return JSON.parse(line) } catch { return {} } })
+      return { ...cell, ...testOrder(events, '/') }
+    })
   process.stdout.write(report(results, allTasks, path.basename(stampDir)))
   process.exit(0)
 }
