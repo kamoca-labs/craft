@@ -36,3 +36,7 @@ test('the change rule runs the tests once per step', () => {
   assert.match(context(), /Run the tests once per step/)
   assert.match(context(), /Do not run the suite before the change only to see it pass/)
 })
+
+test('a fix of one or two lines can skip the red run', () => {
+  assert.match(context(), /A fix of one or two lines skips the red run/)
+})

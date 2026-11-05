@@ -41,7 +41,7 @@ Order: the preparatory refactor, then the behavior, then the refactor of step 6.
 
 ## Rules
 
-- Never write production code without a failing test that requires it.
+- Never write production code without a failing test that requires it. Exception: a fix of one or two lines can skip step 3 (Red). Write the test with the fix and run it once.
 - At the end of each step, say which step finished and the result. Example: "Step 3 (Red): 2 failing, `expected 'error' got undefined`".
 - If a test fails in step 5 or 7, go back to step 4 or fix the refactor. Never change a test to make it pass, unless the specification changed. A failing existing test shows a caller that the change broke: keep the test and fix the code.
 - Never disable, skip or delete a test to make the suite pass. The `test-skip` hook denies `.skip`, `.only` and similar.
