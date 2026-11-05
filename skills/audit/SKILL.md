@@ -1,6 +1,6 @@
 ---
 name: audit
-description: One-shot quality audit of a whole repo, a folder or a package. It finds bugs, security and data risks, code that breaks under real load, risky code without a test, slow paths and code to delete, merge or split. Each finding has a concrete case. The report changes no code. Use when asked to audit the codebase, review the whole repo, find what can be deleted, or check the health of a project. For the diff of the current branch, use craft:craft. For the PR/MR of another person, use git:review.
+description: One-shot audit of a whole repo, folder or package: bugs, security and data risks, load, risky untested code, slow paths, code to delete. The report changes no code. Use when asked to audit the codebase or check its health. For the diff of the branch, use craft:craft.
 argument-hint: "[folder or package]"
 ---
 
@@ -23,12 +23,12 @@ Priority order: correct, safe, holds under the expected load, tested, fast, lean
 
 | Dimension | What to look for | Skill for the detail |
 |---|---|---|
-| Bug | wrong result, crash, a missed edge (empty, zero, last item, rounding, time zone), a caller that disagrees with what the function returns, the same rule applied in two different ways | `craft:real-world-edges` |
-| Risk | injection, weak randomness, a secret in the code, user input without a check, an error that is swallowed, writes in the wrong order or without a transaction | `craft:errors` |
-| Scale | code that is correct for one user and wrong for many (see below) | `craft:performance` |
-| Missing test | risky logic (a branch, a parser, money, security, a data write) without a test that fails when it breaks. One good test, not coverage | `craft:unit-tests` |
-| Speed | a large slowdown is a finding. A small gain in a hot loop is a suggestion | `craft:performance` |
-| Lean | code that must not exist or must be smaller (see below) | `craft:kiss`, `craft:yagni`, `craft:dry` |
+| Bug | wrong result, crash, a missed edge (empty, zero, last item, rounding, time zone), a caller that disagrees with what the function returns, the same rule applied in two different ways | `../atdd/references/real-world-edges.md` |
+| Risk | injection, weak randomness, a secret in the code, user input without a check, an error that is swallowed, writes in the wrong order or without a transaction | `../craft/references/errors.md` |
+| Scale | code that is correct for one user and wrong for many (see below) | `../craft/references/performance.md` |
+| Missing test | risky logic (a branch, a parser, money, security, a data write) without a test that fails when it breaks. One good test, not coverage | `../craft/references/unit-tests.md` |
+| Speed | a large slowdown is a finding. A small gain in a hot loop is a suggestion | `../craft/references/performance.md` |
+| Lean | code that must not exist or must be smaller (see below) | `../craft/references/kiss.md`, `../craft/references/yagni.md`, `../craft/references/dry.md` |
 
 **Scale**: each finding states what happens with two requests, two processes or a large volume at the same time.
 

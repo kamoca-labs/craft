@@ -1,6 +1,6 @@
 ---
 name: craft
-description: Entry point of the refactor (step 6 of ATDD). Reinforces the root rule (less code is better than more code), screens the changed code against SOLID, KISS, YAGNI, DRY and Clean Code, and loads only the skills of the principles with a sign of violation. Use right after the tests turn green, or when asked to refactor or review code quality.
+description: Refactor guided by principles (step 6 of ATDD). Screens the changed code against SOLID, KISS, YAGNI, DRY and Clean Code, and reads only the references of the principles with a sign. Use when the tests turn green, or when asked to refactor or review code quality.
 argument-hint: "[file or scope]"
 ---
 
@@ -12,52 +12,52 @@ The tests are green. If you are in the ATDD loop and a scenario remains, go back
 
 **Less code is better than more code.** This rule is not a new principle. It is what KISS, YAGNI and DRY have in common. It applies to all code you write, not only in the refactor:
 
-- Reuse what already exists before you write (`craft:kiss`).
-- Write only what a test or a current use requires (`craft:yagni`).
-- Generic code starts reusable, outside the specific case (`craft:dry`).
+- Reuse what already exists before you write (`references/kiss.md`).
+- Write only what a test or a current use requires (`references/yagni.md`).
+- Generic code starts reusable, outside the specific case (`references/dry.md`).
 
 ## How to proceed
 
 1. **Scope**: the argument, if there is one. Otherwise, what changed (`git diff` of the branch against main).
-2. **Lint**: if the project has a lint script (`craft:setup` creates one), run it on the files in scope. A size or complexity violation is already a sign: `max-lines-per-function` and `complexity` → `craft:functions`, `max-params` → `craft:arguments`, `max-depth` → `craft:guard-clauses`, `max-lines` → `craft:single-responsibility`. Never turn off or loosen the rule to make it pass.
+2. **Lint**: if the project has a lint script (`craft:setup` creates one), run it on the files in scope. A size or complexity violation is already a sign: `max-lines-per-function` and `complexity` → `references/functions.md`, `max-params` → `references/arguments.md`, `max-depth` → `references/guard-clauses.md`, `max-lines` → `references/single-responsibility.md`. Never turn off or loosen the rule to make it pass.
 3. **Root rule**: before the screening, look in the scope for code you can delete. Deleting is worth more than adding.
 4. **Screening**: read the code in scope and ask the question of each row in the table below.
-5. **Go deeper only where there is a sign**: for each principle with a sign, load its skill with the `Skill` tool (`craft:<skill>`) and follow it. Do not load the skill of a principle without a sign.
+5. **Go deeper only where there is a sign**: for each principle with a sign, read its reference with the `Read` tool (`references/<name>.md`, in the folder of this skill) and follow it. Do not read the reference of a principle without a sign.
 6. **One refactor at a time**: change, run the tests of the refactored module, continue. Never edit a test to make it pass. The verification has limited rounds:
    - one screening round, with all rows of the table
    - one batch of fixes with all findings of the screening, one refactor at a time
    - at most one confirmation round, only over what changed
 
    Then stop and report. A leftover finding goes to the report, not to a new round.
-7. **Report**: one line for the root rule and one per principle with a sign (`craft:dry: attachment limit rule unified in MAX_ATTACHMENT_SIZE`). Say which ones had no sign.
+7. **Report**: one line for the root rule and one per principle with a sign (`references/dry.md: attachment limit rule unified in MAX_ATTACHMENT_SIZE`). Say which ones had no sign.
 
 ## Screening
 
-| Skill | Principle | Screening question |
+| Reference | Principle | Screening question |
 |---|---|---|
-| `craft:single-responsibility` | S of SOLID | Does this module change for more than one reason, or for more than one kind of person? |
-| `craft:open-closed` | O of SOLID | Did a new case require an edit to an existing `if`/`switch`? |
-| `craft:liskov-substitution` | L of SOLID | Does an implementation throw "not supported", ignore a parameter, or require `instanceof` from the caller? |
-| `craft:interface-segregation` | I of SOLID | Does anyone receive a type, object or props and use only a fraction of it? |
-| `craft:dependency-inversion` | D of SOLID | Does the business rule import a database, HTTP, LLM, clock or storage directly? |
-| `craft:kiss` | KISS | Is there a simpler way that passes the same tests? |
-| `craft:yagni` | YAGNI | Is there an option, parameter, layer or abstraction without a current use? |
-| `craft:dry` | DRY | Is the same business rule, text or style written in two places, or is generic code tied to one case? |
-| `craft:english-code` | English code | Is any identifier, comment, log or internal message outside English? |
-| `craft:i18n` | i18n | Is user-visible text written directly in code, or a date, number or currency formatted by hand? |
-| `craft:i18n-layout` | Layout for translation | Does a text container have a fixed width, or does the CSS use a physical direction (left, right)? |
-| `craft:naming` | Names | Does any name need the code (or a comment) to be understood? |
-| `craft:functions` | Functions | Does any function do more than one thing or mix abstraction levels? |
-| `craft:arguments` | Arguments | More than three parameters, or a boolean that changes the behavior? |
-| `craft:guard-clauses` | Guard clause | Is there an `if` nested more than one level, or an `else` after `return`? |
-| `craft:side-effects` | Side effect | Does any function change state, write or send something that its name does not announce? |
-| `craft:comments` | Comments | Is there a comment that explains *what* the code does? |
-| `craft:errors` | Errors | Is any error swallowed, logged and ignored, or turned into a silent `null`? Does any error on screen leave the user without a way to recover? |
-| `craft:performance` | Performance | Does any block run over much data or on a hot path (loop in loop, query in loop, repeated I/O, serial calls) without a measurement that compares forms? |
-| `craft:clean-tests` | Tests | Does any test have logic, test more than one behavior, have a vague name or sit in the wrong layer? |
-| `craft:unit-tests` | Unit and integration | Does any test verify a private method, a mock of a mock, a getter, the library or the appearance? |
-| `craft:test-ids` | Test id | Is any interactive element without `data-testid`, with a generic or position-based id, or does a component not pass the parent attributes through? |
-| `craft:e2e-tests` | E2E | Does any E2E test verify something that does not stop the user from reaching the goal (appearance, exact text, field by field)? |
+| `references/single-responsibility.md` | S of SOLID | Does this module change for more than one reason, or for more than one kind of person? |
+| `references/open-closed.md` | O of SOLID | Did a new case require an edit to an existing `if`/`switch`? |
+| `references/liskov-substitution.md` | L of SOLID | Does an implementation throw "not supported", ignore a parameter, or require `instanceof` from the caller? |
+| `references/interface-segregation.md` | I of SOLID | Does anyone receive a type, object or props and use only a fraction of it? |
+| `references/dependency-inversion.md` | D of SOLID | Does the business rule import a database, HTTP, LLM, clock or storage directly? |
+| `references/kiss.md` | KISS | Is there a simpler way that passes the same tests? |
+| `references/yagni.md` | YAGNI | Is there an option, parameter, layer or abstraction without a current use? |
+| `references/dry.md` | DRY | Is the same business rule, text or style written in two places, or is generic code tied to one case? |
+| `references/english-code.md` | English code | Is any identifier, comment, log or internal message outside English? |
+| `references/i18n.md` | i18n | Is user-visible text written directly in code, or a date, number or currency formatted by hand? |
+| `references/i18n-layout.md` | Layout for translation | Does a text container have a fixed width, or does the CSS use a physical direction (left, right)? |
+| `references/naming.md` | Names | Does any name need the code (or a comment) to be understood? |
+| `references/functions.md` | Functions | Does any function do more than one thing or mix abstraction levels? |
+| `references/arguments.md` | Arguments | More than three parameters, or a boolean that changes the behavior? |
+| `references/guard-clauses.md` | Guard clause | Is there an `if` nested more than one level, or an `else` after `return`? |
+| `references/side-effects.md` | Side effect | Does any function change state, write or send something that its name does not announce? |
+| `references/comments.md` | Comments | Is there a comment that explains *what* the code does? |
+| `references/errors.md` | Errors | Is any error swallowed, logged and ignored, or turned into a silent `null`? Does any error on screen leave the user without a way to recover? |
+| `references/performance.md` | Performance | Does any block run over much data or on a hot path (loop in loop, query in loop, repeated I/O, serial calls) without a measurement that compares forms? |
+| `references/clean-tests.md` | Tests | Does any test have logic, test more than one behavior, have a vague name or sit in the wrong layer? |
+| `references/unit-tests.md` | Unit and integration | Does any test verify a private method, a mock of a mock, a getter, the library or the appearance? |
+| `references/test-ids.md` | Test id | Is any interactive element without `data-testid`, with a generic or position-based id, or does a component not pass the parent attributes through? |
+| `references/e2e-tests.md` | E2E | Does any E2E test verify something that does not stop the user from reaching the goal (appearance, exact text, field by field)? |
 | `design:review` (design plugin) | Interface | Does the change alter the UI (component, CSS, template)? |
 
 The `design:review` row does not load a skill. If the answer is yes, suggest `/design:review` over the touched files to the user. Never run it as a side effect of the refactor. The design plugin owns visual work and includes Impeccable; a separate Impeccable installation is not required. If design is unavailable, report the missing plugin and the unverified visual review.
@@ -77,7 +77,7 @@ Common conflicts:
 
 - **DRY × KISS**: duplication is cheaper than the wrong abstraction. Wait for the third repetition before you extract.
 - **Open/Closed or dependency inversion × YAGNI**: create the abstraction when there is a second real implementation or an I/O boundary that needs a test double. Before that, it is speculation.
-- **Performance × readability**: the faster form wins only with a measurement at the real volume and a comparison between forms (`craft:performance`).
+- **Performance × readability**: the faster form wins only with a measurement at the real volume and a comparison between forms (`references/performance.md`).
 - **Single responsibility × KISS**: separating responsibilities does not mean chopping the code into ten one-line classes. If the parts always change together, they are one responsibility.
 
 ## Checklist before you leave step 6
@@ -90,4 +90,4 @@ Common conflicts:
 - [ ] Every optimization has a measurement before and after and beat another form.
 - [ ] Refactor commit separate from the behavior commit.
 - [ ] Same behavior (no test was edited to pass).
-- [ ] Tests of the touched domains run again, with a filter, and green. The full suite runs in CI, or locally only with the consent of the user (`craft:filtered-tests`).
+- [ ] Tests of the touched domains run again, with a filter, and green. The full suite runs in CI, or locally only with the consent of the user (`../atdd/references/filtered-tests.md`).

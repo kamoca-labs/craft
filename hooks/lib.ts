@@ -100,7 +100,7 @@ export function consentGiven(transcriptPath: string | undefined, labels: string[
 }
 
 export function message(key: string, params: Record<string, string> = {}): string {
-  return MESSAGES[key].replace(/\{(\w+)\}/g, (_, name) => params[name])
+  return withPluginRoot(MESSAGES[key].replace(/\{(\w+)\}/g, (_, name) => params[name]))
 }
 
 export function readInput(): HookInput {
@@ -111,9 +111,17 @@ export function output({ tool_response }: HookInput): string {
   return [tool_response?.stdout, tool_response?.stderr].filter(Boolean).join('\n')
 }
 
+function withPluginRoot(text: string): string {
+  return text.replaceAll('${CLAUDE_PLUGIN_ROOT}', process.env.CLAUDE_PLUGIN_ROOT || '')
+}
+
+export function ruleBody(rule: string): string {
+  return withPluginRoot(fs.readFileSync(path.join(process.env.CLAUDE_PLUGIN_ROOT || '', 'rules', `${rule}.md`), 'utf8'))
+}
+
 export function skillBody(skill: string): string {
   const file = path.join(process.env.CLAUDE_PLUGIN_ROOT || '', 'skills', skill, 'SKILL.md')
-  return fs.readFileSync(file, 'utf8').replace(/^---\n[\s\S]*?\n---\n+/, '').replaceAll('${CLAUDE_PLUGIN_ROOT}', process.env.CLAUDE_PLUGIN_ROOT || '')
+  return withPluginRoot(fs.readFileSync(file, 'utf8').replace(/^---\n[\s\S]*?\n---\n+/, ''))
 }
 
 function capture(useCase: object) {

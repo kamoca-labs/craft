@@ -22,7 +22,7 @@ Check each question against the concrete correction before you propose:
 |---|---|---|---|---|
 | "commit without `Co-Authored-By`" | yes, every commit | yes, the message is in the `git commit` command | yes, the trailer is literal | hook that denies (like `git:no-co-author`) |
 | "never `git add .env`" | yes | yes, by the command | yes | hook that denies |
-| "this variable name says nothing" | yes | no, it needs judgment | no | skill `craft:naming` |
+| "this variable name says nothing" | yes | no, it needs judgment | no | skill `../craft/references/naming.md` |
 | "in this file, use lib X" | no, single case | yes | yes | only the correction |
 
 If the answer is no:
@@ -54,7 +54,7 @@ Choose the event by the cost and the certainty of the check:
 ## How to write
 
 - **TypeScript**, run directly with `node` (Node 22.18+ runs `.ts` without a build), no dependency: only `node:fs`, `node:path`, `node:test`. Even in a PHP or Python project, the hook is TypeScript.
-- **Code in English**. The message the user reads comes from the translation file, in the language of the user (`craft:i18n`).
+- **Code in English**. The message the user reads comes from the translation file, in the language of the user (`../craft/references/i18n.md`).
 - **Follow `craft:atdd`**: the test of the hook comes before the rule and fails first.
 - One rule per file and per entry in settings. Deny only the exact pattern of the correction.
 - To deny: message on stderr and `exit 2` (the message says what to do instead). To inject: JSON with `hookSpecificOutput.additionalContext` on stdout and `exit 0`.
@@ -105,4 +105,4 @@ If the project already has hooks, follow the layout and the lib that exist.
 - Tell the user that the hook applies from the next session.
 - If the correction applied to every project, not only this one, suggest moving it to a plugin.
 
-When a project hook denies an action or reports a finding, follow `craft:hook-denied`.
+When a project hook denies an action or reports a finding, follow `references/hook-denied.md`.

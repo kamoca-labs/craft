@@ -1,7 +1,8 @@
 ---
 name: tasks
-description: Splits the request into activities with TaskCreate and sets the session goal (a META task plus the meta-goal Stop hook). The tasks hook loads this skill in every session. The user can also call it with /craft:tasks. Use it also in step 1 of craft:atdd, after the user approves the specification.
+description: Splits the request into tasks with TaskCreate and sets the session goal (a META task plus the meta-goal Stop hook). The tasks hook injects the same rule in every session, so only the user calls it, with /craft:tasks.
 argument-hint: "[what to do]"
+disable-model-invocation: true
 ---
 
 # Tasks and goal

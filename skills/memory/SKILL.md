@@ -1,7 +1,8 @@
 ---
 name: memory
-description: Long-term project memory in `.claude/memory/`, inside the repo, in the format of Claude Code auto memory. The memory hook injects this skill and the catalog in every session. The memory-outside-project hook denies memory outside the project. Use it when you learn something that matters for a future conversation, or when asked to remember or forget something.
+description: Long-term project memory in `.claude/memory/`, inside the repo. The memory hook injects the same rule and the catalog in every session, so only the user calls it, with /craft:memory, to remember or forget something.
 argument-hint: "[what to remember or forget]"
+disable-model-invocation: true
 ---
 
 # Project memory

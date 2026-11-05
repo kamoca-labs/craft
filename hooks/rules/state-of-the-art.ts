@@ -1,3 +1,3 @@
-import { addContext, skillBody } from '../lib.ts'
+import { addContext, ruleBody } from '../lib.ts'
 
-addContext('SessionStart', skillBody('state-of-the-art'))
+addContext('SessionStart', ruleBody('state-of-the-art'))
