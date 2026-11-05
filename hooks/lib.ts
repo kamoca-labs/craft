@@ -113,7 +113,7 @@ export function output({ tool_response }: HookInput): string {
 
 export function skillBody(skill: string): string {
   const file = path.join(process.env.CLAUDE_PLUGIN_ROOT || '', 'skills', skill, 'SKILL.md')
-  return fs.readFileSync(file, 'utf8').replace(/^---\n[\s\S]*?\n---\n+/, '')
+  return fs.readFileSync(file, 'utf8').replace(/^---\n[\s\S]*?\n---\n+/, '').replaceAll('${CLAUDE_PLUGIN_ROOT}', process.env.CLAUDE_PLUGIN_ROOT || '')
 }
 
 function capture(useCase: object) {
