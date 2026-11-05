@@ -67,7 +67,7 @@
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/reminder.ts\"",
             "timeout": 10,
-            "statusMessage": "craft:reminder: tasks, research, memory"
+            "statusMessage": "craft:reminder: tasks, research"
           }
         ]
       }

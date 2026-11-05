@@ -17,11 +17,11 @@ test('the reminder has 200 characters or fewer', () => {
   assert.ok(reminder().length <= REMINDER_LIMIT, `${reminder().length} characters`)
 })
 
-test('the reminder covers tasks, research with reuse, and memory', () => {
+test('the reminder covers tasks and research with reuse, not memory', () => {
   assert.match(reminder(), /TaskCreate/)
   assert.match(reminder(), /expert practice/)
   assert.match(reminder(), /native or vetted package/)
-  assert.match(reminder(), /Memory/)
+  assert.doesNotMatch(reminder(), /memory/i)
 })
 
 test('an empty stdin does not block the prompt and still gets the same reminder', () => {
