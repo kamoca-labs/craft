@@ -1,33 +1,33 @@
 import assert from 'node:assert'
 import { test } from 'node:test'
-import { codeEdit, runRule, toolUse } from './transcript.ts'
+import { codeEdit, runRule, toolUse, userText } from './transcript.ts'
 
-const edit = (file: string, transcript: string[]) => runRule('test-first', { file_path: file }, transcript, [], { tool_name: 'Edit' })
-const warned = (result: ReturnType<typeof edit>) => {
-  assert.strictEqual(result.status, 0, result.stderr)
-  return result.stdout.includes('[craft:test-first]')
-}
+const START = userText('fix the split of the bill')
+const edit = (file: string, transcript: string[]) => runRule('test-first', { file_path: file }, [START, ...transcript], [], { tool_name: 'Edit' })
 
-test('the first production edit before any test edit gets a warning, not a deny', () => {
-  assert.strictEqual(warned(edit('src/billing/split.ts', [codeEdit('src/billing/split.ts')])), true)
+test('a production edit before any test edit is denied', () => {
+  const result = edit('src/billing/split.ts', [])
+  assert.strictEqual(result.status, 2)
+  assert.match(result.stderr, /\[craft:test-first\] write the failing test/)
 })
 
-test('a production edit after a test edit gets no warning', () => {
-  assert.strictEqual(warned(edit('src/billing/split.ts', [codeEdit('tests/split.test.ts'), codeEdit('src/billing/split.ts')])), false)
+test('a production edit after a test edit passes', () => {
+  assert.strictEqual(edit('src/billing/split.ts', [codeEdit('tests/split.test.ts')]).status, 0)
 })
 
-test('the warning comes once: a later production edit gets none', () => {
-  assert.strictEqual(warned(edit('src/b.ts', [codeEdit('src/a.ts'), codeEdit('src/b.ts')])), false)
+test('a test file, a translation file or a file that is not code passes', () => {
+  for (const file of ['tests/split.test.ts', 'src/locales/es.ts', 'src/i18n/en.ts', 'src/badge.css', 'package.json']) {
+    assert.strictEqual(edit(file, []).status, 0, file)
+  }
 })
 
-test('a test file, a file that is not code, or the design:style flow gets no warning', () => {
-  assert.strictEqual(warned(edit('tests/split.test.ts', [codeEdit('tests/split.test.ts')])), false)
-  assert.strictEqual(warned(edit('src/badge.css', [])), false)
-  const style = toolUse('Skill', { skill: 'design:style' }).line
-  assert.strictEqual(warned(edit('src/Badge.tsx', [style, codeEdit('src/Badge.tsx')])), false)
+test('the ATDD or the style flow, loaded by Claude or typed by the user, lets the edit pass', () => {
+  for (const loaded of [toolUse('Skill', { skill: 'craft:atdd' }).line, toolUse('Skill', { skill: 'design:style' }).line, userText('<command-name>/craft:atdd</command-name>'), userText('<command-name>/design:style</command-name>')]) {
+    assert.strictEqual(edit('src/Badge.tsx', [loaded]).status, 0, loaded)
+  }
 })
 
-test('without a transcript the hook stays silent', () => {
+test('without a transcript the hook lets the edit pass', () => {
   const result = runRule('test-first', { file_path: 'src/a.ts' }, [], [], { tool_name: 'Edit', transcript_path: undefined })
-  assert.strictEqual(result.stdout, '')
+  assert.strictEqual(result.status, 0)
 })

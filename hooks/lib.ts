@@ -20,6 +20,7 @@ const CASES_LOG = process.env.HOOK_CASES_LOG || path.join(os.homedir(), '.claude
 const MESSAGES: Record<string, string> = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, 'locales', 'en.json'), 'utf8'))
 
 export const CODE_FILE = /\.(ts|tsx|js|jsx|mjs|cjs|vue|svelte|astro|php|py|go|rs|java|kt|rb|cs)$/
+export const TRANSLATION_FOLDER = /(^|\/)(lang|locales?|i18n|l10n|translations?)\//
 export const TEST_FILE = /(^|\/)(tests?|__tests__|specs?)\/|[._](test|spec)\.\w+$|(^|\/)test_[^/]+\.py$/
 
 const TEST_RUNNER = new RegExp([

@@ -106,7 +106,7 @@ The limit is a rule. Claude asks for the order with `AskUserQuestion`:
 | Screen first | Style mode iterates on the screen with fixed data. Then `/craft:atdd` builds the back end and replaces the mock with real data |
 | By slice | Each scenario goes through `/craft:atdd`, and its visual part goes through style mode before the next scenario |
 
-In all three options, the rule enters only with a test. If Claude changes the service before any test, the `test-first` hook warns it to write the failing test first.
+In all three options, the rule enters only with a test. If Claude tries to change the service before any test, the `test-first` hook denies the edit and asks for the failing test first.
 
 ## Automatic refactor after green
 

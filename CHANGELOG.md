@@ -43,7 +43,7 @@ Notes reconstructed from repository commits and manifest versions. Historical da
   - `craft:tool` → `rules/tool.md`
   - `craft:verify` → `rules/verify.md`
 - `/craft:memory` and `/craft:tasks` are commands for the user only (`disable-model-invocation: true`). The hooks still inject their rules in every session.
-- The `atdd-first` hook is gone. Code edits no longer wait for `/craft:atdd`.
+- The `atdd-first` hook is gone. The `test-first` hook takes its place.
 
 ### Improvements
 
@@ -52,7 +52,7 @@ Notes reconstructed from repository commits and manifest versions. Historical da
 - One `reminder` hook replaces `tasks-reminder`, `research-reminder` and `memory-reminder`, with one line of 200 characters or less.
 - A project with 1 to 10 test files can run its full suite.
 - A request with one action gets no task and no goal, except the ATDD flow.
-- A `test-first` hook warns, without a deny, when production code changes before any test in the session.
+- A `test-first` hook denies a production code edit while no test file was edited in the session. It replaces `atdd-first`, which also required loading `/craft:atdd`.
 - The refactor triage enters only for a change of 20 code lines or more.
 - The memory rule forbids secrets, credentials and personal data again.
 
