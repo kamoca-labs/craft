@@ -31,3 +31,8 @@ test('a visual-only change gets no test', () => {
 test('the change rule stays short', () => {
   assert.ok(context().length < 1500, String(context().length))
 })
+
+test('the change rule runs the tests once per step', () => {
+  assert.match(context(), /Run the tests once per step/)
+  assert.match(context(), /Do not run the suite before the change only to see it pass/)
+})
