@@ -64,6 +64,12 @@ Notes reconstructed from repository commits and manifest versions. Historical da
 - Require a successful verification result for the goal reminder, and do not count an `echo` of the verification command as execution.
 - Record the scope, findings, regression checks, and limits in [AUDIT.md](AUDIT.md).
 
+## 0.16.1 (2026-11-04)
+
+### Improvements
+
+- The commit policy (a structural change and a behavior change never share a commit) moves from `/craft:atdd` to `/git:commit` 0.8.0. The preparatory refactor in `/craft:atdd` points to `/git:commit`.
+
 ## 0.16.0 — 2026-11-02
 
 ### Breaking changes
