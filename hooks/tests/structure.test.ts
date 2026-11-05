@@ -65,6 +65,7 @@ test('every description has 300 characters or fewer', () => {
   for (const skill of skills) {
     const description = skillText(skill).match(/^description: (.*)$/m)?.[1] ?? ''
     assert.ok(description.length <= DESCRIPTION_LIMIT, `${skill}: ${description.length}`)
+    assert.doesNotMatch(description, /: /, `${skill}: a colon with a space breaks the YAML of the frontmatter`)
   }
 })
 
