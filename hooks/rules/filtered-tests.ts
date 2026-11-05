@@ -1,4 +1,7 @@
-import { consentGiven, deny, FULL_SUITE_LOCAL, readInput, testRunArguments } from '../lib.ts'
+import { execFileSync } from 'node:child_process'
+import { consentGiven, deny, FULL_SUITE_LOCAL, readInput, TEST_FILE, testRunArguments } from '../lib.ts'
+
+const SMALL_SUITE = 10
 
 const FILTER_FLAG = /(^|\s)(-k|-t|-run|-p(?!\s+(\d|no:))|--filter|--group|--grep|--tests|-Dtest|--test-name-pattern|--testNamePattern|--testPathPattern|--findRelatedTests|related)(\s|=|$)|::/
 const VALUE_FLAG = /^(-c|--config|--configuration|--rootdir|--root)$/
@@ -18,8 +21,18 @@ function runsFullSuite(command: string): boolean {
   return !tokens.some((token, index) => isTestPath(token.replace(/^['"]|['"]$/g, ''), tokens[index - 1]))
 }
 
+function smallSuite(root: string): boolean {
+  try {
+    const files = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard'], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 3000 })
+    const tests = files.split('\n').filter((file) => TEST_FILE.test(file)).length
+    return tests > 0 && tests <= SMALL_SUITE
+  } catch {
+    return false
+  }
+}
+
 const input = readInput()
 
-if (runsFullSuite(input.tool_input.command || '') && !consentGiven(input.transcript_path, [FULL_SUITE_LOCAL])) {
+if (runsFullSuite(input.tool_input.command || '') && !smallSuite(process.env.CLAUDE_PROJECT_DIR || process.cwd()) && !consentGiven(input.transcript_path, [FULL_SUITE_LOCAL])) {
   deny('filtered-tests', input)
 }

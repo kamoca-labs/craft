@@ -110,3 +110,15 @@ test('allows a filtered run of the JVM, mocha, unittest and rspec runners', () =
   }
 })
 
+
+test('a project with a small suite can run it in full', () => {
+  const small = Array.from({ length: 3 }, (_, index) => `tests/case-${index}.test.ts`)
+  const large = Array.from({ length: 11 }, (_, index) => `tests/case-${index}.test.ts`)
+  const inRepo = (files: string[]) => {
+    const result = runRule('filtered-tests', { command: 'npm test' }, [], files, {}, true)
+    return result.status
+  }
+  assert.strictEqual(inRepo(small), 0)
+  assert.strictEqual(inRepo(large), 2)
+  assert.strictEqual(inRepo([]), 2)
+})
