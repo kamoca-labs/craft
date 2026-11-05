@@ -55,7 +55,7 @@ Order: the preparatory refactor, then the behavior, then the refactor of step 6.
 
 - **Change without behavior** (config, doc, name, pure refactor): skip the loop. Refactor with `craft:craft`, with the suite green before and after.
 - **Uncertain specification**: do a spike, code written only to learn. Show the user what you learned. Then delete the spike code and start at step 1. Never reuse spike code in production.
-- **Visual change without behavior**: review the rendered screen with `design:style`. Write automated tests only for behavior ([`../craft/references/clean-tests.md`](../clean-tests/SKILL.md#behavior-not-appearance)).
+- **Visual change without behavior**: review the rendered screen with `design:style`. Write automated tests only for behavior ([`../craft/references/clean-tests.md`](../craft/references/clean-tests.md#behavior-not-appearance)).
 - **External state that you cannot control**: isolate the boundary (`../craft/references/dependency-inversion.md`) and test the rule with a test double. Inject the double without breaking the callers: where the module already receives its dependencies, or as an optional last parameter. The boundary stays in the integration test.
 - **Change without a test**: a visual-only change (style, color, spacing, layout, animation, decorative markup), a text, a rename, or a config value. Do not write a test for it.
 

@@ -2,7 +2,7 @@
 
 Notes reconstructed from repository commits and manifest versions. Historical dates identify version changes in Git, not previously published releases. Versions absent from the recorded history are not invented. Categories without changes are omitted.
 
-## Unreleased
+## 0.17.0 (2026-11-05)
 
 ### Breaking changes
 
@@ -51,7 +51,10 @@ Notes reconstructed from repository commits and manifest versions. Historical da
 - A new `change` rule asks Claude to search every caller, keep the public signature, keep the existing tests, check the inputs that break the rule, and test behavior only. A visual-only change gets no test.
 - One `reminder` hook replaces `tasks-reminder`, `research-reminder` and `memory-reminder`, with one line of 200 characters or less.
 - A project with 1 to 10 test files can run its full suite.
-- A request with one action gets no task and no goal.
+- A request with one action gets no task and no goal, except the ATDD flow.
+- A `test-first` hook warns, without a deny, when production code changes before any test in the session.
+- The refactor triage enters only for a change of 20 code lines or more.
+- The memory rule forbids secrets, credentials and personal data again.
 
 ## 0.16.0 — 2026-11-02
 

@@ -53,7 +53,7 @@ Only in a container. Follow `../../atdd/references/e2e-container.md`.
 
 | Forbidden assert in E2E | Where it goes |
 |---|---|
-| Appearance | no functional test: see [`clean-tests.md`](../clean-tests/SKILL.md#behavior-not-appearance) |
+| Appearance | no functional test: see the section "Behavior, not appearance" of `clean-tests.md` |
 | Animation, transition, time of a toast on screen | nowhere |
 | Exact wording of a label, title or message | verify that the message appears, not each word of it |
 | Field-by-field validation, each input combination, edge case of the rule | `unit-tests.md` |
@@ -63,7 +63,7 @@ Only in a container. Follow `../../atdd/references/e2e-container.md`.
 
 ## Signs of violation
 
-- An assert on appearance ([`clean-tests.md`](../clean-tests/SKILL.md#behavior-not-appearance)).
+- An assert on appearance (the section "Behavior, not appearance" of `clean-tests.md`).
 - `toHaveText` with the whole sentence of a label or paragraph.
 - One test per form field (`'empty name shows error'`, `'invalid email shows error'`, `'short phone shows error'`).
 - Name that describes the screen, not the goal: `'products page'`, `'edit modal'`.

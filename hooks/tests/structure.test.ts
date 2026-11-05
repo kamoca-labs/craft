@@ -38,11 +38,10 @@ test('every rule has its own test', () => {
   assert.deepStrictEqual(missing, [])
 })
 
-test('the craft triage lists exactly the principle references', () => {
-  const hub = skillText('craft')
-  const listed = [...hub.matchAll(/^\| `references\/([\w-]+)\.md`/gm)].map((match) => match[1]).sort()
-  const principles = references.filter((reference) => reference.skill === 'craft' && !['clean-tests', 'unit-tests', 'e2e-tests', 'english-code', 'i18n-layout'].includes(reference.file.replace(/\.md$/, ''))).map((reference) => reference.file.replace(/\.md$/, '')).sort()
-  assert.deepStrictEqual(listed.filter((name) => principles.includes(name)), principles)
+test('the craft triage lists exactly the references of craft', () => {
+  const listed = [...skillText('craft').matchAll(/^\| `references\/([\w-]+)\.md`/gm)].map((match) => match[1]).sort()
+  const owned = references.filter((reference) => reference.skill === 'craft').map((reference) => reference.file.replace(/\.md$/, '')).sort()
+  assert.deepStrictEqual(listed, owned)
 })
 
 test('only the entry skills are visible to Claude', () => {
@@ -91,11 +90,30 @@ test('a reference with more than 100 lines starts with a table of contents', () 
   }
 })
 
+const ROOT = path.join(HOOKS_DIR, '..')
+const markdownFiles = () => [
+  ...skills.map((skill) => path.join(SKILLS_DIR, skill, 'SKILL.md')),
+  ...references.map((reference) => path.join(SKILLS_DIR, reference.skill, 'references', reference.file)),
+  ...fs.readdirSync(RULES_DIR).map((file) => path.join(RULES_DIR, file)),
+  ...['README.md', 'USAGE.md', 'CLAUDE.md'].map((file) => path.join(ROOT, file)),
+  ...fs.readdirSync(path.join(ROOT, '.claude', 'memory')).map((file) => path.join(ROOT, '.claude', 'memory', file)),
+]
+
 test('no file names a skill that no longer exists', () => {
-  const moved = references.map((reference) => reference.file.replace(/\.md$/, '')).concat(ALWAYS_ON)
-  const files = [...skills.map(skillText), ...references.map((reference) => reference.text), ...fs.readdirSync(RULES_DIR).map((file) => fs.readFileSync(path.join(RULES_DIR, file), 'utf8')), fs.readFileSync(path.join(HOOKS_DIR, 'locales', 'en.json'), 'utf8')]
+  const moved = references.map((reference) => reference.file.replace(/\.md$/, '')).concat(ALWAYS_ON).filter((name) => !rules.includes(name))
+  const texts = [...markdownFiles(), path.join(HOOKS_DIR, 'locales', 'en.json')].map((file) => ({ file, text: fs.readFileSync(file, 'utf8') }))
   for (const name of moved) {
-    for (const text of files) assert.doesNotMatch(text, new RegExp(`craft:${name}\\b(?!-)`), name)
+    for (const { file, text } of texts) assert.doesNotMatch(text, new RegExp(`craft:${name}\\b(?!-)`), `${path.relative(ROOT, file)} names craft:${name}`)
+  }
+})
+
+test('every relative markdown link points to a file that exists', () => {
+  for (const file of markdownFiles()) {
+    for (const [, target] of fs.readFileSync(file, 'utf8').replace(/```[\s\S]*?```/g, '').matchAll(/\]\(([^)\s]+)\)/g)) {
+      if (/^(https?:|mailto:|#|<)/.test(target)) continue
+      const resolved = path.resolve(path.dirname(file), target.split('#')[0])
+      assert.ok(fs.existsSync(resolved), `${path.relative(ROOT, file)} links ${target}`)
+    }
   }
 })
 

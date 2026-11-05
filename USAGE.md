@@ -106,7 +106,7 @@ The limit is a rule. Claude asks for the order with `AskUserQuestion`:
 | Screen first | Style mode iterates on the screen with fixed data. Then `/craft:atdd` builds the back end and replaces the mock with real data |
 | By slice | Each scenario goes through `/craft:atdd`, and its visual part goes through style mode before the next scenario |
 
-In all three options, the rule enters only with a test. The hook denies the service without `/craft:atdd`.
+In all three options, the rule enters only with a test. If Claude changes the service before any test, the `test-first` hook warns it to write the failing test first.
 
 ## Automatic refactor after green
 
@@ -133,17 +133,17 @@ Claude first looks for what it can delete (root rule). Then it triages all princ
 
 If the change alters the UI (component, CSS, template), the report suggests `/design:review` on the touched files. Claude does not run it as a refactor side effect. The design plugin includes Impeccable; no separate upstream installation is required. If design is unavailable, Claude reports the missing plugin and the pending visual review.
 
-For one principle only, call its skill:
+For one principle only, ask for it by name. Claude reads its reference in `skills/craft/references/`:
 
 ```
-/craft:errors app/Services/PaymentGateway.php
-/craft:clean-tests tests/Feature/UploadTest.php
-/craft:e2e-tests tests/e2e/
+apply the errors principle to app/Services/PaymentGateway.php
+clean the tests in tests/Feature/UploadTest.php
+review the E2E suite in tests/e2e/
 ```
 
-`/craft:e2e-tests` deletes from the E2E suite each assert that does not stop the user from reaching the goal (appearance, exact text, field by field). It moves the business rule to the unit test. The loading, empty, error, and no-permission states enter when the screen has them.
+The E2E review (`e2e-tests.md`) deletes from the E2E suite each assert that does not stop the user from reaching the goal (appearance, exact text, field by field). It moves the business rule to the unit test. The loading, empty, error, and no-permission states enter when the screen has them.
 
-The same rule applies to unit, component and integration tests: a functional test checks behavior, not appearance. `craft:clean-tests` owns this rule, and the other test skills point to it. Screenshot comparisons are created only on an explicit request, in a separate visual suite.
+The same rule applies to unit, component and integration tests: a functional test checks behavior, not appearance. `skills/craft/references/clean-tests.md` owns this rule, and the other test references point to it. Screenshot comparisons are created only on an explicit request, in a separate visual suite.
 
 ## Combine with the git plugin
 
@@ -167,7 +167,7 @@ The `english-code` hook denies non-English text in a code file:
 | text in another language in a `.md`, `.json`, or `.po` file | allowed (not code) |
 | `it('rejects an attachment above the limit')` in `tests/Feature/AttachmentTest.php` | allowed (test file: `tests/`, `test/`, `__tests__/`, `spec/`, `*.test.*`, `*.spec.*`, `*_test.*`, `test_*.py`) |
 
-The hook does not detect English text written directly in the code for the user (`<button>Save</button>`). The triage of `/craft:craft` catches it through the skill `craft:i18n`. A project without i18n gets a proposal for the default library of the stack, with your approval before the installation. The same skill catches dates, numbers, and currencies formatted by hand (use `Intl`). The skill `craft:i18n-layout` catches a fixed width in a text container, and `margin-left` where `margin-inline-start` fits. The skill `craft:english-code` covers names, comments, and logs in another language.
+The hook does not detect English text written directly in the code for the user (`<button>Save</button>`). The triage of `/craft:craft` catches it through the reference `i18n.md`. A project without i18n gets a proposal for the default library of the stack, with your approval before the installation. The same reference catches dates, numbers, and currencies formatted by hand (use `Intl`). The reference `i18n-layout.md` catches a fixed width in a text container, and `margin-left` where `margin-inline-start` fits. The reference `english-code.md` covers names, comments, and logs in another language.
 
 ## Test id on every interactive element
 
@@ -177,7 +177,7 @@ The `test-id` hook denies an interactive element without `data-testid` in `.vue`
 |---|---|
 | `<button @click="save">Save</button>` | denied: `<button data-testid="profile-save-button" @click="save">` |
 | `<Card onClick={open}>` | denied: the handler makes the component interactive |
-| `` <li :data-testid="`item-${index}`"> `` | the hook allows it, but the triage of `/craft:craft` catches the index through the skill `craft:test-ids`: use the SKU |
+| `` <li :data-testid="`item-${index}`"> `` | the hook allows it, but the triage of `/craft:craft` catches the index through the reference `test-ids.md`: use the SKU |
 | `<button class="btn" v-bind="$attrs">` in a `BaseButton.vue` | allowed (the test id arrives through the parent) |
 | `<button>Save</button>` in `src/components/Form.test.tsx` | allowed (test file) |
 
@@ -220,7 +220,7 @@ You correct Claude (for example, "do not run `git add .env`"). Claude judges if 
 
 ## Project memory
 
-No command is required. The `memory` hook loads the skill `craft:memory` and the catalog in every session. When a conversation brings something that matters for the next one, Claude writes it in the project:
+No command is required. The `memory` hook loads the memory rule and the catalog in every session. When a conversation brings something that matters for the next one, Claude writes it in the project:
 
 ```
 .claude/memory/
