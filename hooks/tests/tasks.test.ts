@@ -22,3 +22,9 @@ test('the tasks skill has no exception that lets a request skip the tasks', () =
   assert.doesNotMatch(additionalContext, /purely informative/)
   assert.doesNotMatch(additionalContext, /If the request has more than one activity/)
 })
+
+test('the ATDD flow keeps one task per scenario and the goal, even for one request', () => {
+  const additionalContext = JSON.parse(sandbox().start('tasks', 'startup').stdout).hookSpecificOutput.additionalContext
+  assert.match(additionalContext, /The ATDD flow is the exception/)
+  assert.match(additionalContext, /one task per scenario/)
+})

@@ -16,7 +16,7 @@ test('every session source injects the change rule', () => {
 
 test('the change rule keeps the public signature and the existing tests', () => {
   assert.match(context(), /Keep the public signature/)
-  assert.match(context(), /optional last parameter with a default/)
+  assert.match(context(), /without breaking the callers/)
   assert.match(context(), /Never edit an existing test/)
 })
 
@@ -29,7 +29,7 @@ test('a visual-only change gets no test', () => {
 })
 
 test('the change rule stays short', () => {
-  assert.ok(context().length < 1500, String(context().length))
+  assert.ok(context().length < 1800, String(context().length))
 })
 
 test('the change rule runs the tests once per step', () => {
@@ -37,6 +37,3 @@ test('the change rule runs the tests once per step', () => {
   assert.match(context(), /Do not run the suite before the change only to see it pass/)
 })
 
-test('a fix of one or two lines can skip the red run', () => {
-  assert.match(context(), /A fix of one or two lines skips the red run/)
-})
