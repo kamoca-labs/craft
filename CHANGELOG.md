@@ -6,7 +6,7 @@ Notes reconstructed from repository commits and manifest versions. Historical da
 
 ### Breaking changes
 
-- Only five skills are visible to Claude: `atdd`, `craft`, `audit`, `hook` and `setup`. The listing of craft drops from 40 descriptions (10,548 characters) to 5 (1,296 characters), as `SKILLS-ARCHITECTURE.md` plans. `node scripts/skill-budget.ts` prints the count.
+- Only five skills are visible to Claude: `atdd`, `craft`, `audit`, `hook` and `setup`. The listing of craft drops from 40 descriptions (10,548 characters) to 5 (1,317 characters), as `SKILLS-ARCHITECTURE.md` plans. `node scripts/skill-budget.ts` prints the count.
 - The principles and the step guides are reference files. Claude reads them with `Read`, so `craft:<name>` no longer loads with the `Skill` tool:
   - `craft:acceptance-criteria` → `skills/atdd/references/acceptance-criteria.md`
   - `craft:e2e-container` → `skills/atdd/references/e2e-container.md`
@@ -55,6 +55,14 @@ Notes reconstructed from repository commits and manifest versions. Historical da
 - A `test-first` hook denies a production code edit while no test file was edited in the session. It replaces `atdd-first`, which also required loading `/craft:atdd`.
 - The refactor triage enters only for a change of 20 code lines or more.
 - The memory rule forbids secrets, credentials and personal data again.
+
+### Fixes
+
+- Keep valid transcript entries when a JSONL line is incomplete or malformed.
+- Do not count denied test edits, failed skill calls, or flow names quoted in ordinary text as test-first prerequisites.
+- Check every recognized test invocation in a compound command before allowing an unfiltered suite.
+- Require a successful verification result for the goal reminder, and do not count an `echo` of the verification command as execution.
+- Record the scope, findings, regression checks, and limits in [AUDIT.md](AUDIT.md).
 
 ## 0.16.0 — 2026-11-02
 
