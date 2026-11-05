@@ -1,4 +1,5 @@
 import assert from 'node:assert'
+import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
@@ -95,5 +96,19 @@ test('no file names a skill that no longer exists', () => {
   const files = [...skills.map(skillText), ...references.map((reference) => reference.text), ...fs.readdirSync(RULES_DIR).map((file) => fs.readFileSync(path.join(RULES_DIR, file), 'utf8')), fs.readFileSync(path.join(HOOKS_DIR, 'locales', 'en.json'), 'utf8')]
   for (const name of moved) {
     for (const text of files) assert.doesNotMatch(text, new RegExp(`craft:${name}\\b(?!-)`), name)
+  }
+})
+
+test('every plugin path in a hook message resolves to a file that exists', () => {
+  const root = path.join(HOOKS_DIR, '..')
+  const messages = JSON.parse(fs.readFileSync(path.join(HOOKS_DIR, 'locales', 'en.json'), 'utf8')) as Record<string, string>
+  const keys = Object.keys(messages).filter((key) => messages[key].includes('${CLAUDE_PLUGIN_ROOT}'))
+  assert.ok(keys.length > 0)
+  const script = `import { message } from ${JSON.stringify(path.join(HOOKS_DIR, 'lib.ts'))}; console.log(JSON.stringify(${JSON.stringify(keys)}.map((key) => message(key))))`
+  const result = spawnSync('node', ['--input-type=module', '-e', script], { encoding: 'utf8', env: { ...process.env, CLAUDE_PLUGIN_ROOT: root } })
+  assert.strictEqual(result.status, 0, result.stderr)
+  for (const text of JSON.parse(result.stdout) as string[]) {
+    assert.doesNotMatch(text, /undefined|\$\{CLAUDE_PLUGIN_ROOT\}/, text)
+    for (const file of text.match(/\/\S+?\.md/g) ?? []) assert.ok(fs.existsSync(file), file)
   }
 })

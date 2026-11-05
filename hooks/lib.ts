@@ -100,7 +100,7 @@ export function consentGiven(transcriptPath: string | undefined, labels: string[
 }
 
 export function message(key: string, params: Record<string, string> = {}): string {
-  return withPluginRoot(MESSAGES[key].replace(/\{(\w+)\}/g, (_, name) => params[name]))
+  return withPluginRoot(MESSAGES[key]).replace(/\{(\w+)\}/g, (match, name) => params[name] ?? match)
 }
 
 export function readInput(): HookInput {
