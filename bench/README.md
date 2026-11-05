@@ -25,6 +25,16 @@ Each task is a ticket against a small TypeScript repo with existing code and tes
 | `split-bill` | a split bill loses a cent | the parts sum to the total, invalid input |
 | `upload-path` | a file name escapes the uploads folder | `....//` and absolute paths, not only `../` |
 
+### Held-out tasks
+
+No craft change was tuned on these tasks. The report gives their totals in a separate table, so a gain that comes only from tuning shows up there as a smaller gain.
+
+| Task | Ticket | What the hidden check catches |
+|---|---|---|
+| `email-duplicates` | one account per email, in any case | case and spaces, and the login, a second caller. The seed has 12 test files, so the `filtered-tests` hook of craft applies |
+| `discount-cap` | a coupon above 100% makes the total negative | 100% and 150% give 0, a normal discount still works, also through the invoice |
+| `report-range` | the report leaves out the last day | the last minute of the last day is in, midnight of the next day is out |
+
 Each task has a `good` and a `bad` reference. The self-test proves the check before any session runs: the seed fails, the good reference passes, the bad reference fails, and the seed tests pass.
 
 ## Metrics
@@ -34,6 +44,8 @@ Each task has a `good` and a `bad` reference. The self-test proves the check bef
 | hidden checks passed | the hidden check of the task |
 | source lines changed | `git diff --numstat` of the session, added plus deleted, without tests |
 | wrote a test | the session added lines to a test file |
+| test before code | the first test file edit comes before the first source edit |
+| red run | a test run failed after a test edit and before any source edit (the red step of ATDD) |
 | output tokens, cost, time, turns | the JSON output of the `claude` CLI |
 
 ## Isolation
@@ -52,6 +64,7 @@ node bench/run.ts --selftest                         # prove the checks, no sess
 node bench/run.ts --model sonnet --workers 5         # all tasks, both arms
 node bench/run.ts --task split-bill,csv-export       # some tasks
 node bench/run.ts --runs 3                           # 3 runs per cell
+node bench/run.ts --web                              # also allow WebSearch and WebFetch
 CRAFT_LEAN_DIR=<checkout> node bench/run.ts --arms baseline,craft-lean   # craft from another checkout
 node bench/run.ts --report bench/runs/<stamp>        # report again from kept cells
 ```
@@ -62,4 +75,6 @@ Each cell keeps its workspace, its diff and the CLI output under `bench/runs/<st
 
 - One run per cell has noise. A difference of one or two cells is not a result.
 - The tasks are small. Craft adds a fixed context at the start of each session, so on a small task its cost weighs more than on a real feature.
-- A hidden check is a floor, not a proof of quality.
+- A hidden check is a floor, not a proof of quality. The baseline passes almost every check, so the bench mostly measures cost.
+- The session cannot ask a question, so the approval step of ATDD cannot happen. CLAUDE.md and memory are off. Without `--web`, research can only add cost.
+- The bench does not see prose quality, memory, research, large features, slow suites or real frontend work.

@@ -11,6 +11,7 @@ export type Task = {
   good: Files
   bad: Files
   check: (dir: string) => Promise<string[]>
+  heldOut?: boolean
 }
 
 export function writeFiles(dir: string, files: Files) {

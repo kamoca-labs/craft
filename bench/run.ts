@@ -13,6 +13,10 @@ const TEST_PATH = /(^|\/)(tests?|__tests__|spec)\/|\.(test|spec)\.[a-z]+$/
 const MODELS: Record<string, string> = { haiku: 'claude-haiku-5-5', sonnet: 'claude-sonnet-5-5', opus: 'claude-opus-5-5' }
 const UNATTENDED = 'You work unattended: nobody can answer a question or approve a plan. Make the decisions yourself, finish the change in this repo, and stop.'
 const ALLOWED_TOOLS = 'Read,Edit,Write,Glob,Grep,Skill,TaskCreate,TaskUpdate,TaskList,Bash(node --test:*),Bash(npm test:*),Bash(git diff:*),Bash(git status:*),Bash(git rm:*)'
+const WEB_TOOLS = ',WebSearch,WebFetch'
+const SOURCE_PATH = /\.(ts|tsx|js|jsx|mjs|cjs|vue|css)$/
+const FAILED_RUN = /\b[1-9]\d* (failed|failing)\b|^(#|\u2139) fail [1-9]|^not ok \d+|^\u2716 /m
+let allowedTools = ALLOWED_TOOLS
 const USAGE_LIMIT = /hit your .*limit|usage limit|rate limit/i
 let stopped = ''
 function latestPlugin(name: string): string {
@@ -49,6 +53,8 @@ type Result = Cell & {
   durationMs: number
   turns: number
   tools: string[]
+  testFirst: boolean
+  redRun: boolean
   error?: string
 }
 
@@ -94,7 +100,7 @@ function diffLines(dir: string) {
 
 function runClaude(cell: Cell, task: Task, dir: string, logDir: string): Promise<Record<string, any>> {
   const args = ['-p', `${task.prompt}\n\n${UNATTENDED}`, '--output-format', 'stream-json', '--verbose', '--model', MODELS[cell.model] ?? cell.model,
-    '--setting-sources', 'project,local', '--strict-mcp-config', '--permission-mode', 'acceptEdits', '--allowedTools', ALLOWED_TOOLS, ...ARMS[cell.arm]()]
+    '--setting-sources', 'project,local', '--strict-mcp-config', '--permission-mode', 'acceptEdits', '--allowedTools', allowedTools, ...ARMS[cell.arm]()]
   const env = { ...process.env, CLAUDE_CODE_DISABLE_CLAUDE_MDS: '1', CLAUDE_CODE_DISABLE_AUTO_MEMORY: '1', HOOK_CASES_LOG: path.join(logDir, 'hook-cases.jsonl') }
   return new Promise((resolve) => {
     const child = spawn('claude', args, { cwd: dir, env, detached: true, stdio: ['ignore', 'pipe', 'pipe'] })
@@ -109,13 +115,35 @@ function runClaude(cell: Cell, task: Task, dir: string, logDir: string): Promise
       const events = stdout.split('\n').filter(Boolean).map((line) => { try { return JSON.parse(line) } catch { return {} } })
       const result = events.find((event) => event.type === 'result')
       const tools = events.filter((event) => event.type === 'assistant').flatMap((event) => event.message?.content ?? []).filter((block: any) => block.type === 'tool_use')
-      resolve(result ? { ...result, tools: tools.map((block: any) => block.name === 'Skill' ? `Skill:${block.input?.skill}` : block.name) } : { is_error: true, result: `no result event: ${stderr.slice(-500)}` })
+      const order = testOrder(events, dir)
+      resolve(result ? { ...result, ...order, tools: tools.map((block: any) => block.name === 'Skill' ? `Skill:${block.input?.skill}` : block.name) } : { is_error: true, result: `no result event: ${stderr.slice(-500)}` })
     })
   })
 }
 
+function testOrder(events: Record<string, any>[], dir: string) {
+  const outputs = new Map<string, { failed: boolean }>()
+  for (const event of events.filter((item) => item.type === 'user')) {
+    for (const block of event.message?.content ?? []) {
+      if (block.type === 'tool_result') outputs.set(block.tool_use_id, { failed: Boolean(block.is_error) || FAILED_RUN.test(JSON.stringify(block.content)) })
+    }
+  }
+  let testEdit = -1
+  let sourceEdit = -1
+  let redRun = false
+  const blocks = events.filter((event) => event.type === 'assistant').flatMap((event) => event.message?.content ?? []).filter((block: any) => block.type === 'tool_use')
+  blocks.forEach((block: any, index: number) => {
+    const file = path.relative(dir, path.resolve(dir, block.input?.file_path || ''))
+    if (/^(Edit|MultiEdit|Write)$/.test(block.name) && TEST_PATH.test(file) && testEdit < 0) testEdit = index
+    else if (/^(Edit|MultiEdit|Write)$/.test(block.name) && SOURCE_PATH.test(file) && !TEST_PATH.test(file) && sourceEdit < 0) sourceEdit = index
+    const runsTests = block.name === 'Bash' && /--test|\btest\b/.test(block.input?.command || '')
+    if (runsTests && testEdit >= 0 && sourceEdit < 0 && outputs.get(block.id)?.failed) redRun = true
+  })
+  return { testFirst: testEdit >= 0 && (sourceEdit < 0 || testEdit < sourceEdit), redRun }
+}
+
 async function runCell(cell: Cell, task: Task, stampDir: string): Promise<Result> {
-  if (stopped) return { ...cell, passed: false, failures: [], srcAdded: 0, srcDeleted: 0, testAdded: 0, costUsd: 0, outputTokens: 0, durationMs: 0, turns: 0, tools: [], error: `not run: ${stopped}` }
+  if (stopped) return { ...cell, passed: false, failures: [], srcAdded: 0, srcDeleted: 0, testAdded: 0, costUsd: 0, outputTokens: 0, durationMs: 0, turns: 0, tools: [], testFirst: false, redRun: false, error: `not run: ${stopped}` }
   const logDir = path.join(stampDir, cell.task, `${cell.arm}-${cell.run}`)
   fs.mkdirSync(logDir, { recursive: true })
   const dir = seedWorkspace(task)
@@ -125,7 +153,7 @@ async function runCell(cell: Cell, task: Task, stampDir: string): Promise<Result
     fs.rmSync(dir, { recursive: true, force: true })
     fs.rmSync(logDir, { recursive: true, force: true })
     console.log(`STOP ${cell.task} ${cell.arm}#${cell.run}: ${stopped}`)
-    return { ...cell, passed: false, failures: [], srcAdded: 0, srcDeleted: 0, testAdded: 0, costUsd: 0, outputTokens: 0, durationMs: 0, turns: 0, tools: [], error: `not run: ${stopped}` }
+    return { ...cell, passed: false, failures: [], srcAdded: 0, srcDeleted: 0, testAdded: 0, costUsd: 0, outputTokens: 0, durationMs: 0, turns: 0, tools: [], testFirst: false, redRun: false, error: `not run: ${stopped}` }
   }
   const failures = runCheck(task, dir)
   const result: Result = {
@@ -138,6 +166,8 @@ async function runCell(cell: Cell, task: Task, stampDir: string): Promise<Result
     durationMs: output.duration_ms ?? 0,
     turns: output.num_turns ?? 0,
     tools: output.tools ?? [],
+    testFirst: output.testFirst ?? false,
+    redRun: output.redRun ?? false,
     error: output.is_error ? String(output.result).slice(0, 300) : undefined,
   }
   fs.writeFileSync(path.join(logDir, 'diff.patch'), git(dir, 'diff', '--cached', 'HEAD'))
@@ -168,13 +198,9 @@ const median = (values: number[]) => {
 const sum = (values: number[]) => values.reduce((total, value) => total + value, 0)
 const percent = (value: number, base: number) => (base ? `${value >= base ? '+' : ''}${Math.round(((value - base) / base) * 100)}%` : 'n/a')
 
-function report(all: Result[], tasks: Task[], meta: string): string {
-  const results = all.filter((result) => !result.error?.startsWith('not run'))
-  const notRun = all.length - results.length
-  const arms = [...new Set(results.map((result) => result.arm))]
-  const byArm = (arm: string) => results.filter((result) => result.arm === arm)
+function totalsTable(results: Result[], arms: string[]): string[] {
   const totals = arms.map((arm) => {
-    const cells = byArm(arm)
+    const cells = results.filter((result) => result.arm === arm)
     return {
       arm,
       passed: cells.filter((cell) => cell.passed).length,
@@ -185,15 +211,29 @@ function report(all: Result[], tasks: Task[], meta: string): string {
       cost: sum(cells.map((cell) => cell.costUsd)),
       time: sum(cells.map((cell) => cell.durationMs)),
       turns: median(cells.map((cell) => cell.turns)),
+      testFirst: cells.filter((cell) => cell.testFirst).length,
+      redRun: cells.filter((cell) => cell.redRun).length,
     }
   })
   const base = totals.find((total) => total.arm === 'baseline')
-  const lines = [`# Craft benchmark ${meta}`, '', ...(notRun ? [`${notRun} cells did not run (usage limit) and are left out.`, ''] : []), '## Totals', '',
-    '| arm | hidden checks passed | source lines changed | wrote a test | output tokens | cost (USD) | time | median turns |',
-    '|---|--:|--:|--:|--:|--:|--:|--:|']
+  const lines = ['| arm | hidden checks passed | source lines changed | wrote a test | test before code | red run | output tokens | cost (USD) | time | median turns |',
+    '|---|--:|--:|--:|--:|--:|--:|--:|--:|--:|']
   for (const total of totals) {
     const versus = (value: number, key: 'src' | 'tokens' | 'cost' | 'time') => (base && total.arm !== 'baseline' ? ` (${percent(value, base[key])})` : '')
-    lines.push(`| ${total.arm} | ${total.passed}/${total.cells} | ${total.src}${versus(total.src, 'src')} | ${total.wroteTest}/${total.cells} | ${total.tokens}${versus(total.tokens, 'tokens')} | ${total.cost.toFixed(2)}${versus(total.cost, 'cost')} | ${Math.round(total.time / 1000)}s${versus(total.time, 'time')} | ${total.turns} |`)
+    lines.push(`| ${total.arm} | ${total.passed}/${total.cells} | ${total.src}${versus(total.src, 'src')} | ${total.wroteTest}/${total.cells} | ${total.testFirst}/${total.cells} | ${total.redRun}/${total.cells} | ${total.tokens}${versus(total.tokens, 'tokens')} | ${total.cost.toFixed(2)}${versus(total.cost, 'cost')} | ${Math.round(total.time / 1000)}s${versus(total.time, 'time')} | ${total.turns} |`)
+  }
+  return lines
+}
+
+function report(all: Result[], tasks: Task[], meta: string): string {
+  const results = all.filter((result) => !result.error?.startsWith('not run'))
+  const notRun = all.length - results.length
+  const arms = [...new Set(results.map((result) => result.arm))]
+  const byArm = (arm: string) => results.filter((result) => result.arm === arm)
+  const heldOut = new Set(tasks.filter((task) => task.heldOut).map((task) => task.id))
+  const lines = [`# Craft benchmark ${meta}`, '', ...(notRun ? [`${notRun} cells did not run (usage limit) and are left out.`, ''] : []), '## Totals', '', ...totalsTable(results, arms)]
+  if (heldOut.size && results.some((result) => heldOut.has(result.task))) {
+    lines.push('', '## Held-out tasks', '', 'No craft change was tuned on these tasks.', '', ...totalsTable(results.filter((result) => heldOut.has(result.task)), arms))
   }
   lines.push('', '## Per task', '', `| task | ${arms.map((arm) => `${arm}: checks, src lines, test lines, cost`).join(' | ')} |`, `|---|${arms.map(() => '---').join('|')}|`)
   for (const task of tasks) {
@@ -262,9 +302,11 @@ const { values } = parseArgs({
     workers: { type: 'string', default: '4' },
     report: { type: 'string' },
     compare: { type: 'string' },
+    web: { type: 'boolean' },
   },
 })
 
+if (values.web) allowedTools += WEB_TOOLS
 const allTasks = await loadTasks()
 const tasks = values.task ? allTasks.filter((task) => values.task!.split(',').includes(task.id)) : allTasks
 
@@ -291,7 +333,7 @@ for (let run = 1; run <= Number(values.runs); run++) {
 }
 const byId = new Map(tasks.map((task) => [task.id, task]))
 const results = await pool(cells, Number(values.workers), (cell) => runCell(cell, byId.get(cell.task)!, stampDir))
-const markdown = report(results, tasks, `${stamp} (${values.model}, ${values.runs} run per cell)`)
+const markdown = report(results, tasks, `${stamp} (${values.model}, ${values.runs} run per cell${values.web ? ', web tools on' : ''})`)
 fs.mkdirSync(path.join(BENCH, 'results'), { recursive: true })
 fs.writeFileSync(path.join(BENCH, 'results', `${stamp}.md`), markdown)
 fs.writeFileSync(path.join(stampDir, 'results.md'), markdown)
