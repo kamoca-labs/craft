@@ -140,3 +140,17 @@ test('a small change does not inject, a large change does', () => {
   assert.strictEqual(repo(3), null)
   assert.ok(repo(30))
 })
+
+test('the lines committed on the branch count too', () => {
+  const box = sandbox()
+  fs.mkdirSync(box.projectDir, { recursive: true })
+  const run = (...args: string[]) => spawnSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...args], { cwd: box.projectDir })
+  run('init', '-q', '-b', 'main')
+  fs.writeFileSync(`${box.projectDir}/a.ts`, 'export const a = 1\n')
+  run('add', '.')
+  run('commit', '-qm', 'seed')
+  run('checkout', '-qb', 'feature')
+  fs.writeFileSync(`${box.projectDir}/a.ts`, Array.from({ length: 30 }, (_, index) => `export const a${index} = ${index}`).join('\n'))
+  run('commit', '-qam', 'behavior')
+  assert.ok(injected(box.run(RULE, { command: 'npm test', stdout: '# pass 3\n# fail 0' })))
+})

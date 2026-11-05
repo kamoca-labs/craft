@@ -38,8 +38,17 @@ function git(root: string, args: string[]): string {
   return execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 3000 })
 }
 
+function branchBase(root: string): string {
+  for (const branch of ['origin/HEAD', 'origin/main', 'origin/master', 'main', 'master']) {
+    try {
+      return git(root, ['merge-base', 'HEAD', branch]).trim()
+    } catch {}
+  }
+  return 'HEAD'
+}
+
 function changedLines(root: string): number {
-  const tracked = git(root, ['diff', 'HEAD', '--numstat']).split('\n')
+  const tracked = git(root, ['diff', branchBase(root), '--numstat']).split('\n')
     .map((line) => line.split('\t'))
     .filter(([, , file]) => file && CODE_FILE.test(file))
     .reduce((sum, [added, deleted]) => sum + (Number(added) || 0) + (Number(deleted) || 0), 0)
