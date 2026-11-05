@@ -44,12 +44,12 @@ Claude detects the stack, shows the plan (dependencies, configs, limits), and **
 
 2. It writes the test of **one** scenario and runs it: `Step 3 (Red): 1 failing, expected 422 got 201`.
 3. It writes the minimum code: `Step 5 (Passing): 1 passing`. If the specification has another scenario, it goes back to step 2 with the next one.
-4. With all scenarios green, the hook injects the triage. Claude loads only what has a signal and refactors: `Step 6 (Refactor): craft:dry, limit unified in MAX_ATTACHMENT_SIZE. No signal in the others`. When performance has a signal, Claude measures the current form, compares at least two forms, and puts the table in the `perf` commit.
+4. With all scenarios green, the hook injects the triage. Claude loads only what has a signal and refactors: `Step 6 (Refactor): dry, limit unified in MAX_ATTACHMENT_SIZE. No signal in the others`. When performance has a signal, Claude measures the current form, compares at least two forms, and puts the table in the `perf` commit.
 5. It runs the tests of the touched domains: `Step 7 (Passing again): 34 passing in tests/Feature/Request and tests/Unit/Attachment`.
 
 ## Tasks and goal
 
-In step 1, `/craft:atdd` loads the skill `craft:acceptance-criteria`: each `Then` states an observable value, and each scenario names the test that proves it. After you approve the specification, it follows `craft:tasks`, which the hook already injected in the session. Claude creates one task per scenario (`TaskCreate`), plus the refactor and the passing again. You follow the list with `Ctrl+T`.
+In step 1, `/craft:atdd` reads `references/acceptance-criteria.md`: each `Then` states an observable value, and each scenario names the test that proves it. After you approve the specification, it follows the tasks rule, which the hook already injected in the session. Claude creates one task per scenario (`TaskCreate`), plus the refactor and the passing again. You follow the list with `Ctrl+T`.
 
 When the `TaskCreate` tool is on, Claude finds the criterion by itself (the scenarios, your request, or the project scripts) and sets the goal without asking. If no command can prove the result, it creates only the tasks. You can also call `/craft:tasks <what to do>`. The first task of the list is the `META:` task:
 
@@ -72,7 +72,7 @@ When the work ends, the final reply always carries the closing, met or not: the 
 
 ### Several activities in the same request
 
-Outside ATDD, Claude also follows `craft:tasks` when your prompt has two or more actions, or adds a new action during the work. The `tasks-reminder` hook repeats this rule on every prompt. An analysis or a comparison counts as an action. Example: "fix the login, update the README, and start the service". Claude splits the request into tasks, shows the list, and sets the goal. The verification of the goal is one command that proves the final state of all activities.
+Outside ATDD, Claude also follows the tasks rule when your prompt has two or more actions, or adds a new action during the work. The `reminder` hook repeats this rule on every prompt. An analysis or a comparison counts as an action. Example: "fix the login, update the README, and start the service". Claude splits the request into tasks, shows the list, and sets the goal. The verification of the goal is one command that proves the final state of all activities.
 
 ## Bug fix with ATDD
 
@@ -185,7 +185,7 @@ The test finds the element with `getByTestId` first. Removing the attribute in t
 
 ## Writing in the ASD-STE100 standard
 
-There is no command. The `ste` hook injects the skill `craft:ste` in every session, and again after `/clear` and after compaction. From then on, replies, docs, commits, and PRs/MRs follow ASD-STE100 (Simplified Technical English, Issue 9):
+There is no command. The `ste` hook injects the rule `rules/ste.md` in every session, and again after `/clear` and after compaction. From then on, replies, docs, commits, and PRs/MRs follow ASD-STE100 (Simplified Technical English, Issue 9):
 
 | Before | After |
 |---|---|
@@ -201,9 +201,9 @@ There is no command. Three hooks inject three skills in every session, and again
 
 | Skill | What Claude does |
 |---|---|
-| `craft:verify` | Before it uses a version, an image tag, a package name, a flag, or an API that can change, Claude looks in the documentation, the registry, the CLI, or the web. It cites the source. Without a source, it writes "not verified" |
-| `craft:challenge` | Claude treats a claim of yours about a fact as wrong until a proof says it is right. If the proof contradicts you, Claude says so and shows the proof. A preference or a decision of yours is not a fact, so Claude does not challenge it |
-| `craft:state-of-the-art` | Before it implements something (a Dockerfile, a CI pipeline, a framework feature), Claude looks for the official best practices and the current recommendation of the community, applies them, and cites the sources. If the practice differs from the pattern of the repo, it asks you which one to follow |
+| `rules/verify.md` | Before it uses a version, an image tag, a package name, a flag, or an API that can change, Claude looks in the documentation, the registry, the CLI, or the web. It cites the source. Without a source, it writes "not verified" |
+| `rules/challenge.md` | Claude treats a claim of yours about a fact as wrong until a proof says it is right. If the proof contradicts you, Claude says so and shows the proof. A preference or a decision of yours is not a fact, so Claude does not challenge it |
+| `rules/state-of-the-art.md` | Before it implements something (a Dockerfile, a CI pipeline, a framework feature), Claude looks for the official best practices and the current recommendation of the community, applies them, and cites the sources. If the practice differs from the pattern of the repo, it asks you which one to follow |
 
 Example:
 
@@ -253,6 +253,6 @@ If Claude tries to write to the local auto memory (`~/.claude/projects/<project>
 | `push-gate` denied the push in a project with CI | a CI with a config outside the list | Add the path to `CI_CONFIGS` with a test in `push-gate.test.ts` |
 | It did not inject with a green suite | a test runner that the hook does not know | Write the case in `cases.json` with `"inject": ["refactor-on-green"]` and add the runner to `TEST_RUNNER` |
 
-Before you change the hook, classify the finding (`craft:hook-denied`). Real problem: fix it. False positive with evidence: make the narrowest possible exception, with the reason `"<who decided>: <evidence>"` in the commit. Doubt: ask the user once. A wide exception (a whole file, a whole rule) needs a request from the user.
+Before you change the hook, classify the finding (`skills/hook/references/hook-denied.md`). Real problem: fix it. False positive with evidence: make the narrowest possible exception, with the reason `"<who decided>: <evidence>"` in the commit. Doubt: ask the user once. A wide exception (a whole file, a whole rule) needs a request from the user.
 
 The full procedure is in [turn a real case into a test](https://github.com/kamoca-labs/marketplace/blob/main/USAGE.md#turn-a-real-case-into-a-test).

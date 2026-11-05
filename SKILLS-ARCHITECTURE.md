@@ -1,6 +1,11 @@
 # Skills architecture and migration plan
 
-Status: plan. Start the migration when the craft, docker, design and git plugins are stable. Written on 2026-11-04.
+Status: in progress. Written on 2026-11-04.
+
+| Plugin | Done | Open |
+|---|---|---|
+| craft | phases 1, 2 and 4 on 2026-11-05. `node scripts/skill-budget.ts`: 5 skills visible, 1,296 description characters (was 40 and 10,548). The relative link `references/dry.md` resolves in a test session | phase 0 evals (the benchmark in `bench/` measures the behavior instead), phase 5 release |
+| docker, design, git | none | phases 1, 3 and 4, and the decisions of the user in section 4 |
 
 ## 1. The problem
 
