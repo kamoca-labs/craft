@@ -1,3 +1,4 @@
 - [ATDD scenarios language](feedback_atdd-scenarios-language.md): show the scenarios in the language of the user
 - [Session rules enforcement](project_session-rules-enforcement.md): tasks, memory and state-of-the-art need hooks that enforce them; add craft:code
 - [Skills progressive disclosure](project_skills-progressive-disclosure.md): entry skills, references and rules in every plugin; plan and open items
+- [Activity flow](project_activity-flow.md): craft 0.18.0 replaces META and TaskCreate with a linear markdown activity; decisions and limits

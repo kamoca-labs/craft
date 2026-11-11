@@ -2,6 +2,30 @@
 
 Notes reconstructed from repository commits and manifest versions. Historical dates identify version changes in Git, not previously published releases. Versions absent from the recorded history are not invented. Categories without changes are omitted.
 
+## 0.18.0 (unreleased)
+
+### Breaking changes
+
+- `/craft:tasks`, the `tasks` SessionStart hook, the `meta-goal` Stop hook and the `META:` task are removed. `TaskCreate` is no longer part of the flow. Use `/craft:craft` for a big or multi-step request.
+- A `META:` declaration in a session that is already running is no longer enforced.
+
+### Added
+
+- Activity: a linear, numbered list in `.claude/local/activities/<slug>/index.md` (ignored by git), with a child file and folder for a complex item. `craft:craft` builds it (`references/activity.md`, `references/activity-format.md`).
+- `scripts/activity.ts`: the CLI (`start`, `status`, `begin`, `done`, `verify`, `approve`, `block`, `replan`, `split`, `resume`, `link`, `export`, `goal-line`).
+- `activity-gate` Stop hook: the next item, one at a time, until every required item has sealed evidence; or an incomplete end with a saved state.
+- Evidence with files: a check writes to `$ACTIVITY_EVIDENCE_DIR`, or `approve --attach` adds files. They are sealed and shown in `index.md` (images inline).
+- `reopen`: the user rejects a verified item, and it returns as the next item with its dependents. A `review` check is approved by Claude with a note.
+- Short CLI output (one line per command, `show` for the whole file) and a plan with `check` as a command string: fewer tokens per activity.
+
+### Decisions and limits
+
+- The markdown is the only source. A seal (HMAC with `.claude/local/.seal`) separates evidence from a box checked by hand. It guards against mistakes, not against someone who reads the key.
+- Jira and Asana: no integration exists, so `export` is a dry run. Publishing needs an explicit request.
+- `TaskCompleted` is not used, because the native tasks are not part of the flow.
+- `/goal` cannot be run by a skill or a hook, so there is no binding. The hook prints the line `ACTIVITY COMPLETE` that its evaluator can read, and `goal-line` gives the condition.
+- The `bench/` benchmark was not run for this change. `bench/run.ts` still allows the task tools in its sessions.
+
 ## 0.17.0 (2026-11-05)
 
 ### Breaking changes

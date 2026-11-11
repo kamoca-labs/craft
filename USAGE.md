@@ -4,7 +4,7 @@
 
 - [New project](#new-project)
 - [New feature with ATDD](#new-feature-with-atdd)
-- [Tasks and goal](#tasks-and-goal)
+- [Big requests: activities, /craft:craft and /goal](#big-requests-activities-craftcraft-and-goal)
 - [Bug fix with ATDD](#bug-fix-with-atdd)
 - [Visual-only change with style mode](#visual-only-change-with-style-mode)
 - [Automatic refactor after green](#automatic-refactor-after-green)
@@ -47,32 +47,60 @@ Claude detects the stack, shows the plan (dependencies, configs, limits), and **
 4. With all scenarios green, the hook injects the triage. Claude loads only what has a signal and refactors: `Step 6 (Refactor): dry, limit unified in MAX_ATTACHMENT_SIZE. No signal in the others`. When performance has a signal, Claude measures the current form, compares at least two forms, and puts the table in the `perf` commit.
 5. It runs the tests of the touched domains: `Step 7 (Passing again): 34 passing in tests/Feature/Request and tests/Unit/Attachment`.
 
-## Tasks and goal
+## Big requests: activities, /craft:craft and /goal
 
-In step 1, `/craft:atdd` reads `references/acceptance-criteria.md`: each `Then` states an observable value, and each scenario names the test that proves it. After you approve the specification, it follows the tasks rule, which the hook already injected in the session. Claude creates one task per scenario (`TaskCreate`), plus the refactor and the passing again. You follow the list with `Ctrl+T`.
-
-When the `TaskCreate` tool is on, Claude finds the criterion by itself (the scenarios, your request, or the project scripts) and sets the goal without asking. If no command can prove the result, it creates only the tasks. You can also call `/craft:tasks <what to do>`. The first task of the list is the `META:` task:
+Say the request in plain words: "implement the pagination of this screen". `craft:craft` starts by itself from the description. A question ("explain why the pagination skips records") stays an analysis and opens nothing. For a big request, call it by name:
 
 ```
-TaskCreate: META: the 3 scenarios of the specification pass
-  Verification: `pnpm vitest run tests/unit/attachment` exits with code 0 after the last code edit.
-  Constraints: no test skipped, deleted, or edited to pass.
-  Limit: 6 blocks.
+/craft:craft implement the pagination of the orders screen: endpoint, screen and tests
 ```
 
-When the work ends, the final reply always carries the closing, met or not: the `META:` task becomes `completed`, and the `META CLOSED:` line cites the command and the result.
+Claude organizes the request into a linear list. The request does not come in order, so Claude lists the pieces with what each one needs, and the CLI sorts them: every item comes after what it needs. A cycle is rejected with the path. The list is a file you can open and follow, even though git ignores it:
 
-- Claude Code does not let the model run `/goal`. For this reason, the goal is the `META:` task plus the `meta-goal` Stop hook. You type nothing.
-- The `meta-goal` hook is a script, without an agent, so it uses no tokens. It reads the transcript and holds the end of the turn until the verification command runs with the expected result. It does not run commands. For this reason, Claude cites the command and the result at the end of each step.
-- The hook also requires the closing: if the condition is met and the `META CLOSED:` line is missing, it blocks once and asks for the closing.
-- The hook releases the end of the turn when Claude asks for your approval, when the goal reaches the block limit, and after the closing. If you refuse the goal in your own words, Claude writes `META CLOSED: refused by the user`. If you tell Claude to stop, it closes the goal with the reason and says the goal was not met.
-- Without the `TaskCreate` tool, the goal becomes a `META:` line in the text of the reply, with the same parts.
-- The hook has no panel, no check-ins, and no restore of the native `/goal`. It works in every session and acts only after the goal is declared.
-- In some sessions `TaskCreate` comes as a deferred tool, and Claude loads the schema with `ToolSearch`. If the tool does not exist even then, Claude writes the list in the reply and asks if it can enable the tool. With your approval, it keeps a copy of `~/.claude/settings.json`, adds `"env": { "CLAUDE_CODE_ENABLE_TODO_TOOLS": "1" }`, and opens a test session to confirm. The tool appears in the next session. You edit nothing by hand.
+```
+.claude/local/activities/orders-pagination-3f2a/index.md
+```
 
-### Several activities in the same request
+```markdown
+Status: active
+Next: T2 List screen pages through the API
+Progress: 1/3 required items verified
+Blocked: none
 
-Outside ATDD, Claude also follows the tasks rule when your prompt has two or more actions, or adds a new action during the work. The `reminder` hook repeats this rule on every prompt. Example: "fix the login, update the README, and start the service". Claude splits the request into tasks, shows the list, and sets the goal. The verification of the goal is one command that proves the final state of all activities.
+## Sequence
+
+- [x] 1. T1 Orders endpoint returns pages
+- [ ] 2. T2 List screen pages through the API  <- next
+- [ ] 3. T3 Page links survive a reload
+
+### [x] 1. T1 Orders endpoint returns pages
+- Accept: page 2 of 25 orders with size 10 returns 10 items and total 25; page 0 returns 400
+- Check: command
+- Command: npm test -- orders.api
+- Evidence: pass at 2026-11-10T14:02:11Z, evidence/T1-1.txt
+```
+
+How it works:
+
+- **One line at a time.** The first line that is not verified is `Next`. Only that item accepts `begin`, `done`, `verify` and `approve`. When it is verified, the next line becomes `Next`.
+- **Verified means evidence.** `verify` runs the check itself and records the result with a seal. A box that you or Claude check by hand is ignored and redrawn. A change in the criterion, in the check, or in the `watch` files reopens the item.
+- **The `activity-gate` hook (Stop)** gives Claude the next item, the missing criterion and the command, until every required item is verified. It never runs checks. A blocked item is skipped only by items that do not need it. When everything left is blocked, there is no progress, the stop limit is reached, or the verifier crashes twice, the activity ends as **incomplete**, with the state saved and the reason in the file.
+- **Replan.** New work found during the job goes in with `replan --reason`. Ids and valid evidence stay, and the history records why.
+- **A very complex request.** The plan can mark an item with `detail`. `index.md` stays the parent. The item moves to a child file `T2-api-pages.md`, and its outputs go to the folder `T2-api-pages/`.
+- **Not only code.** A guide or a report works too: the check is a `review` that Claude approves with what it saw, a `human` approval with your words, or a simple command.
+- **Evidence by kind of item.** An API item runs a command with a known input and fails when a limit is broken (status, response, time). A screen item attaches captures (images show inline in `index.md`, and you open them at no cost to the session). Files that a check writes to `$ACTIVITY_EVIDENCE_DIR`, or that `approve --attach` adds, are sealed.
+- **You reject, Claude reworks.** If a screen "does not look good", say so. Claude runs `reopen` with your words: the item and every item that depends on it come back as `Next`, Claude adjusts, collects new evidence and approves again.
+- **Token cost.** Each CLI command prints one short line. A 6-item activity costs about 9 thousand tokens (an estimate by character count, not a measurement). Captures taken by a command of the project cost no image tokens in the session; look at each capture once.
+- **Cards.** There is no Jira or Asana integration. `export` writes a dry run (`cards.json`) with a stable key per item, and `link` keeps the link to a card, so a repeat updates the same card.
+
+### Keep going, resume, and /goal
+
+- The hook holds the turn while there is work, but nothing can force the work to finish: Ctrl+C, disabled hooks, an authentication or credit error, and an item that needs your decision all stop it. The hook never ends the turn in silence: the activity ends complete or incomplete.
+- The stop limit counts stops **without new evidence**, so an activity that makes progress does not reach it. Claude Code also overrides any Stop hook after 8 blocks in a row without a tool call.
+- To continue an incomplete activity, send a message. Claude runs `resume --from <old session>` first, which keeps the id, the evidence and the history. For a wait on an outside event (a CI result), Claude blocks the item and schedules its own resume.
+- `/goal` is a native command that only you can type, at the start of a message. A skill, a hook or Claude cannot run it, so there is no binding "under the hood". It works with the hook: the evaluator of `/goal` reads only the transcript, so the hook asks for the line `ACTIVITY COMPLETE: <id>, N/N verified` when everything is verified. Claude prints the ready condition on request (`goal-line`).
+- Two ways to use both. In two messages: first `/craft:craft <big request>`, then paste the `/goal` line. In one message: `/goal use craft:craft to organize and run <big request>, done when the reply shows ACTIVITY COMPLETE`.
+- `/craft:craft <request> /goal` in one message does not work: a command is recognized only at the start of the message, and chaining is for skills, not for the built-in `/goal`.
 
 ## Bug fix with ATDD
 
