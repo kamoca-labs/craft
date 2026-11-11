@@ -9,14 +9,18 @@ The whole suite grows with the project and starts to cost minutes without tellin
 | 6 (between refactors) | the tests of the refactored file or module |
 | 7 | the tests of the touched domains: the ones for the changed files (`git diff --name-only main...`) and the ones for the modules that import those files |
 
-Run every test with a filter. The `filtered-tests` hook denies the full suite without the consent of the user. A small project, with 1 to 10 test files in git, can run its full suite: it takes seconds.
+Run every test with a filter. The `filtered-tests` hook denies the full suite unless the push needs it. A small project, with 1 to 10 test files in git, can run its full suite: it takes seconds.
 
-The full suite runs this way:
+## When the full suite runs, and who decides
 
-- **Project with CI**: the full suite runs in the cloud, after the push. Do not run it locally.
-- **Project without CI**: before the push or the PR/MR, ask the user with `AskUserQuestion`. Use the exact options `Run the full suite locally` and `Continue without the full suite`. The `push-gate` hook denies the push and the PR/MR until the user answers. If the answer is to run it, run the suite and push only with it green.
+Nobody asks the user. Follow these cases in order, and stop at the first that applies:
 
-The answer is valid until the next code edit. After an edit, ask again.
+1. **The project has no test.** There is nothing to run. Push.
+2. **The project has CI.** The CI runs the full suite after the push. Running it locally would repeat the same work, so do not run it and do not ask.
+3. **No CI, and no code changed since the last green run of the full suite** (or the commits to push have no code file, such as docs or config only). A run would prove nothing new. Do not run it and do not ask.
+4. **No CI, tests exist, and code changed since the last green run.** Run the full suite now, without asking. Push only when it is green. The `push-gate` hook denies `git push`, `gh pr create` and `glab mr create` in this case, and the `filtered-tests` hook allows the unfiltered run.
+
+"Code changed" is read from the commits that the push would send, compared with the upstream branch (or `origin/main`), and from the last code edit of the session. "Green run" is a successful run of the full suite after that last edit. A filtered run or a failed run does not count.
 
 When you report, state the filter used. Example: "Step 7 (Passing again): 34 passing in `tests/Feature/Request` and `tests/Unit/Attachment`".
 

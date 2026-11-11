@@ -278,7 +278,7 @@ If Claude tries to write to the local auto memory (`~/.claude/projects/<project>
 | `english-code` denied text that is neither user-facing text nor code | domain data (a city name in a seed) | Move the data to JSON or CSV. If a translation folder has another name, add it to `TRANSLATION_FOLDER` with a test in `english-code.test.ts` |
 | `test-id` denied an element that is not interactive | a decorative anchor `<a>`, or a loose `>` in an attribute without quotes | Add the `data-testid` anyway. If the tag reading is wrong, fix `OPENING_TAG` with a test in `test-id.test.ts` |
 | `filtered-tests` denied a run that is already filtered | a filter that the hook does not know | Add the filter to `FILTER_FLAG` or `TEST_PATH` with a test in `filtered-tests.test.ts` |
-| `push-gate` denied the push in a project with CI | a CI with a config outside the list | Add the path to `CI_CONFIGS` with a test in `push-gate.test.ts` |
+| `push-gate` denied the push in a project with CI | a CI with a config outside the list | Add the path to `CI_CONFIGS` in `hooks/lib.ts` with a test in `push-gate.test.ts` |
 | It did not inject with a green suite | a test runner that the hook does not know | Write the case in `cases.json` with `"inject": ["refactor-on-green"]` and add the runner to `TEST_RUNNER` |
 
 Before you change the hook, classify the finding (`skills/hook/references/hook-denied.md`). Real problem: fix it. False positive with evidence: make the narrowest possible exception, with the reason `"<who decided>: <evidence>"` in the commit. Doubt: ask the user once. A wide exception (a whole file, a whole rule) needs a request from the user.

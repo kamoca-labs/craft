@@ -3,9 +3,6 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 
-export const FULL_SUITE_LOCAL = 'Run the full suite locally'
-export const SKIP_FULL_SUITE = 'Continue without the full suite'
-
 let toolUseCount = 0
 
 export function toolUse(name: string, input: object) {
@@ -15,17 +12,6 @@ export function toolUse(name: string, input: object) {
 
 function toolResult(id: string, content: string, toolUseResult: object) {
   return JSON.stringify({ type: 'user', toolUseResult, message: { content: [{ type: 'tool_result', tool_use_id: id, content }] } })
-}
-
-export function answer(label: string): string {
-  const question = 'Run the full suite locally before the push?'
-  const use = toolUse('AskUserQuestion', { questions: [{ question, options: [{ label: FULL_SUITE_LOCAL }, { label: SKIP_FULL_SUITE }] }] })
-  return [use.line, toolResult(use.id, `Your questions have been answered: "${question}"="${label}".`, { answers: { [question]: label } })].join('\n')
-}
-
-export function bashOutput(stdout: string): string {
-  const use = toolUse('Bash', { command: `echo '${stdout}'` })
-  return [use.line, toolResult(use.id, stdout, { stdout, stderr: '' })].join('\n')
 }
 
 export const assistantText = (text: string) => JSON.stringify({ type: 'assistant', message: { content: [{ type: 'text', text }] } })
@@ -53,6 +39,46 @@ export function runRule(rule: string, toolInput: object, transcript: string[] = 
   if (gitRepo) spawnSync('git', ['init', '-q'], { cwd: projectDir })
   return spawnSync('node', [path.join(import.meta.dirname, '..', 'rules', `${rule}.ts`)], {
     input: JSON.stringify({ tool_name: 'Bash', tool_input: toolInput, transcript_path: transcriptPath, cwd: projectDir, ...extra }),
+    encoding: 'utf8',
+    env: { ...process.env, HOOK_CASES_LOG: path.join(dir, 'cases.jsonl'), CLAUDE_PROJECT_DIR: projectDir },
+  })
+}
+
+const git = (cwd: string, ...args: string[]) => spawnSync('git', ['-c', 'user.name=test', '-c', 'user.email=test@example.com', ...args], { cwd, encoding: 'utf8' })
+
+// A work repo with a bare remote. `files` is the base on main and is pushed. `ahead` is one more commit on a branch that is not pushed.
+export function gitProject(files: Record<string, string>, ahead: Record<string, string> = {}): string {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'craft-git-'))
+  const work = path.join(dir, 'work')
+  fs.mkdirSync(work)
+  git(dir, 'init', '-q', '--bare', 'remote.git')
+  git(work, 'init', '-q', '-b', 'main')
+  const write = (entries: Record<string, string>) => {
+    for (const [file, content] of Object.entries(entries)) {
+      fs.mkdirSync(path.dirname(path.join(work, file)), { recursive: true })
+      fs.writeFileSync(path.join(work, file), content)
+    }
+  }
+  write({ 'README.md': 'base', ...files })
+  git(work, 'add', '-A')
+  git(work, 'commit', '-q', '-m', 'base')
+  git(work, 'remote', 'add', 'origin', path.join(dir, 'remote.git'))
+  git(work, 'push', '-q', '-u', 'origin', 'main')
+  if (Object.keys(ahead).length) {
+    git(work, 'checkout', '-q', '-b', 'feat/change')
+    write(ahead)
+    git(work, 'add', '-A')
+    git(work, 'commit', '-q', '-m', 'change')
+  }
+  return work
+}
+
+export function runIn(rule: string, projectDir: string, toolInput: object, transcript: string[] = []) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'craft-hooks-'))
+  const transcriptPath = path.join(dir, 'transcript.jsonl')
+  fs.writeFileSync(transcriptPath, transcript.join('\n'))
+  return spawnSync('node', [path.join(import.meta.dirname, '..', 'rules', `${rule}.ts`)], {
+    input: JSON.stringify({ tool_name: 'Bash', tool_input: toolInput, transcript_path: transcriptPath, cwd: projectDir }),
     encoding: 'utf8',
     env: { ...process.env, HOOK_CASES_LOG: path.join(dir, 'cases.jsonl'), CLAUDE_PROJECT_DIR: projectDir },
   })

@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -73,9 +74,6 @@ export function addedText({ tool_input }: HookInput): string {
   return [tool_input.content, tool_input.new_string, ...edits].filter(Boolean).join('\n')
 }
 
-export const FULL_SUITE_LOCAL = MESSAGES['consent.full-suite-local']
-export const SKIP_FULL_SUITE = MESSAGES['consent.skip-full-suite']
-
 export type TranscriptBlock = { type: string, id?: string, name?: string, text?: string, is_error?: boolean, tool_use_id?: string, input?: { file_path?: string, command?: string, subject?: string, description?: string, subagent_type?: string, skill?: string } }
 export type TranscriptEntry = { type: string, message?: { role?: string, content?: string | TranscriptBlock[] }, toolUseResult?: { answers?: Record<string, string> } }
 
@@ -100,21 +98,6 @@ export function readTranscript(transcriptPath: string): TranscriptEntry[] {
 }
 
 export const isCodeEdit = (block: TranscriptBlock) => block.type === 'tool_use' && /^(Edit|MultiEdit|Write)$/.test(block.name || '') && CODE_FILE.test(block.input?.file_path || '')
-
-export function consentGiven(transcriptPath: string | undefined, labels: string[]): boolean {
-  const questions = new Set<string>()
-  let lastEdit = -1
-  let lastConsent = -1
-  readTranscript(transcriptPath || '').forEach((entry, index) => {
-    for (const block of blocks(entry)) {
-      if (block.type === 'tool_use' && block.name === 'AskUserQuestion' && block.id) questions.add(block.id)
-      if (isCodeEdit(block)) lastEdit = index
-      const answered = block.type === 'tool_result' && questions.has(block.tool_use_id || '')
-      if (answered && Object.values(entry.toolUseResult?.answers || {}).some((answer) => labels.includes(answer))) lastConsent = index
-    }
-  })
-  return lastConsent > lastEdit
-}
 
 export function message(key: string, params: Record<string, string> = {}): string {
   return withPluginRoot(MESSAGES[key]).replace(/\{(\w+)\}/g, (match, name) => params[name] ?? match)
@@ -167,4 +150,68 @@ export function inject(rule: string, input: HookInput, context: string) {
 
 export function addContext(hookEventName: string, context: string) {
   process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName, additionalContext: context } }))
+}
+
+const FILTER_FLAG = /(^|\s)(-k|-t|-run|-p(?!\s+(\d|no:))|--filter|--group|--grep|--tests|-Dtest|--test-name-pattern|--testNamePattern|--testPathPattern|--findRelatedTests|related)(\s|=|$)|::/
+const VALUE_FLAG = /^(-c|--config|--configuration|--rootdir|--root)$/
+const REDIRECT = /^\d*[<>]/
+const TEST_ROOT = /^(\.\/)?(tests?|specs?|__tests__)\/?$/
+const PATH_LIKE = /\/|\.(test|spec)\.|_test\.|_spec\.|Test\.php|test_/
+
+function isTestPath(token: string, previous = '') {
+  return !/^[-'"]/.test(token) && !REDIRECT.test(token) && !REDIRECT.test(previous) && !VALUE_FLAG.test(previous) &&
+    token !== './...' && !TEST_ROOT.test(token) && PATH_LIKE.test(token)
+}
+
+// True when the arguments of a test runner select no test: the run is the full suite.
+export function unfiltered(args: string): boolean {
+  if (FILTER_FLAG.test(args)) return false
+  const tokens = args.trim().split(/\s+/)
+  return !tokens.some((token, index) => isTestPath(token.replace(/^['"]|['"]$/g, ''), tokens[index - 1]))
+}
+
+const CI_CONFIGS = ['.github/workflows', '.gitlab-ci.yml', 'bitbucket-pipelines.yml', '.circleci/config.yml', 'Jenkinsfile', 'azure-pipelines.yml', '.drone.yml', '.woodpecker.yml']
+const gitOutput = (root: string, args: string[]) => execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 3000 })
+
+export const hasCi = (root: string) => CI_CONFIGS.some((config) => fs.existsSync(path.join(root, config)))
+
+export function testFileCount(root: string): number {
+  try {
+    return gitOutput(root, ['ls-files', '--cached', '--others', '--exclude-standard']).split('\n').filter((file) => TEST_FILE.test(file)).length
+  } catch {
+    return 0
+  }
+}
+
+// The files of the commits that a push or a PR/MR would send. null when git cannot tell.
+export function filesToPush(root: string): string[] | null {
+  for (const base of ['@{upstream}', 'origin/HEAD', 'origin/main', 'origin/master']) {
+    try {
+      return gitOutput(root, ['diff', '--name-only', `${base}...HEAD`]).split('\n').filter(Boolean)
+    } catch {}
+  }
+  return null
+}
+
+// The full suite ran green after the last code edit of the session.
+export function suiteGreenSinceLastEdit(transcriptPath: string | undefined): boolean {
+  const entries = readTranscript(transcriptPath || '')
+  const failed = new Set(entries.flatMap((entry) => blocks(entry).filter((block) => block.type === 'tool_result' && block.is_error).map((block) => block.tool_use_id)))
+  let lastEdit = -1
+  let lastGreen = -1
+  entries.forEach((entry, index) => {
+    for (const block of blocks(entry)) {
+      if (isCodeEdit(block)) lastEdit = index
+      if (block.type === 'tool_use' && block.name === 'Bash' && !failed.has(block.id) && testRunsArguments(block.input?.command || '').some(unfiltered)) lastGreen = index
+    }
+  })
+  return lastGreen > lastEdit
+}
+
+// No CI, tests in the project, and code changed since the last green run of the full suite: Claude runs the suite, without a question.
+export function suiteRequired(root: string, transcriptPath: string | undefined): boolean {
+  if (hasCi(root) || testFileCount(root) === 0) return false
+  const files = filesToPush(root)
+  const changed = files ? files.some((file) => CODE_FILE.test(file)) : readTranscript(transcriptPath || '').some((entry) => blocks(entry).some(isCodeEdit))
+  return changed && !suiteGreenSinceLastEdit(transcriptPath)
 }
