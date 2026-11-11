@@ -2,6 +2,7 @@
 name: hook
 description: Turns a user correction into a project hook, so the mistake does not repeat. Use when the user corrects something you did (command, file, code pattern) and the tool input can check the rule, or when asked to create a hook or a guaranteed rule in the project.
 argument-hint: "<behavior that must not repeat>"
+disable-model-invocation: true
 ---
 
 # Correction becomes a hook
@@ -55,49 +56,12 @@ Choose the event by the cost and the certainty of the check:
 
 - **TypeScript**, run directly with `node` (Node 22.18+ runs `.ts` without a build), no dependency: only `node:fs`, `node:path`, `node:test`. Even in a PHP or Python project, the hook is TypeScript.
 - **Code in English**. The message the user reads comes from the translation file, in the language of the user (`../craft/references/i18n.md`).
-- **Follow `craft:atdd`**: the test of the hook comes before the rule and fails first.
+- **Follow ATDD** (`../craft/references/atdd.md`): the test of the hook comes before the rule and fails first.
 - One rule per file and per entry in settings. Deny only the exact pattern of the correction.
 - To deny: message on stderr and `exit 2` (the message says what to do instead). To inject: JSON with `hookSpecificOutput.additionalContext` on stdout and `exit 0`.
 - When in doubt (unreadable file, unexpected input), allow. A broken hook must not block the session.
 
-Layout in the project (committed, so it applies to the whole team):
-
-```
-.claude/
-  settings.json            # connects each rule to the event
-  hooks/
-    lib.ts                 # readInput, deny, message
-    locales/en.json        # messages for the user, one file per locale
-    rules/<rule>.ts
-    tests/<rule>.test.ts   # node --test .claude/hooks/tests/
-```
-
-```ts
-// .claude/hooks/rules/no-env-commit.ts
-import { deny, readInput } from '../lib.ts'
-
-const input = readInput()
-
-if (/\bgit\s+add\b.*\.env\b/.test(input.tool_input.command || '')) {
-  deny('no-env-commit')
-}
-```
-
-```json
-// .claude/settings.json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/rules/no-env-commit.ts\"", "timeout": 10 }]
-      }
-    ]
-  }
-}
-```
-
-If the project already has hooks, follow the layout and the lib that exist.
+Before you write the first hook of a project, read the layout and the example in `references/example.md`. If the project already has hooks, follow the layout and the lib that exist.
 
 ## After you create it
 
