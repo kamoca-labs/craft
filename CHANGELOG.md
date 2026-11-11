@@ -10,6 +10,7 @@ craft is now an opt-in engineer toolkit. Nothing loads in a session until the us
 
 - `/craft:plan <scope>`: closes every gap of a large scope before the work. Claude (the Elephant, on Sonnet for the first turn) finds the facts and asks only the decisions, in rounds of 3 to 5 options, and records them in `.claude/local/plans/<slug>.md`. Then it writes the linear activity.
 - The `goldfish` agent (Haiku, the `Read` tool only, a fresh context) reads the activity and the files that its pending items name, and lists each point where an executor must guess. Each gap becomes a question. The loop stops at no gap or after 3 rounds. The pattern comes from the Google Elephant-Goldfish model. Only `craft:plan` uses it.
+- `/craft:doc [section or package]`: writes `ARCHITECTURE.md` in the arc42 structure (12 sections). Claude finds the facts in the repo and asks only the decisions, one section at a time, and marks a section open with `<!-- arc42:todo -->` until it is complete. It detects the language of the project and the layout (root or monorepo), and adapts the document to both. It changes no code.
 
 ### Changed
 
