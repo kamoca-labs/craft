@@ -2,6 +2,16 @@
 
 Notes reconstructed from repository commits and manifest versions. Historical dates identify version changes in Git, not previously published releases. Versions absent from the recorded history are not invented. Categories without changes are omitted.
 
+## 1.0.0 (unreleased)
+
+### Added
+
+- `/craft:grill`: an interview before a plan, after the `grilling` skill of mattpocock/skills. Claude finds the facts and asks only the decisions, in rounds of the decision frontier. Each question has 3 to 5 options, one recommended, and the user can write an own answer.
+- An open or vague answer comes back in the next round. A final audit turns every statement without a user decision or a source into a question, so no decision is inferred.
+- The spec is written after every round to `.claude/local/grill/<slug>.md`, local and ignored by git. A second call with the same subject continues from the open questions.
+- Only the user calls it (`disable-model-invocation: true`).
+- The skill stays lean. The round format and the spec format are in `skills/grill/references/`, and Claude reads each one only at the step that needs it.
+
 ## 0.19.1 (2026-11-11)
 
 ### Fixed

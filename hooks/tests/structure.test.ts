@@ -11,7 +11,7 @@ const wired = [...hooksJson.matchAll(/rules\/([\w-]+)\.ts/g)].map((match) => mat
 const SKILLS_DIR = path.join(HOOKS_DIR, '..', 'skills')
 const RULES_DIR = path.join(HOOKS_DIR, '..', 'rules')
 const ENTRY = ['atdd', 'audit', 'craft', 'hook', 'setup']
-const USER_ONLY = ['memory']
+const USER_ONLY = ['grill', 'memory']
 const ALWAYS_ON = ['challenge', 'change', 'state-of-the-art', 'ste', 'tool', 'verify']
 const DESCRIPTION_LIMIT = 300
 const skills = fs.readdirSync(SKILLS_DIR).sort()
