@@ -16,6 +16,7 @@
 - [Research before you trust](#research-before-you-trust)
 - [A correction becomes a hook](#a-correction-becomes-a-hook)
 - [Project memory](#project-memory)
+- [Architecture documentation with arc42](#architecture-documentation-with-arc42)
 - [When a hook is wrong](#when-a-hook-is-wrong)
 
 ## New project
@@ -269,6 +270,18 @@ To ask directly:
 ```
 
 If Claude tries to write to the local auto memory (`~/.claude/projects/<project>/memory/`), the `memory-outside-project` hook denies it and says to write to `.claude/memory/`.
+
+## Architecture documentation with arc42
+
+`/craft:doc` writes `ARCHITECTURE.md` in the [arc42](https://arc42.org) structure. It starts with two checks: the language of the project (from `CLAUDE.md`, the README, the commits) and the layout (code at the root, or a monorepo with apps and packages). The file follows both. Then it goes through the 12 sections in order. For each section, Claude collects the facts from the repo, then asks you only what the repo cannot show (goals, constraints, risks), in one round. It writes your answers at once. A section stays open with `<!-- arc42:todo -->` until it is complete.
+
+```
+/craft:doc
+/craft:doc 5
+/craft:doc packages/billing
+```
+
+An argument jumps to one section (number or title) or to one package. Call it again to continue: it resumes from the first open section. It never overwrites a section that you approved. At the end, it lists the open sections, or asks you to review the file.
 
 ## When a hook is wrong
 

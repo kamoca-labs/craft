@@ -10,7 +10,7 @@ const hooksJson = fs.readFileSync(path.join(HOOKS_DIR, 'hooks.json'), 'utf8')
 const wired = [...hooksJson.matchAll(/rules\/([\w-]+)\.ts/g)].map((match) => match[1])
 const ROOT = path.join(HOOKS_DIR, '..')
 const SKILLS_DIR = path.join(HOOKS_DIR, '..', 'skills')
-const USER_ONLY = ['audit', 'craft', 'hook', 'memory', 'plan', 'setup']
+const USER_ONLY = ['audit', 'craft', 'doc', 'hook', 'memory', 'plan', 'setup']
 const REMOVED = ['atdd', 'grill']
 const ALWAYS_ON = ['challenge', 'change', 'state-of-the-art', 'ste', 'tool', 'verify']
 const SESSION_REFERENCES = ['engineer', 'memory', 'ste']
