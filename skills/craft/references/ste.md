@@ -1,6 +1,6 @@
 # Writing in the ASD-STE100 standard
 
-**Rule**: every reply to the user and every text you write follows ASD-STE100 (Simplified Technical English, Issue 9, 2025). The goal is a text with one meaning that any reader understands at the first reading, including readers who are not native speakers or who use machine translation.
+Read this before you write a doc, a commit, a PR/MR or the activity. Write every reply and text in ASD-STE100 (Simplified Technical English), in the language of the user. Use one term per thing, the active voice, short sentences (20 words in a step, 25 in a description), one instruction per sentence, and lists for options and steps. Put the result first. Keep code, commands and quotes as they are.
 
 ## Language
 

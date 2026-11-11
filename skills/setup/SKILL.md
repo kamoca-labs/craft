@@ -2,11 +2,12 @@
 name: setup
 description: Prepares a project for craft. Configures the test runner, a linter with size and complexity limits (function, class, parameters, nesting), and the `test` and `lint` scripts. Use when you start a new project, or when the project has no lint with limits or no test script yet.
 argument-hint: "[stack, if it cannot be detected]"
+disable-model-invocation: true
 ---
 
 # Quality setup
 
-This skill gets the project ready for `craft:atdd` and `craft:craft`. What is a visual review today becomes a rule that the linter enforces.
+This skill gets the project ready for `craft:craft` and its ATDD flow. What is a visual review today becomes a rule that the linter enforces.
 
 ## How to proceed
 
@@ -33,24 +34,17 @@ Test files are outside the limits of lines per function and per file (a `describ
 
 ## By stack
 
-| Stack | Tool | Rules |
-|---|---|---|
-| JS/TS | ESLint (flat config, `eslint.config.js`) | `max-lines-per-function`, `max-lines`, `max-params`, `max-depth`, `complexity` |
-| PHP | PHPMD (`phpmd.xml`) + Pint for style | `ExcessiveMethodLength`, `ExcessiveClassLength`, `ExcessiveParameterList`, `CyclomaticComplexity`, `NPathComplexity` |
-| Python | Ruff (`pyproject.toml`) | `max-args`, `max-statements`, `max-branches`, `max-nested-blocks`, `mccabe.max-complexity` (select `PLR`, `C90`) |
-| Go | golangci-lint (`.golangci.yml`) | `funlen`, `gocyclo`, `nestif`, `lll` |
-| Rust | Clippy (`clippy.toml`) | `too-many-lines-threshold`, `too-many-arguments-threshold`, `cognitive-complexity-threshold` |
+The tool and the rules of each stack are in `references/stacks.md`.
 
 Vue or React frontend: ask whether the production build must remove `data-testid`. If yes, configure the plugin of the stack listed in `../craft/references/test-ids.md`. Never remove the attribute from the build that runs the E2E.
 
-Test runner: the one the project already uses. If there is none, use the default of the stack (vitest, pest, pytest, `go test`, `cargo test`). Check that it runs filtered (`../atdd/references/filtered-tests.md`).
+Test runner: the one the project already uses. If there is none, use the default of the stack (vitest, pest, pytest, `go test`, `cargo test`). Check that it runs filtered (`../craft/references/filtered-tests.md`).
 
 ## CLAUDE.md
 
 Create or complete a minimal CLAUDE.md with the project context that the setup found:
 
 ```markdown
-Every behavior change follows `/craft:atdd`.
 A reference, decision or choice about the project lives in the repo (CLAUDE.md, `docs/`, `.claude/memory/`), with a relative path. Never in the local memory of Claude (`~/.claude/`) and never with an absolute path: it would hold only on this machine and the team would not see it.
 
 ## Commands
@@ -63,7 +57,7 @@ Add one more line only if something departs from the stack default (tests inside
 
 The reference line exists because, without it, the model writes project decisions to its local memory. That memory does not go to the repo or to the team.
 
-The ATDD line is the only reference to a skill. Without it, the model loads `craft:atdd` only when it remembers, and the flow must apply from the first code. Do not list the other skills, agents, hooks, principles or the lint limits. `craft:atdd` already leads to `craft:craft`, the hook triggers the screening, and the limits are in the config file. Repeating them spends context in every session and goes out of date.
+Do not list the craft skills, agents, hooks, principles or the lint limits. The user starts craft with `/craft:plan` and `/craft:craft`, and the limits are in the config file. Repeating them spends context in every session and goes out of date.
 
 ## Out of scope
 

@@ -38,7 +38,7 @@ Write the plan as JSON (`goal`, `items`) in a temporary file outside the repo, t
 
 Read `Next`. Only that item accepts `begin`, `done`, `verify`, `approve`. Each command prints one short line.
 
-1. `begin <id>`, do the item (follow `craft:atdd` for a change of behavior), `done <id>`.
+1. `begin <id>`, do the item (follow the ATDD reference of `SKILL.md` for a change of behavior), `done <id>`.
 2. A `command` check: `verify <id>`. The CLI runs it and records the evidence. A failure keeps the item open: fix the cause and run it again.
 3. A `review` check: collect the evidence and `approve <id> --by claude --note "<what you saw>" [--attach f1,f2]`. You approve it yourself. The user can reject it later (see 4).
 4. A `human` check: ask the user, wait, then `approve <id> --by user --quote "<their words>"`. Never approve it yourself.

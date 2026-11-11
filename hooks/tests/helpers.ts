@@ -8,22 +8,31 @@ const RULES = path.join(import.meta.dirname, '..', 'rules')
 
 export type ToolRun = { command: string, stdout?: string, stderr?: string }
 
+export const SESSION = 'test-session'
+
+// The hooks act only while the session has an active craft activity, so each test project has one.
+export function startActivity(projectDir: string, session = SESSION) {
+  const dir = path.join(projectDir, '.claude', 'local', 'activities', 'test')
+  fs.mkdirSync(dir, { recursive: true })
+  fs.writeFileSync(path.join(projectDir, '.claude', 'local', '.gitignore'), '*\n')
+  fs.writeFileSync(path.join(dir, 'index.md'), `---\nactivity: test\nsession: ${session}\nstatus: active\n---\n`)
+}
+
 export type Sandbox = {
   casesLog: string
   projectDir: string
   run: (rule: string, toolRun: ToolRun) => SpawnSyncReturns<string>
-  start: (rule: string, source: string) => SpawnSyncReturns<string>
   pre: (rule: string, toolName: string, toolInput: object) => SpawnSyncReturns<string>
-  prompt: (rule: string, text: string) => SpawnSyncReturns<string>
 }
 
-export function sandbox(): Sandbox {
+export function sandbox({ activity = true } = {}): Sandbox {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'craft-hooks-'))
   const casesLog = path.join(dir, 'cases.jsonl')
   const projectDir = path.join(dir, 'project')
+  if (activity) startActivity(projectDir)
   const execute = (rule: string, input: object) =>
     spawnSync('node', [path.join(RULES, `${rule}.ts`)], {
-      input: JSON.stringify(input),
+      input: JSON.stringify({ session_id: SESSION, ...input }),
       encoding: 'utf8',
       env: {
         ...process.env,
@@ -34,11 +43,9 @@ export function sandbox(): Sandbox {
     })
   const run = (rule: string, { command, stdout = '', stderr = '' }: ToolRun) =>
     execute(rule, { hook_event_name: 'PostToolUse', tool_name: 'Bash', tool_input: { command }, tool_response: { stdout, stderr } })
-  const start = (rule: string, source: string) => execute(rule, { hook_event_name: 'SessionStart', source })
   const pre = (rule: string, toolName: string, toolInput: object) =>
     execute(rule, { hook_event_name: 'PreToolUse', tool_name: toolName, tool_input: toolInput })
-  const prompt = (rule: string, text: string) => execute(rule, { hook_event_name: 'UserPromptSubmit', prompt: text })
-  return { casesLog, projectDir, run, start, pre, prompt }
+  return { casesLog, projectDir, run, pre }
 }
 
 export function injected(result: SpawnSyncReturns<string>): string | null {
@@ -47,7 +54,3 @@ export function injected(result: SpawnSyncReturns<string>): string | null {
   return JSON.parse(result.stdout).hookSpecificOutput.additionalContext
 }
 
-export function userPromptCommands(): string[] {
-  const hooks = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', 'hooks.json'), 'utf8')).hooks
-  return hooks.UserPromptSubmit.flatMap((group: { hooks: { command: string }[] }) => group.hooks.map((hook) => hook.command))
-}

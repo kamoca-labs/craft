@@ -1,18 +1,38 @@
 ---
 name: craft
-description: Turns a request to implement, fix, refactor, migrate or write something into a linear activity, one verified item at a time (a small task gets one item). Also refactors code by principles when tests turn green. Not for questions.
-argument-hint: "[request, file or scope]"
+description: Executes a craft activity one verified item at a time. Software items follow ATDD (test first) and the clean code principles. Only the user calls it, with /craft:craft, usually after /craft:plan.
+argument-hint: "<activity slug, or a small task>"
+disable-model-invocation: true
 ---
 
 # Craft
 
 Session id: `${CLAUDE_SESSION_ID}`. Activity CLI: `node ${CLAUDE_PLUGIN_ROOT}/scripts/activity.ts <command> --session ${CLAUDE_SESSION_ID}` (commands in the usage that the script prints).
 
-## A request to do something: build an activity
+## Start
 
-A request to implement, fix, refactor, migrate or write something starts here. Read `references/activity.md` and follow it: it turns the request into a numbered list in `.claude/local/activities/<slug>/index.md`, you do one item at a time, and the `activity-gate` hook holds the end of the turn until every item has evidence. The file format is in `references/activity-format.md`. A question or an analysis is not an activity: answer it. A small task is an activity with one item, well defined: a fix of one line still gets its check and its evidence. Work that is not code fits too.
+Before the first item, do these steps once per call:
 
-The items that change code follow `craft:atdd`, and the refactor of the code you touched follows the rest of this skill.
+1. Read `references/engineer.md` and follow it for the whole call.
+2. Read the memory catalog `.claude/memory/MEMORY.md` and the memory files that touch the subject. To save a memory, follow `references/memory.md`.
+3. Run `node ${CLAUDE_PLUGIN_ROOT}/scripts/codebase-map.ts` to see what already exists. Reuse it before you write new code.
+4. Before you write a doc, a commit, a PR/MR or the activity, read `references/ste.md`.
+
+## The activity
+
+The argument names an activity in `.claude/local/activities/<slug>/index.md`, usually written by `/craft:plan`. Read `references/activity.md`, sections 3 to 6, and execute one item at a time. The `activity-gate` hook holds the end of the turn until every item has evidence. The file format is in `references/activity-format.md`. If the activity belongs to another session, run `resume --from <old session>` first.
+
+Without an activity, suggest `/craft:plan <scope>` once, in one sentence: it closes the gaps before the work. If the user goes on without a plan, build a one-item activity with `references/activity.md`, section 2, and execute it.
+
+## Software items: ATDD
+
+An item that changes behavior follows `references/atdd.md`: test first, one scenario per turn. The steps use these references:
+
+- `references/acceptance-criteria.md` and `references/real-world-edges.md`: step 1, the specification.
+- `references/filtered-tests.md`: every test run, with a filter.
+- `references/e2e-container.md`: the E2E test, after the feature is ready.
+
+The refactor of the code you touched follows the rest of this skill.
 
 ## Refactor guided by principles
 
@@ -33,7 +53,7 @@ The tests are green. If you are in the ATDD loop and a scenario remains, go back
 3. **Root rule**: before the screening, look in the scope for code you can delete. Deleting is worth more than adding.
 4. **Screening**: read the code in scope and ask the question of each row in the table below.
 5. **Go deeper only where there is a sign**: for each principle with a sign, read its reference with the `Read` tool (`references/<name>.md`, in the folder of this skill) and follow it. Do not read the reference of a principle without a sign.
-6. **One refactor at a time**: change, run the tests of the refactored module, continue. Never edit a test to make it pass. The verification has limited rounds:
+6. **One refactor at a time**: change, run the tests of the refactored module, continue. Never edit a test to make it pass. Commit the refactor apart from the behavior commits. The verification has limited rounds:
    - one screening round, with all rows of the table
    - one batch of fixes with all findings of the screening, one refactor at a time
    - at most one confirmation round, only over what changed
@@ -45,8 +65,6 @@ The tests are green. If you are in the ATDD loop and a scenario remains, go back
 
 | Reference | Principle | Screening question |
 |---|---|---|
-| `references/activity.md` | Activity | Is the request big, or does it have several steps, or must each result be proven? |
-| `references/activity-format.md` | Activity file | Must you repair or read the activity file by hand? |
 | `references/single-responsibility.md` | S of SOLID | Does this module change for more than one reason, or for more than one kind of person? |
 | `references/open-closed.md` | O of SOLID | Did a new case require an edit to an existing `if`/`switch`? |
 | `references/liskov-substitution.md` | L of SOLID | Does an implementation throw "not supported", ignore a parameter, or require `instanceof` from the caller? |
@@ -91,15 +109,3 @@ Common conflicts:
 - **Open/Closed or dependency inversion × YAGNI**: create the abstraction when there is a second real implementation or an I/O boundary that needs a test double. Before that, it is speculation.
 - **Performance × readability**: the faster form wins only with a measurement at the real volume and a comparison between forms (`references/performance.md`).
 - **Single responsibility × KISS**: separating responsibilities does not mean chopping the code into ten one-line classes. If the parts always change together, they are one responsibility.
-
-## Checklist before you leave step 6
-
-- [ ] Lint of the scope has no violation (when the project has lint).
-- [ ] Root rule applied: nothing in scope can be deleted.
-- [ ] Screening done on all rows of the table.
-- [ ] Skill loaded and applied for each principle with a sign.
-- [ ] At most one confirmation round after the batch of fixes.
-- [ ] Every optimization has a measurement before and after and beat another form.
-- [ ] Refactor commit separate from the behavior commit.
-- [ ] Same behavior (no test was edited to pass).
-- [ ] Tests of the touched domains run again, with a filter, and green. The full suite runs in CI, or locally by you, with no question, only when the push needs it (`../atdd/references/filtered-tests.md`).

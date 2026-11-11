@@ -11,4 +11,4 @@ On 2026-11-04 the user compared craft with ponytail and decided:
 - The work goes step by step, one PR/MR per demand. The split of skills by single responsibility (atdd, tasks, hook, i18n, e2e-tests) comes after.
 
 **Why:** a rule that the model reads once at the session start loses weight. A hook that checks the transcript does not depend on the model to remember.
-**How to apply:** prefer an enforcement hook (UserPromptSubmit reminder, Stop or PreToolUse check) over more text in a skill. Keep each injected text short, because the session already gets about 18 KB at each start.
+**How to apply:** superseded on 2026-11-11 by `project_skills-cost.md`: craft is opt-in, no hook injects text at SessionStart or on a prompt, and the rules are references that `/craft:craft` reads. Enforcement hooks (PreToolUse, Stop) stay.

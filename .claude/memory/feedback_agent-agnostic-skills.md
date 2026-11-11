@@ -4,7 +4,7 @@ description: skill text names no tool of one harness (AskUserQuestion), it state
 type: feedback
 ---
 
-A skill or reference must not name a tool of one harness, such as `AskUserQuestion` of Claude Code. State the rule in generic words. Example from `skills/grill/references/round.md` (2026-11-11): "Send the round as plain text in your reply. DO NOT USE A QUESTION TOOL."
+A skill or reference must not name a tool of one harness, such as `AskUserQuestion` of Claude Code. State the rule in generic words. Example from `skills/plan/references/round.md` (moved from `grill` on 2026-11-11): "Send the round as plain text in your reply. DO NOT USE A QUESTION TOOL."
 
 **Why:** the user corrected a rule that named `AskUserQuestion`. The skills must stay expandable to other agents and harnesses, and a tool name ties the text to Claude Code.
 

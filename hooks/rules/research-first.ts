@@ -1,5 +1,5 @@
 import fs from 'node:fs'
-import { addedText, blocks, deny, readInput, readTranscript, type TranscriptBlock } from '../lib.ts'
+import { addedText, blocks, deny, readActiveInput, readTranscript, type TranscriptBlock } from '../lib.ts'
 
 const INFRA_FILE = /(^|\/)((Dockerfile|Containerfile)[^/]*|(docker-)?compose[^/]*\.ya?ml|\.gitlab-ci\.yml|\.github\/workflows\/[^/]+\.ya?ml)$/
 const INFRA_VERSION = /\bimage:\s*\S+:\S+|^\s*FROM\s+\S+:\S+|\buses:\s*\S+@\S+/m
@@ -9,7 +9,7 @@ const VERSION_BY_FILE = [[INFRA_FILE, INFRA_VERSION], [MANIFEST, MANIFEST_VERSIO
 const RESEARCH_TOOL = /^(WebSearch|WebFetch|mcp__.*context7.*)$/
 const REGISTRY_COMMAND = /\b((npm|pnpm) view|yarn info|composer show|pip index versions|docker manifest inspect|cargo search|go list -m)\b/
 
-const input = readInput()
+const input = readActiveInput()
 
 function isResearch(block: TranscriptBlock): boolean {
   if (block.type !== 'tool_use') return false

@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
+import { SESSION, startActivity } from './helpers.ts'
 
 let toolUseCount = 0
 
@@ -36,9 +37,10 @@ export function runRule(rule: string, toolInput: object, transcript: string[] = 
     fs.writeFileSync(path.join(projectDir, file), '')
   }
   fs.mkdirSync(projectDir, { recursive: true })
+  startActivity(projectDir)
   if (gitRepo) spawnSync('git', ['init', '-q'], { cwd: projectDir })
   return spawnSync('node', [path.join(import.meta.dirname, '..', 'rules', `${rule}.ts`)], {
-    input: JSON.stringify({ tool_name: 'Bash', tool_input: toolInput, transcript_path: transcriptPath, cwd: projectDir, ...extra }),
+    input: JSON.stringify({ tool_name: 'Bash', tool_input: toolInput, transcript_path: transcriptPath, cwd: projectDir, session_id: SESSION, ...extra }),
     encoding: 'utf8',
     env: { ...process.env, HOOK_CASES_LOG: path.join(dir, 'cases.jsonl'), CLAUDE_PROJECT_DIR: projectDir },
   })
@@ -77,8 +79,9 @@ export function runIn(rule: string, projectDir: string, toolInput: object, trans
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'craft-hooks-'))
   const transcriptPath = path.join(dir, 'transcript.jsonl')
   fs.writeFileSync(transcriptPath, transcript.join('\n'))
+  startActivity(projectDir)
   return spawnSync('node', [path.join(import.meta.dirname, '..', 'rules', `${rule}.ts`)], {
-    input: JSON.stringify({ tool_name: 'Bash', tool_input: toolInput, transcript_path: transcriptPath, cwd: projectDir }),
+    input: JSON.stringify({ tool_name: 'Bash', tool_input: toolInput, transcript_path: transcriptPath, cwd: projectDir, session_id: SESSION }),
     encoding: 'utf8',
     env: { ...process.env, HOOK_CASES_LOG: path.join(dir, 'cases.jsonl'), CLAUDE_PROJECT_DIR: projectDir },
   })
