@@ -2,6 +2,16 @@
 
 Notes reconstructed from repository commits and manifest versions. Historical dates identify version changes in Git, not previously published releases. Versions absent from the recorded history are not invented. Categories without changes are omitted.
 
+## 0.19.0 (2026-11-11)
+
+### Changed
+
+- The push no longer asks the user about the full suite. `push-gate` and `filtered-tests` decide from the project:
+  - No test, or a CI that runs the suite, or no code change since the last green run of the full suite: nothing runs locally and nothing is asked. A local run would repeat the CI or prove nothing new.
+  - Tests, no CI, and a code change that is not green yet: Claude runs the full suite now, and pushes only when it is green.
+- "Code changed" is read from the commits that the push would send (against the upstream branch or `origin/main`) and from the last code edit of the session.
+- The answers `Run the full suite locally` and `Continue without the full suite` are gone.
+
 ## 0.18.0 (2026-11-11)
 
 ### Breaking changes
