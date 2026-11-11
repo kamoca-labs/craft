@@ -32,8 +32,6 @@ export const assistantText = (text: string) => JSON.stringify({ type: 'assistant
 
 export const codeEdit = (file: string) => toolUse('Edit', { file_path: file, old_string: 'a', new_string: 'b' }).line
 
-export const taskCreate = (subject: string, description: string) => toolUse('TaskCreate', { subject, description }).line
-
 export function bashRun(command: string, failed = false): string {
   const use = toolUse('Bash', { command })
   const result = JSON.stringify({ type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: use.id, is_error: failed, content: failed ? 'Exit code 1' : 'ok' }] } })

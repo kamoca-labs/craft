@@ -1,10 +1,20 @@
 ---
 name: craft
-description: Refactor guided by principles (step 6 of ATDD). Screens the changed code against SOLID, KISS, YAGNI, DRY and Clean Code, and reads only the references of the principles with a sign. Use when the tests turn green, or when asked to refactor or review code quality.
-argument-hint: "[file or scope]"
+description: Turns a request to implement, fix, refactor, migrate or write something into a linear activity, one verified item at a time (a small task gets one item). Also refactors code by principles when tests turn green. Not for questions.
+argument-hint: "[request, file or scope]"
 ---
 
-# Craft: refactor guided by principles
+# Craft
+
+Session id: `${CLAUDE_SESSION_ID}`. Activity CLI: `node ${CLAUDE_PLUGIN_ROOT}/scripts/activity.ts <command> --session ${CLAUDE_SESSION_ID}` (commands in the usage that the script prints).
+
+## A request to do something: build an activity
+
+A request to implement, fix, refactor, migrate or write something starts here. Read `references/activity.md` and follow it: it turns the request into a numbered list in `.claude/local/activities/<slug>/index.md`, you do one item at a time, and the `activity-gate` hook holds the end of the turn until every item has evidence. The file format is in `references/activity-format.md`. A question or an analysis is not an activity: answer it. A small task is an activity with one item, well defined: a fix of one line still gets its check and its evidence. Work that is not code fits too.
+
+The items that change code follow `craft:atdd`, and the refactor of the code you touched follows the rest of this skill.
+
+## Refactor guided by principles
 
 The tests are green. If you are in the ATDD loop and a scenario remains, go back to step 2 with the next one. The screening waits for the end. If all scenarios are green, do step 6 now: refactor the code you touched and run the tests of the touched domains again (step 7). If the refactor is done, this is step 7: confirm that everything passes and report.
 
@@ -35,6 +45,8 @@ The tests are green. If you are in the ATDD loop and a scenario remains, go back
 
 | Reference | Principle | Screening question |
 |---|---|---|
+| `references/activity.md` | Activity | Is the request big, or does it have several steps, or must each result be proven? |
+| `references/activity-format.md` | Activity file | Must you repair or read the activity file by hand? |
 | `references/single-responsibility.md` | S of SOLID | Does this module change for more than one reason, or for more than one kind of person? |
 | `references/open-closed.md` | O of SOLID | Did a new case require an edit to an existing `if`/`switch`? |
 | `references/liskov-substitution.md` | L of SOLID | Does an implementation throw "not supported", ignore a parameter, or require `instanceof` from the caller? |

@@ -17,8 +17,8 @@ test('the reminder has 200 characters or fewer', () => {
   assert.ok(reminder().length <= REMINDER_LIMIT, `${reminder().length} characters`)
 })
 
-test('the reminder covers tasks and research with reuse, not memory', () => {
-  assert.match(reminder(), /TaskCreate/)
+test('the reminder points to craft:craft and covers research with reuse, not memory', () => {
+  assert.match(reminder(), /craft:craft/)
   assert.match(reminder(), /expert practice/)
   assert.match(reminder(), /native or vetted package/)
   assert.doesNotMatch(reminder(), /memory/i)

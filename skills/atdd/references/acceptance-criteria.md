@@ -7,7 +7,7 @@ A criterion that nobody verifies does not close the cycle. Before you ask the us
 - The `Given` fixes the input data. The scenario does not depend on order or on the clock.
 - If you cannot say how a test proves the scenario, the criterion is vague. Rewrite the scenario or ask the user.
 
-After the user approves, follow the tasks rule of the session.
+After the user approves, open the activity of the scenarios (`craft:craft`).
 
 ## Verification
 

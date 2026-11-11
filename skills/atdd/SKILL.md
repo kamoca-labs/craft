@@ -8,7 +8,7 @@ argument-hint: "<what must change>"
 
 Every behavior change follows these steps, in this order. Never skip or reorder them. Steps 2 to 5 form a loop: **one scenario per turn**.
 
-1. **Specification**: write all acceptance criteria as Given/When/Then scenarios. Go through the real-world edges (`references/real-world-edges.md`) and include the ones the feature has. Read `references/acceptance-criteria.md` and follow it. Show the scenarios to the user and wait for approval. After approval, follow the tasks rule that the hook injects in every session. It creates the tasks and sets the goal.
+1. **Specification**: write all acceptance criteria as Given/When/Then scenarios. Go through the real-world edges (`references/real-world-edges.md`) and include the ones the feature has. Read `references/acceptance-criteria.md` and follow it. Show the scenarios to the user and wait for approval. After approval, open an activity (`craft:craft`, `references/activity.md`) with one item per scenario, plus the refactor and the passing again. The `activity-gate` hook then holds the end of the turn until every item has evidence.
 2. **Test**: write the acceptance test for **one** scenario, at the unit or integration layer (`../craft/references/clean-tests.md`). E2E is not part of the loop. Do not write production code yet.
 3. **Red**: run **only the new test**. Confirm that it fails **for the expected reason** (missing behavior), not because of a syntax, import or setup error.
 4. **Green**: write the minimum production code that makes the test pass. Less code is better than more code: reuse what already exists, and generic code is born reusable (root rule of `craft:craft`).
