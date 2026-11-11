@@ -4,5 +4,4 @@
 - [Activity flow](project_activity-flow.md): craft 0.18.0 replaces META and TaskCreate with a linear markdown activity; decisions and limits
 - [Push gate by changes](project_push-gate-by-changes.md): craft 0.19.0 decides the full suite from CI, tests and code changes, never asks
 - [Agent-agnostic skills](feedback_agent-agnostic-skills.md): no harness tool name (AskUserQuestion) in a skill; generic words
-- [Skills cost](project_skills-cost.md): cut tokens of rules, bodies and memory catalog; items and status in SKILLS-COST.md
 - [Goldfish scope](feedback_goldfish-scope.md): Elephant and Goldfish only for the gap search of craft:plan, never proposed elsewhere

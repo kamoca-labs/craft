@@ -49,7 +49,7 @@ Automated unit, component, integration and E2E tests verify behavior, public sem
 
 ### Layout of the knowledge
 
-The plugin follows progressive disclosure (`SKILLS-ARCHITECTURE.md`). No skill is visible to Claude: each one is a command that only you start (`disable-model-invocation: true`), so a session that does not use craft pays almost nothing. ATDD is a reference of `craft`. The session rules (`engineer`, `memory`, `ste`) are references of `craft` that it reads when you call it. The rest is reference files that a skill links. When you already know the principle, ask for it by name ("apply DRY in src/upload.ts"), and Claude reads its reference. `node scripts/skill-budget.ts` prints the skills visible to Claude and the size of their descriptions.
+The plugin follows progressive disclosure. No skill is visible to Claude: each one is a command that only you start (`disable-model-invocation: true`), so a session that does not use craft pays almost nothing. ATDD is a reference of `craft`. The session rules (`engineer`, `memory`, `ste`) are references of `craft` that it reads when you call it. The rest is reference files that a skill links. When you already know the principle, ask for it by name ("apply DRY in src/upload.ts"), and Claude reads its reference. `node scripts/skill-budget.ts` prints the skills visible to Claude and the size of their descriptions.
 
 | Group | References and rules |
 |---|---|

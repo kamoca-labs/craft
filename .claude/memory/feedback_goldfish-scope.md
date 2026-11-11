@@ -8,4 +8,4 @@ The Elephant (the session that interviews and writes) and the Goldfish (the `age
 
 **Why:** on 2026-11-11 Claude proposed four more uses. The user answered: "quero o goldfish e o elephant APENAS para o grill do plan, para buscar lacunas fora isso ele nao deve sequer ser cogitado". One Goldfish review cost about 97,000 tokens.
 
-**How to apply:** a new review need gets another solution. The structure test `only the gap search of plan uses the Goldfish` denies the word in any other skill or reference. Decision D10 in `SKILLS-COST.md`.
+**How to apply:** a new review need gets another solution. The structure test `only the gap search of plan uses the Goldfish` denies the word in any other skill or reference.
