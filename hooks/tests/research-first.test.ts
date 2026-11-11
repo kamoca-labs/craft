@@ -4,6 +4,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { test } from 'node:test'
+import { SESSION, startActivity } from './helpers.ts'
 import { toolUse } from './transcript.ts'
 
 const RULE = path.join(import.meta.dirname, '..', 'rules', 'research-first.ts')
@@ -12,10 +13,11 @@ function edit(toolName: string, toolInput: object, transcript: string[] | null) 
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'craft-hooks-'))
   const transcriptPath = path.join(dir, 'transcript.jsonl')
   if (transcript !== null) fs.writeFileSync(transcriptPath, transcript.join('\n'))
+  startActivity(dir)
   return spawnSync('node', [RULE], {
-    input: JSON.stringify({ tool_name: toolName, tool_input: toolInput, transcript_path: transcriptPath }),
+    input: JSON.stringify({ tool_name: toolName, tool_input: toolInput, transcript_path: transcriptPath, session_id: SESSION }),
     encoding: 'utf8',
-    env: { ...process.env, HOOK_CASES_LOG: path.join(dir, 'cases.jsonl') },
+    env: { ...process.env, HOOK_CASES_LOG: path.join(dir, 'cases.jsonl'), CLAUDE_PROJECT_DIR: dir },
   })
 }
 

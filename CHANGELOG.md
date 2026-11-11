@@ -2,6 +2,31 @@
 
 Notes reconstructed from repository commits and manifest versions. Historical dates identify version changes in Git, not previously published releases. Versions absent from the recorded history are not invented. Categories without changes are omitted.
 
+## 1.0.0 (2026-11-11)
+
+craft is now an opt-in engineer toolkit. Nothing loads in a session until the user calls a craft skill.
+
+### Added
+
+- `/craft:plan <scope>`: closes every gap of a large scope before the work. Claude (the Elephant, on Sonnet for the first turn) finds the facts and asks only the decisions, in rounds of 3 to 5 options, and records them in `.claude/local/plans/<slug>.md`. Then it writes the linear activity.
+- The `goldfish` agent (Haiku, the `Read` tool only, a fresh context) reads the activity and the files that its pending items name, and lists each point where an executor must guess. Each gap becomes a question. The loop stops at no gap or after 3 rounds. The pattern comes from the Google Elephant-Goldfish model. Only `craft:plan` uses it.
+- `/craft:doc [section or package]`: writes `ARCHITECTURE.md` in the arc42 structure (12 sections). Claude finds the facts in the repo and asks only the decisions, one section at a time, and marks a section open with `<!-- arc42:todo -->` until it is complete. It detects the language of the project and the layout (root or monorepo), and adapts the document to both. It changes no code.
+
+### Changed
+
+- Every skill uses `disable-model-invocation: true`: only the user starts craft, and no skill description goes into the session context.
+- `/craft:craft <activity>` executes an activity one verified item at a time. Without an activity, it suggests `/craft:plan` once. If the user goes on, it builds a one-item activity.
+- No hook injects text at the start of a session or on a prompt. The rules `change`, `tool`, `verify`, `challenge` and `state-of-the-art` are now `skills/craft/references/engineer.md`. `ste` and `memory` are references too. `craft:craft` and `craft:plan` read them when the user calls them. `codebase-map` is `scripts/codebase-map.ts`.
+- The deny hooks and `refactor-on-green` act only while a craft activity is active in the session. Outside an activity, they allow every action.
+- `/craft:setup` no longer writes the ATDD line in the `CLAUDE.md` of the project.
+- The `bench/` run is no longer required before a change to the text of a session.
+
+### Removed
+
+- `/craft:atdd`: ATDD is now `skills/craft/references/atdd.md`, with its references in `skills/craft/references/`. Use `/craft:craft`.
+- `/craft:grill`: replaced by `/craft:plan`. The round format and the spec format moved to `skills/plan/references/`.
+- The `reminder` hook (on every prompt) and the SessionStart hooks `ste`, `memory`, `codebase-map`, `change`, `tool`, `verify`, `challenge` and `state-of-the-art`. The folder `rules/` is gone.
+
 ## 0.19.1 (2026-11-11)
 
 ### Fixed
@@ -46,7 +71,7 @@ Notes reconstructed from repository commits and manifest versions. Historical da
 
 ### Breaking changes
 
-- Only five skills are visible to Claude: `atdd`, `craft`, `audit`, `hook` and `setup`. The listing of craft drops from 40 descriptions (10,548 characters) to 5 (1,317 characters), as `SKILLS-ARCHITECTURE.md` plans. `node scripts/skill-budget.ts` prints the count.
+- Only five skills are visible to Claude: `atdd`, `craft`, `audit`, `hook` and `setup`. The listing of craft drops from 40 descriptions (10,548 characters) to 5 (1,317 characters). `node scripts/skill-budget.ts` prints the count.
 - The principles and the step guides are reference files. Claude reads them with `Read`, so `craft:<name>` no longer loads with the `Skill` tool:
   - `craft:acceptance-criteria` → `skills/atdd/references/acceptance-criteria.md`
   - `craft:e2e-container` → `skills/atdd/references/e2e-container.md`
@@ -102,7 +127,7 @@ Notes reconstructed from repository commits and manifest versions. Historical da
 - Do not count denied test edits, failed skill calls, or flow names quoted in ordinary text as test-first prerequisites.
 - Check every recognized test invocation in a compound command before allowing an unfiltered suite.
 - Require a successful verification result for the goal reminder, and do not count an `echo` of the verification command as execution.
-- Record the scope, findings, regression checks, and limits in [AUDIT.md](AUDIT.md).
+- Record the scope, findings, regression checks, and limits in the body of the commit `e63ec75`.
 
 ## 0.16.1 (2026-11-04)
 

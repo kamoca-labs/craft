@@ -11,4 +11,4 @@ Before a push, a PR or an MR, Claude no longer asks the user if the full suite r
 **How to apply:**
 - No test: push. CI exists: do not run, do not ask. No code change since the last green run of the full suite: do not run, do not ask.
 - Tests, no CI, and a code change that is not green: run the full suite now, without asking, and push when it is green.
-- The code lives in `hooks/lib.ts` (`suiteRequired`), used by `push-gate` and `filtered-tests`. The text for people is in `skills/atdd/references/filtered-tests.md`.
+- The code lives in `hooks/lib.ts` (`suiteRequired`), used by `push-gate` and `filtered-tests`. The text for people is in `skills/craft/references/filtered-tests.md`.

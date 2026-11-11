@@ -1,7 +1,7 @@
 {
   "name": "craft",
-  "description": "/craft:atdd runs the 7-step flow. /craft:craft turns a big or multi-step request into a linear activity (a markdown in .claude/local/activities, one verified item at a time, held by the activity-gate Stop hook) and enforces the root rule (less code is better than more code) and triages SOLID, KISS, YAGNI, DRY and Clean Code, reading only the reference of each principle with a signal. /craft:audit audits the whole repo. /craft:setup prepares lint with limits. /craft:hook turns a correction into a project hook. Hooks inject short rules in every session (ASD-STE100 writing, project memory, Claude as the tool of the user, research before facts and implementations, and the rule for each code change), deny English-less code, missing data-testid, skipped tests, E2E outside a container, unfiltered tests in a large suite and memory outside the project, and run the full suite before a push only when the project has tests, no CI and a code change that is not green.",
-  "version": "0.19.1",
+  "description": "Opt-in engineer toolkit, started only by the user. /craft:plan closes every gap of a large scope in rounds of questions and writes a linear activity that a fresh Haiku subagent reviews. /craft:craft executes it one verified item at a time, with ATDD and the clean code principles. /craft:audit audits a repo, /craft:doc writes ARCHITECTURE.md in the arc42 structure, /craft:setup prepares lint with limits, /craft:hook turns a correction into a project hook, /craft:memory keeps project memory. Hooks deny English-less code, missing data-testid, skipped tests, E2E outside a container and unfiltered tests, and run the full suite before a push when the project has no CI.",
+  "version": "1.0.0",
   "icon": "./assets/icon.png",
   "license": "MIT",
   "author": {

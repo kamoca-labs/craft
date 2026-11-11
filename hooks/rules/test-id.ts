@@ -1,4 +1,4 @@
-import { addedText, deny, readInput, TEST_FILE } from '../lib.ts'
+import { addedText, deny, readActiveInput, TEST_FILE } from '../lib.ts'
 
 const COMPONENT_FILE = /\.(vue|jsx|tsx)$/
 const OPENING_TAG = /<([A-Za-z][\w.-]*)((?:"[^"]*"|'[^']*'|\{(?:[^{}]|\{[^{}]*\})*\}|[^>"'{])*)>/g
@@ -21,7 +21,7 @@ function missesTestId(text: string): boolean {
   return [...text.matchAll(OPENING_TAG)].some(([, tag, attributes]) => isInteractive(tag, attributes) && !receivesTestId(attributes))
 }
 
-const input = readInput()
+const input = readActiveInput()
 const file = input.tool_input.file_path || ''
 
 if (COMPONENT_FILE.test(file) && !TEST_FILE.test(file) && missesTestId(addedText(input))) {

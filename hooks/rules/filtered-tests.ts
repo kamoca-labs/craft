@@ -1,4 +1,4 @@
-import { deny, readInput, suiteRequired, testFileCount, testRunsArguments, unfiltered } from '../lib.ts'
+import { deny, readActiveInput, suiteRequired, testFileCount, testRunsArguments, unfiltered } from '../lib.ts'
 
 const SMALL_SUITE = 10
 
@@ -7,7 +7,7 @@ function smallSuite(root: string): boolean {
   return tests > 0 && tests <= SMALL_SUITE
 }
 
-const input = readInput()
+const input = readActiveInput()
 
 const root = process.env.CLAUDE_PROJECT_DIR || process.cwd()
 

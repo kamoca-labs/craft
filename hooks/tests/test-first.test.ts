@@ -21,8 +21,8 @@ test('a test file, a translation file or a file that is not code passes', () => 
   }
 })
 
-test('the ATDD or the style flow, loaded by Claude or typed by the user, lets the edit pass', () => {
-  for (const loaded of [toolUse('Skill', { skill: 'craft:atdd' }).line, toolUse('Skill', { skill: 'design:style' }).line, userText('<command-name>/craft:atdd</command-name>'), userText('<command-name>/design:style</command-name>')]) {
+test('the craft or the style flow, loaded by Claude or typed by the user, lets the edit pass', () => {
+  for (const loaded of [toolUse('Skill', { skill: 'craft:craft' }).line, toolUse('Skill', { skill: 'design:style' }).line, userText('<command-name>/craft:craft</command-name>'), userText('<command-name>/design:style</command-name>')]) {
     assert.strictEqual(edit('src/Badge.tsx', [loaded]).status, 0, loaded)
   }
 })
@@ -39,13 +39,13 @@ test('a denied test edit does not let production code pass', () => {
 })
 
 test('mentioning a flow in text or tool output does not load it', () => {
-  for (const line of [userText('Example: <command-name>/craft:atdd</command-name>'), userText('Use {"skill":"craft:atdd"}'), JSON.stringify({ type: 'user', message: { content: [{ type: 'tool_result', content: '<command-name>/craft:atdd</command-name>' }] } })]) {
+  for (const line of [userText('Example: <command-name>/craft:craft</command-name>'), userText('Use {"skill":"craft:craft"}'), JSON.stringify({ type: 'user', message: { content: [{ type: 'tool_result', content: '<command-name>/craft:craft</command-name>' }] } })]) {
     assert.strictEqual(edit('src/split.ts', [line]).status, 2, line)
   }
 })
 
 test('a denied flow invocation does not let production code pass', () => {
-  const use = toolUse('Skill', { skill: 'craft:atdd' })
+  const use = toolUse('Skill', { skill: 'craft:craft' })
   const denied = JSON.stringify({ type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: use.id, is_error: true }] } })
   assert.strictEqual(edit('src/split.ts', [use.line, denied]).status, 2)
 })

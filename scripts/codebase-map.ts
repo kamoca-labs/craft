@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
-import { addContext, message } from '../lib.ts'
+import { message } from '../hooks/lib.ts'
 
 const BUDGET = 2000
 const MAX_FILES = 4000
@@ -101,4 +101,4 @@ function codebaseMap(root: string): string {
 }
 
 const map = codebaseMap(process.env.CLAUDE_PROJECT_DIR || process.cwd())
-if (map) addContext('SessionStart', map)
+if (map) process.stdout.write(`${map}\n`)

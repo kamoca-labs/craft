@@ -35,7 +35,7 @@ Example: "if I create an item, the item appears in the list" is E2E.
 
 ## Where to run
 
-Only in a container. Follow the e2e-container guide that `craft:atdd` links.
+Only in a container. Follow the e2e-container reference.
 
 ## What goes in
 

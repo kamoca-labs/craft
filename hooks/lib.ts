@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process'
+import { locate, projectRoot } from './activity.ts'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -14,6 +15,8 @@ export type HookInput = {
   }
   transcript_path?: string
   last_assistant_message?: string
+  session_id?: string
+  cwd?: string
   tool_response?: { stdout?: string, stderr?: string }
 }
 
@@ -107,21 +110,20 @@ export function readInput(): HookInput {
   return JSON.parse(fs.readFileSync(0, 'utf8'))
 }
 
+// The craft hooks act only while the session has an active craft activity. Outside one, the hook allows the action.
+export function readActiveInput(): HookInput {
+  const input = readInput()
+  const dir = input.session_id ? locate(projectRoot(input.cwd), input.session_id) : null
+  if (!dir || !/^status: active$/m.test(fs.readFileSync(path.join(dir, 'index.md'), 'utf8'))) process.exit(0)
+  return input
+}
+
 export function output({ tool_response }: HookInput): string {
   return [tool_response?.stdout, tool_response?.stderr].filter(Boolean).join('\n')
 }
 
 function withPluginRoot(text: string): string {
   return text.replaceAll('${CLAUDE_PLUGIN_ROOT}', process.env.CLAUDE_PLUGIN_ROOT || '')
-}
-
-export function ruleBody(rule: string): string {
-  return withPluginRoot(fs.readFileSync(path.join(process.env.CLAUDE_PLUGIN_ROOT || '', 'rules', `${rule}.md`), 'utf8'))
-}
-
-export function skillBody(skill: string): string {
-  const file = path.join(process.env.CLAUDE_PLUGIN_ROOT || '', 'skills', skill, 'SKILL.md')
-  return withPluginRoot(fs.readFileSync(file, 'utf8').replace(/^---\n[\s\S]*?\n---\n+/, ''))
 }
 
 function capture(useCase: object) {

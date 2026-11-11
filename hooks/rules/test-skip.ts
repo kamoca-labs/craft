@@ -1,4 +1,4 @@
-import { addedText, deny, readInput, TEST_FILE } from '../lib.ts'
+import { addedText, deny, readActiveInput, TEST_FILE } from '../lib.ts'
 
 const SKIPPED_OR_FOCUSED = new RegExp([
   String.raw`\b(it|test|describe|context|suite)\.(skip|only|todo)\b`,
@@ -11,7 +11,7 @@ const SKIPPED_OR_FOCUSED = new RegExp([
   String.raw`@(Disabled|Ignore)\b`,
 ].join('|'))
 
-const input = readInput()
+const input = readActiveInput()
 const file = input.tool_input.file_path || ''
 
 if (TEST_FILE.test(file) && SKIPPED_OR_FOCUSED.test(addedText(input))) {
