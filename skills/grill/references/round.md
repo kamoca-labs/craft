@@ -4,7 +4,7 @@ Read this before you send a round and before you record its answers.
 
 ## The message
 
-Send the round as plain text in your reply. Do not use `AskUserQuestion` or another question tool: it limits the number of questions and options, and the user cannot answer the whole round in one reply.
+Send the round as plain text in your reply. DO NOT USE A QUESTION TOOL.
 
 Put all the frontier questions in one message, in the language of the user. A round has no limit of questions: the frontier sets the number. Each question has 3 to 5 options, each different and valid. Mark one option as recommended, with a reason in one line. The last option lets the user write an own answer.
 
