@@ -4,13 +4,27 @@ Notes reconstructed from repository commits and manifest versions. Historical da
 
 ## 1.0.0 (unreleased)
 
+craft is now an opt-in engineer toolkit. Nothing loads in a session until the user calls a craft skill. The plan and the measured cost are in `SKILLS-COST.md`.
+
 ### Added
 
-- `/craft:grill`: an interview before a plan, after the `grilling` skill of mattpocock/skills. Claude finds the facts and asks only the decisions, in rounds of the decision frontier. Each question has 3 to 5 options, one recommended, and the user can write an own answer.
-- An open or vague answer comes back in the next round. A final audit turns every statement without a user decision or a source into a question, so no decision is inferred.
-- The spec is written after every round to `.claude/local/grill/<slug>.md`, local and ignored by git. A second call with the same subject continues from the open questions.
-- Only the user calls it (`disable-model-invocation: true`).
-- The skill stays lean. The round format and the spec format are in `skills/grill/references/`, and Claude reads each one only at the step that needs it.
+- `/craft:plan <scope>`: closes every gap of a large scope before the work. Claude (the Elephant, on Sonnet for the first turn) finds the facts and asks only the decisions, in rounds of 3 to 5 options, and records them in `.claude/local/plans/<slug>.md`. Then it writes the linear activity.
+- The `goldfish` agent (Haiku, the `Read` tool only, a fresh context) reads the activity and the files that its pending items name, and lists each point where an executor must guess. Each gap becomes a question. The loop stops at no gap or after 3 rounds. The pattern comes from the Google Elephant-Goldfish model. Only `craft:plan` uses it.
+
+### Changed
+
+- Every skill uses `disable-model-invocation: true`: only the user starts craft, and no skill description goes into the session context.
+- `/craft:craft <activity>` executes an activity one verified item at a time. Without an activity, it suggests `/craft:plan` once. If the user goes on, it builds a one-item activity.
+- No hook injects text at the start of a session or on a prompt. The rules `change`, `tool`, `verify`, `challenge` and `state-of-the-art` are now `skills/craft/references/engineer.md`. `ste` and `memory` are references too. `craft:craft` and `craft:plan` read them when the user calls them. `codebase-map` is `scripts/codebase-map.ts`.
+- The deny hooks and `refactor-on-green` act only while a craft activity is active in the session. Outside an activity, they allow every action.
+- `/craft:setup` no longer writes the ATDD line in the `CLAUDE.md` of the project.
+- The `bench/` run is no longer required before a change to the text of a session.
+
+### Removed
+
+- `/craft:atdd`: ATDD is now `skills/craft/references/atdd.md`, with its references in `skills/craft/references/`. Use `/craft:craft`.
+- `/craft:grill`: replaced by `/craft:plan`. The round format and the spec format moved to `skills/plan/references/`.
+- The `reminder` hook (on every prompt) and the SessionStart hooks `ste`, `memory`, `codebase-map`, `change`, `tool`, `verify`, `challenge` and `state-of-the-art`. The folder `rules/` is gone.
 
 ## 0.19.1 (2026-11-11)
 

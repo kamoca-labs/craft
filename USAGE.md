@@ -24,12 +24,12 @@
 /craft:setup
 ```
 
-Claude detects the stack, shows the plan (dependencies, configs, limits), and **waits for your approval**. Then it installs the linter with the craft limits and creates the `test` and `lint` scripts. In CLAUDE.md, it writes only three things: the line that says to follow `/craft:atdd`, the line that says to record project decisions in the repo (never in the local memory of Claude), and the test and lint commands. It does not list the other skills or the limits, because they arrive by themselves. Violations in existing code are only counted, not fixed. From then on, `/craft:craft` runs this lint before the triage.
+Claude detects the stack, shows the plan (dependencies, configs, limits), and **waits for your approval**. Then it installs the linter with the craft limits and creates the `test` and `lint` scripts. In CLAUDE.md, it writes only two things: the line that says to record project decisions in the repo (never in the local memory of Claude), and the test and lint commands. It does not list the other skills or the limits, because they arrive by themselves. Violations in existing code are only counted, not fixed. From then on, `/craft:craft` runs this lint before the triage.
 
 ## New feature with ATDD
 
 ```
-/craft:atdd reject an attachment above 10 MB on the request
+/craft:craft reject an attachment above 10 MB on the request
 ```
 
 1. Claude writes the scenarios and **waits for your approval**. It goes through the list of real-world edge cases (long text, emoji, timeout, 403, double submit, and others). It includes only the ones that the feature has:
@@ -49,13 +49,14 @@ Claude detects the stack, shows the plan (dependencies, configs, limits), and **
 
 ## Big requests: activities, /craft:craft and /goal
 
-Say the request in plain words: "implement the pagination of this screen". `craft:craft` starts by itself from the description. A question ("explain why the pagination skips records") stays an analysis and opens nothing. For a big request, call it by name:
+Craft starts only when you call it. For a big request, plan first, then execute:
 
 ```
-/craft:craft implement the pagination of the orders screen: endpoint, screen and tests
+/craft:plan implement the pagination of the orders screen: endpoint, screen and tests
+/craft:craft orders-pagination-3f2a
 ```
 
-Claude organizes the request into a linear list. The request does not come in order, so Claude lists the pieces with what each one needs, and the CLI sorts them: every item comes after what it needs. A cycle is rejected with the path. The list is a file you can open and follow, even though git ignores it:
+`/craft:plan` asks every open decision in rounds of options, writes the activity, and the `goldfish` subagent (Haiku, fresh context) lists each point where it must guess. Each gap comes back to you as a question, for at most 3 rounds. Claude organizes the request into a linear list. The request does not come in order, so Claude lists the pieces with what each one needs, and the CLI sorts them: every item comes after what it needs. A cycle is rejected with the path. The list is a file you can open and follow, even though git ignores it:
 
 ```
 .claude/local/activities/orders-pagination-3f2a/index.md
@@ -105,7 +106,7 @@ How it works:
 ## Bug fix with ATDD
 
 ```
-/craft:atdd a department without an owner breaks the listing
+/craft:craft a department without an owner breaks the listing
 ```
 
 Step 1 becomes the scenario that reproduces the bug. Step 3 proves that the test catches the bug **before** the fix.
@@ -130,9 +131,9 @@ The limit is a rule. Claude asks for the order with `AskUserQuestion`:
 
 | Option | What happens |
 |---|---|
-| Back end first (recommended) | `/craft:atdd` covers the contract and the limit rule. Then style mode iterates on the screen with real data |
-| Screen first | Style mode iterates on the screen with fixed data. Then `/craft:atdd` builds the back end and replaces the mock with real data |
-| By slice | Each scenario goes through `/craft:atdd`, and its visual part goes through style mode before the next scenario |
+| Back end first (recommended) | `/craft:craft` covers the contract and the limit rule. Then style mode iterates on the screen with real data |
+| Screen first | Style mode iterates on the screen with fixed data. Then `/craft:craft` builds the back end and replaces the mock with real data |
+| By slice | Each scenario goes through `/craft:craft`, and its visual part goes through style mode before the next scenario |
 
 In all three options, the rule enters only with a test. If Claude tries to change the service before any test, the `test-first` hook denies the edit and asks for the failing test first.
 
@@ -176,7 +177,7 @@ The same rule applies to unit, component and integration tests: a functional tes
 ## Combine with the git plugin
 
 ```
-/craft:atdd reject an attachment above 10 MB
+/craft:craft reject an attachment above 10 MB
 ... steps 1 to 7 ...
 /git:commit
 ```
@@ -213,7 +214,7 @@ The test finds the element with `getByTestId` first. Removing the attribute in t
 
 ## Writing in the ASD-STE100 standard
 
-There is no command. The `ste` hook injects the rule `rules/ste.md` in every session, and again after `/clear` and after compaction. From then on, replies, docs, commits, and PRs/MRs follow ASD-STE100 (Simplified Technical English, Issue 9):
+There is no command. `/craft:craft` reads `skills/craft/references/ste.md` before it writes a doc, a commit, a PR/MR or the activity. That text follows ASD-STE100 (Simplified Technical English, Issue 9):
 
 | Before | After |
 |---|---|
@@ -225,13 +226,12 @@ Replies follow your language. English text follows the full standard. Text in an
 
 ## Research before you trust
 
-There is no command. Three hooks inject three skills in every session, and again after `/clear` and after compaction. Claude stops answering from memory:
+There is no command. `/craft:craft` reads `skills/craft/references/engineer.md` at the start of each call. Claude stops answering from memory:
 
-| Skill | What Claude does |
+| Section | What Claude does |
 |---|---|
-| `rules/verify.md` | Before it uses a version, an image tag, a package name, a flag, or an API that can change, Claude looks in the documentation, the registry, the CLI, or the web. It cites the source. Without a source, it writes "not verified" |
-| `rules/challenge.md` | Claude treats a claim of yours about a fact as wrong until a proof says it is right. If the proof contradicts you, Claude says so and shows the proof. A preference or a decision of yours is not a fact, so Claude does not challenge it |
-| `rules/state-of-the-art.md` | Before it implements something (a Dockerfile, a CI pipeline, a framework feature), Claude looks for the official best practices and the current recommendation of the community, applies them, and cites the sources. If the practice differs from the pattern of the repo, it asks you which one to follow |
+| Evidence before you trust or act | Before it uses a version, an image tag, a package name, a flag, or an API that can change, Claude looks in the repo, the documentation, the registry, the CLI, or the web. It cites the source. Without a source, it writes "not verified". It treats a claim of yours about a fact as wrong until a proof says it is right. A preference or a decision of yours is not a fact |
+| State of the art | Before it implements something (a Dockerfile, a CI pipeline, a framework feature), Claude looks for the official guide and the expert practice, applies them, and cites the sources. If the practice differs from the pattern of the repo, it asks you which one to follow |
 
 Example:
 
@@ -248,7 +248,7 @@ You correct Claude (for example, "do not run `git add .env`"). Claude judges if 
 
 ## Project memory
 
-No command is required. The `memory` hook loads the memory rule and the catalog in every session. When a conversation brings something that matters for the next one, Claude writes it in the project:
+`/craft:craft` reads the catalog at the start of each call and follows `skills/craft/references/memory.md`. To remember or forget something yourself, use `/craft:memory`. When a conversation brings something that matters for the next one, Claude writes it in the project:
 
 ```
 .claude/memory/
@@ -271,6 +271,8 @@ To ask directly:
 If Claude tries to write to the local auto memory (`~/.claude/projects/<project>/memory/`), the `memory-outside-project` hook denies it and says to write to `.claude/memory/`.
 
 ## When a hook is wrong
+
+The hooks act only while a craft activity is active in the session. Outside an activity, they allow every action.
 
 | Error | Example | What to do |
 |---|---|---|
