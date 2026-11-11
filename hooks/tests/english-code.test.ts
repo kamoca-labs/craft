@@ -4,6 +4,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { test } from 'node:test'
+import { SESSION, startActivity } from './helpers.ts'
 
 const RULE = path.join(import.meta.dirname, '..', 'rules', 'english-code.ts')
 const FRENCH_LABEL = "const label = 'Utilisateur non trouv\u00e9'"
@@ -13,10 +14,11 @@ const ENGLISH_CODE = "const label = t('user.notFound')"
 
 function runTool(toolName: string, toolInput: object) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'craft-hooks-'))
+  startActivity(dir)
   return spawnSync('node', [RULE], {
-    input: JSON.stringify({ tool_name: toolName, tool_input: toolInput }),
+    input: JSON.stringify({ tool_name: toolName, tool_input: toolInput, session_id: SESSION }),
     encoding: 'utf8',
-    env: { ...process.env, HOOK_CASES_LOG: path.join(dir, 'cases.jsonl'), CLAUDE_PLUGIN_ROOT: path.join(import.meta.dirname, '..', '..') },
+    env: { ...process.env, HOOK_CASES_LOG: path.join(dir, 'cases.jsonl'), CLAUDE_PLUGIN_ROOT: path.join(import.meta.dirname, '..', '..'), CLAUDE_PROJECT_DIR: dir },
   })
 }
 

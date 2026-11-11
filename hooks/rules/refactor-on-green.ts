@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
-import { CODE_FILE, inject, message, output, readInput, testRunArguments } from '../lib.ts'
+import { CODE_FILE, inject, message, output, readActiveInput, testRunArguments } from '../lib.ts'
 
 const SMALL_CHANGE = 20
 
@@ -66,7 +66,7 @@ function largeChange(root: string): boolean {
   }
 }
 
-const input = readInput()
+const input = readActiveInput()
 const runOutput = output(input)
 
 if (testRunArguments(input.tool_input.command || '') !== null && SUCCESS.test(runOutput) && !FAILURE.test(runOutput) && largeChange(process.env.CLAUDE_PROJECT_DIR || process.cwd())) {

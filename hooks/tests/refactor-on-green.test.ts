@@ -8,7 +8,7 @@ const RULE = 'refactor-on-green'
 
 test('green suite injects a short reminder to load the craft triage', () => {
   const context = injected(sandbox().run(RULE, { command: 'pnpm vitest run', stdout: 'Tests  12 passed (12)' }))
-  assert.match(context!, /craft:craft/)
+  assert.match(context!, /skills\/craft\/SKILL\.md/)
   assert.ok(context!.length < 500, `reminder has ${context!.length} chars`)
 })
 

@@ -1,9 +1,9 @@
-import { blocks, CODE_FILE, deny, isCodeEdit, readInput, readTranscript, TEST_FILE, TRANSLATION_FOLDER } from '../lib.ts'
+import { blocks, CODE_FILE, deny, isCodeEdit, readActiveInput, readTranscript, TEST_FILE, TRANSLATION_FOLDER } from '../lib.ts'
 
-const FLOWS = new Set(['craft:atdd', 'design:style'])
-const USER_FLOW = /^<command-name>\/(craft:atdd|design:style)<\/command-name>/
+const FLOWS = new Set(['craft:craft', 'design:style'])
+const USER_FLOW = /^<command-name>\/(craft:craft|design:style)<\/command-name>/
 
-const input = readInput()
+const input = readActiveInput()
 const file = input.tool_input.file_path || ''
 
 function testWrittenOrFlowLoaded(transcriptPath: string): boolean {
