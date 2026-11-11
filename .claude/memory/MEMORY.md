@@ -3,3 +3,4 @@
 - [Skills progressive disclosure](project_skills-progressive-disclosure.md): entry skills, references and rules in every plugin; plan and open items
 - [Activity flow](project_activity-flow.md): craft 0.18.0 replaces META and TaskCreate with a linear markdown activity; decisions and limits
 - [Push gate by changes](project_push-gate-by-changes.md): craft 0.19.0 decides the full suite from CI, tests and code changes, never asks
+- [Grill](project_grill.md): craft 0.20.0 adds /craft:grill, user-only interview, spec in .claude/local/grill
