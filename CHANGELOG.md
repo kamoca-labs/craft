@@ -2,7 +2,7 @@
 
 Notes reconstructed from repository commits and manifest versions. Historical dates identify version changes in Git, not previously published releases. Versions absent from the recorded history are not invented. Categories without changes are omitted.
 
-## 0.20.0 (2026-11-11)
+## 1.0.0 (unreleased)
 
 ### Added
 
