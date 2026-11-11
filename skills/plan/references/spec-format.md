@@ -1,6 +1,6 @@
 # Spec format
 
-Read this before you create or repair a spec file in `.claude/local/grill/<slug>.md`.
+Read this before you create or repair a spec file in `.claude/local/plans/<slug>.md`.
 
 ```markdown
 ---
