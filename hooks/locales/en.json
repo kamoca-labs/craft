@@ -16,8 +16,6 @@
   "context.codebase-map": "[craft:codebase-map] What already exists in the project. Reuse it before you write new code. Read a file only when you need its details:",
   "context.codebase-map-more": "({count} more folders not listed)",
   "context.memory-truncated": "(The catalog is cut here. Read the rest in .claude/memory/MEMORY.md.)",
-  "block.meta-verify": "[craft:meta-goal] The goal is not closed. Run `{command}` after the last code edit, with a success result. Cite the command and the result in the reply. Then close the goal.",
-  "block.meta-close": "[craft:meta-goal] Goal met. Mark the META task as completed. End the reply with META CLOSED: met, the verification command, and the result.",
-  "context.reminder": "[craft] 2+ actions: one task each (TaskCreate). Before code or config: official docs, expert practice, native or vetted package first.",
+  "context.reminder": "[craft] Request to implement, fix, refactor, migrate or write: load craft:craft first (opens the activity). Before code or config: official docs, expert practice, native or vetted package first.",
   "deny.test-first": "write the failing test of this change first, and run it to see it fail. Then edit the production code. If the change alters no behavior (config, rename, dead code, text), load /craft:atdd: it says when the flow does not apply. For a visual-only UI change, load /design:style."
 }

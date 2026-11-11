@@ -11,7 +11,7 @@ const wired = [...hooksJson.matchAll(/rules\/([\w-]+)\.ts/g)].map((match) => mat
 const SKILLS_DIR = path.join(HOOKS_DIR, '..', 'skills')
 const RULES_DIR = path.join(HOOKS_DIR, '..', 'rules')
 const ENTRY = ['atdd', 'audit', 'craft', 'hook', 'setup']
-const USER_ONLY = ['memory', 'tasks']
+const USER_ONLY = ['memory']
 const ALWAYS_ON = ['challenge', 'change', 'state-of-the-art', 'ste', 'tool', 'verify']
 const DESCRIPTION_LIMIT = 300
 const skills = fs.readdirSync(SKILLS_DIR).sort()
@@ -139,6 +139,4 @@ test('the session rules keep their safety lines', () => {
   assert.match(rule('state-of-the-art'), /typosquatting/)
   assert.match(rule('state-of-the-art'), /not verified/)
   assert.match(skillText('memory'), /Never save a secret, a credential, or personal data/)
-  assert.match(skillText('tasks'), /never the full suite/)
-  assert.match(skillText('tasks'), /refused by the user/)
 })

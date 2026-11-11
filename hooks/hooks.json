@@ -29,12 +29,6 @@
           },
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/tasks.ts\"",
-            "timeout": 10,
-            "statusMessage": "craft:tasks: tasks and goal"
-          },
-          {
-            "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/tool.ts\"",
             "timeout": 10,
             "statusMessage": "craft:tool: Claude is the user's tool"
@@ -77,9 +71,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/meta-goal.ts\"",
-            "timeout": 10,
-            "statusMessage": "craft:meta-goal: goal closed?"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/activity-gate.ts\"",
+            "timeout": 15,
+            "statusMessage": "craft:activity-gate: activity verified?"
           }
         ]
       }

@@ -75,7 +75,7 @@ So a plugin has few **entry skills** with a clear trigger. The detailed knowledg
 **Always-on rules**
 
 - An always-on rule is not a skill. Put the text in `rules/<name>.md` and let the hook read the file.
-- If the user must also call it as a command (`/craft:memory`, `/craft:tasks`), keep the skill with `disable-model-invocation: true`. The hook already gives Claude the text.
+- If the user must also call it as a command (`/craft:memory`), keep the skill with `disable-model-invocation: true`. The hook already gives Claude the text.
 
 **Reference files**
 
