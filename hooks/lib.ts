@@ -196,13 +196,14 @@ export function filesToPush(root: string): string[] | null {
 // The full suite ran green after the last code edit of the session.
 export function suiteGreenSinceLastEdit(transcriptPath: string | undefined): boolean {
   const entries = readTranscript(transcriptPath || '')
-  const failed = new Set(entries.flatMap((entry) => blocks(entry).filter((block) => block.type === 'tool_result' && block.is_error).map((block) => block.tool_use_id)))
+  // A run counts only with a result: the pending call that the hook judges now has none.
+  const passed = new Set(entries.flatMap((entry) => blocks(entry).filter((block) => block.type === 'tool_result' && !block.is_error).map((block) => block.tool_use_id)))
   let lastEdit = -1
   let lastGreen = -1
   entries.forEach((entry, index) => {
     for (const block of blocks(entry)) {
       if (isCodeEdit(block)) lastEdit = index
-      if (block.type === 'tool_use' && block.name === 'Bash' && !failed.has(block.id) && testRunsArguments(block.input?.command || '').some(unfiltered)) lastGreen = index
+      if (block.type === 'tool_use' && block.name === 'Bash' && passed.has(block.id) && testRunsArguments(block.input?.command || '').some(unfiltered)) lastGreen = index
     }
   })
   return lastGreen > lastEdit
