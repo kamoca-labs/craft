@@ -4,7 +4,7 @@ Notes reconstructed from repository commits and manifest versions. Historical da
 
 ## 1.0.0 (unreleased)
 
-craft is now an opt-in engineer toolkit. Nothing loads in a session until the user calls a craft skill. The plan and the measured cost are in `SKILLS-COST.md`.
+craft is now an opt-in engineer toolkit. Nothing loads in a session until the user calls a craft skill.
 
 ### Added
 
@@ -71,7 +71,7 @@ craft is now an opt-in engineer toolkit. Nothing loads in a session until the us
 
 ### Breaking changes
 
-- Only five skills are visible to Claude: `atdd`, `craft`, `audit`, `hook` and `setup`. The listing of craft drops from 40 descriptions (10,548 characters) to 5 (1,317 characters), as `SKILLS-ARCHITECTURE.md` plans. `node scripts/skill-budget.ts` prints the count.
+- Only five skills are visible to Claude: `atdd`, `craft`, `audit`, `hook` and `setup`. The listing of craft drops from 40 descriptions (10,548 characters) to 5 (1,317 characters). `node scripts/skill-budget.ts` prints the count.
 - The principles and the step guides are reference files. Claude reads them with `Read`, so `craft:<name>` no longer loads with the `Skill` tool:
   - `craft:acceptance-criteria` → `skills/atdd/references/acceptance-criteria.md`
   - `craft:e2e-container` → `skills/atdd/references/e2e-container.md`
@@ -127,7 +127,7 @@ craft is now an opt-in engineer toolkit. Nothing loads in a session until the us
 - Do not count denied test edits, failed skill calls, or flow names quoted in ordinary text as test-first prerequisites.
 - Check every recognized test invocation in a compound command before allowing an unfiltered suite.
 - Require a successful verification result for the goal reminder, and do not count an `echo` of the verification command as execution.
-- Record the scope, findings, regression checks, and limits in [AUDIT.md](AUDIT.md).
+- Record the scope, findings, regression checks, and limits in the body of the commit `e63ec75`.
 
 ## 0.16.1 (2026-11-04)
 
