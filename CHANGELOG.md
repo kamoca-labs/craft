@@ -10,6 +10,7 @@ Notes reconstructed from repository commits and manifest versions. Historical da
 - An open or vague answer comes back in the next round. A final audit turns every statement without a user decision or a source into a question, so no decision is inferred.
 - The spec is written after every round to `.claude/local/grill/<slug>.md`, local and ignored by git. A second call with the same subject continues from the open questions.
 - Only the user calls it (`disable-model-invocation: true`).
+- The skill stays lean. The round format and the spec format are in `skills/grill/references/`, and Claude reads each one only at the step that needs it.
 
 ## 0.19.1 (2026-11-11)
 
