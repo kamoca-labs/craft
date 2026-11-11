@@ -1,6 +1,6 @@
 # Real-world edges
 
-Code that works only with perfect data breaks in the hands of the user. In step 1 of `craft:atdd`, compare each edge in this list with the feature:
+Code that works only with perfect data breaks in the hands of the user. In step 1 of ATDD, compare each edge in this list with the feature:
 
 | Edge | Example |
 |---|---|
