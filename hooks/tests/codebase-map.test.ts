@@ -1,10 +1,11 @@
 import assert from 'node:assert'
+import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
 import { sandbox, type Sandbox } from './helpers.ts'
 
-const RULE = 'codebase-map'
+const SCRIPT = path.join(import.meta.dirname, '..', '..', 'scripts', 'codebase-map.ts')
 const BUDGET = 2000
 
 function writeFiles(box: Sandbox, files: Record<string, string>) {
@@ -16,10 +17,10 @@ function writeFiles(box: Sandbox, files: Record<string, string>) {
 }
 
 function sessionContext(box: Sandbox): string | null {
-  const result = box.start(RULE, 'startup')
+  fs.mkdirSync(box.projectDir, { recursive: true })
+  const result = spawnSync('node', [SCRIPT], { cwd: box.projectDir, encoding: 'utf8', env: { ...process.env, CLAUDE_PROJECT_DIR: box.projectDir } })
   assert.strictEqual(result.status, 0, result.stderr)
-  if (!result.stdout.trim()) return null
-  return JSON.parse(result.stdout).hookSpecificOutput.additionalContext
+  return result.stdout.trim() || null
 }
 
 test('lists the top-level names of each source folder', () => {

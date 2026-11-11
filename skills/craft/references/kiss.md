@@ -19,7 +19,7 @@
 ## How to apply
 
 1. Ask: what is the most direct way to satisfy **these** tests?
-2. Reuse before you write, in the order of "Reuse before you build" in `the state-of-the-art rule`: the project, a native feature, a vetted package, your own code.
+2. Reuse before you write, in the order of "Reuse before you build" in the engineer rules: the project, a native feature, a vetted package, your own code.
 3. Replace the clever with the explicit, even if it is one or two lines longer.
 4. Remove derived state: compute it on the spot.
 
