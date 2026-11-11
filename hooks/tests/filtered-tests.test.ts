@@ -1,6 +1,6 @@
 import assert from 'node:assert'
 import { test } from 'node:test'
-import { bashRun, codeEdit, gitProject, runIn, runRule } from './transcript.ts'
+import { bashRun, codeEdit, gitProject, runIn, runRule, toolUse } from './transcript.ts'
 
 const bash = (command: string, transcript: string[] = []) => runRule('filtered-tests', { command }, transcript)
 
@@ -43,6 +43,12 @@ test('allows the full suite when the push needs it: tests, no CI, and a code cha
   const project = gitProject({ 'tests/upload.test.ts': 'test', 'src/upload.ts': 'a', 'tests/b.test.ts': 'x', 'tests/c.test.ts': 'x', 'tests/d.test.ts': 'x', 'tests/e.test.ts': 'x', 'tests/f.test.ts': 'x', 'tests/g.test.ts': 'x', 'tests/h.test.ts': 'x', 'tests/i.test.ts': 'x', 'tests/j.test.ts': 'x', 'tests/k.test.ts': 'x' }, { 'src/upload.ts': 'b' })
   assert.strictEqual(runIn('filtered-tests', project, { command: 'pnpm vitest run' }).status, 0)
   assert.strictEqual(runIn('filtered-tests', project, { command: 'pnpm vitest run' }, [codeEdit('src/upload.ts'), bashRun('pnpm vitest run')]).status, 2)
+})
+
+test('the pending call of the full suite is not a green run', () => {
+  const project = gitProject({ 'src/upload.ts': 'a', ...Object.fromEntries(Array.from({ length: 11 }, (_, index) => [`tests/t${index}.test.ts`, 'x'])) }, { 'src/upload.ts': 'b' })
+  const pending = toolUse('Bash', { command: 'pnpm vitest run' }).line
+  assert.strictEqual(runIn('filtered-tests', project, { command: 'pnpm vitest run' }, [codeEdit('src/upload.ts'), pending]).status, 0)
 })
 
 test('denies the full suite in a project with CI, where the CI runs it', () => {

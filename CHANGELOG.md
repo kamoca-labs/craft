@@ -2,6 +2,12 @@
 
 Notes reconstructed from repository commits and manifest versions. Historical dates identify version changes in Git, not previously published releases. Versions absent from the recorded history are not invented. Categories without changes are omitted.
 
+## 0.19.1 (2026-11-11)
+
+### Fixed
+
+- `filtered-tests` denied every full run of the suite, even when the push needed it. At PreToolUse the transcript already holds the pending Bash call with no result, and the green-run check counted that call as a green full run. A run now counts as green only when its result exists and is not an error.
+
 ## 0.19.0 (2026-11-11)
 
 ### Changed
