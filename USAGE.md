@@ -285,7 +285,7 @@ An argument jumps to one section (number or title) or to one package. Call it ag
 
 ## When a hook is wrong
 
-The hooks act only while a craft activity is active in the session. Outside an activity, they allow every action.
+The hooks act only while a craft activity is active in the session. Outside an activity, they allow every action. The exception is `no-shell-edit`, which denies a file edit through the shell (`sed -i`, `tee`, a redirect to a file, a `python` or `node` script that writes) in every session: Claude uses `Write` or `Edit` instead.
 
 | Error | Example | What to do |
 |---|---|---|
