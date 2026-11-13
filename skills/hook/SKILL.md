@@ -1,8 +1,7 @@
 ---
 name: hook
-description: Turns a user correction into a project hook, so the mistake does not repeat. Use when the user corrects something you did (command, file, code pattern) and the tool input can check the rule, or when asked to create a hook or a guaranteed rule in the project.
+description: Turns a correction from the user into a project hook, so the mistake cannot repeat. Use when the user corrects a repeatable pattern in a command, file or code that a regex can check, or asks for a hook or a guaranteed rule. Not for judgment calls or one-off fixes.
 argument-hint: "<behavior that must not repeat>"
-disable-model-invocation: true
 ---
 
 # Correction becomes a hook

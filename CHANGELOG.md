@@ -2,6 +2,12 @@
 
 Notes reconstructed from repository commits and manifest versions. Historical dates identify version changes in Git, not previously published releases. Versions absent from the recorded history are not invented. Categories without changes are omitted.
 
+## 1.2.0 (2026-11-13)
+
+### Changed
+
+- `audit`, `hook` and `memory` are visible to Claude again. Each description says when to use the skill and when not to. `craft`, `doc`, `plan` and `setup` stay user-only.
+
 ## 1.1.0 (2026-11-13)
 
 ### Added

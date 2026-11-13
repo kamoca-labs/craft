@@ -1,10 +1,9 @@
 ---
 name: memory
-description: Long-term project memory in `.claude/memory/`, inside the repo. Only the user calls it, with /craft:memory, to remember or forget something.
+description: Saves or forgets long-term project facts in `.claude/memory/`, inside the repo, so the team shares them. Use when the user says remember this, from now on, do not forget, or forget that. Not for personal preferences or context of one task.
 argument-hint: "[what to remember or forget]"
-disable-model-invocation: true
 ---
 
 # Project memory
 
-Read [the memory rules](../craft/references/memory.md) and follow them. Then remember or forget what the argument says.
+Read [the memory rules](../craft/references/memory.md) and follow them. Then remember or forget what the argument or the request of the user says.
