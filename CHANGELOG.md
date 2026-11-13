@@ -2,6 +2,21 @@
 
 Notes reconstructed from repository commits and manifest versions. Historical dates identify version changes in Git, not previously published releases. Versions absent from the recorded history are not invented. Categories without changes are omitted.
 
+## 1.1.0 (2026-11-13)
+
+### Added
+
+- `no-shell-edit` hook (`PreToolUse`, `Bash`): denies editing a file through the shell, so file changes go through `Write` (create or replace the whole file) or `Edit` (change a part), which show the diff and require a read before the write. It denies:
+  - in-place editors: `sed -i`, `perl -i`/`-pi`, `awk -i inplace`, `ed`, `ex -s`, `ruby -i`;
+  - `tee`, `truncate`, `dd of=` and `install` with a file as the destination;
+  - a redirect to a file (`>`, `>>`, `>|`, `2>`, `&>`), including `cat > f <<EOF`;
+  - `python`, `node -e`, `ruby -e` and `perl -e` (inline, by heredoc or by stdin) with a body that writes a file (`open(` for writing, `.write_text(`, `writeFileSync`, `shutil.copy`, `os.rename`, `Path.touch`, among others).
+  It allows a redirect to `/dev/null` and to a descriptor (`2>&1`, `>&2`), a heredoc that feeds a command (`git commit -F -`, `gh pr create --body-file -`), a script that only reads, and the commands that write as their normal effect (`composer lint:fix`, `pint`, `git mv`, `mv`, `cp`, `rm`, `mkdir`). A command that the hook cannot interpret passes.
+
+### Changed
+
+- `no-shell-edit` acts in every session. The other deny hooks still act only while a craft activity is active.
+
 ## 1.0.0 (2026-11-11)
 
 craft is now an opt-in engineer toolkit. Nothing loads in a session until the user calls a craft skill.
