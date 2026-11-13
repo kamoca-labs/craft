@@ -10,7 +10,8 @@ const hooksJson = fs.readFileSync(path.join(HOOKS_DIR, 'hooks.json'), 'utf8')
 const wired = [...hooksJson.matchAll(/rules\/([\w-]+)\.ts/g)].map((match) => match[1])
 const ROOT = path.join(HOOKS_DIR, '..')
 const SKILLS_DIR = path.join(HOOKS_DIR, '..', 'skills')
-const USER_ONLY = ['audit', 'craft', 'doc', 'hook', 'memory', 'plan', 'setup']
+const USER_ONLY = ['craft', 'doc', 'plan', 'setup']
+const MODEL_INVOCABLE = ['audit', 'hook', 'memory']
 const REMOVED = ['atdd', 'grill']
 const ALWAYS_ON = ['challenge', 'change', 'state-of-the-art', 'ste', 'tool', 'verify']
 const SESSION_REFERENCES = ['engineer', 'memory', 'ste']
@@ -48,10 +49,18 @@ test('the craft triage lists exactly the references of craft', () => {
   assert.deepStrictEqual(listed, owned)
 })
 
-test('no skill is visible to Claude: only the user starts craft', () => {
+test('only audit, hook and memory are visible to Claude: the rest is started by the user', () => {
   const visible = skills.filter((skill) => !/^disable-model-invocation: true$/m.test(skillText(skill)))
-  assert.deepStrictEqual(visible, [])
-  assert.deepStrictEqual(skills, USER_ONLY)
+  assert.deepStrictEqual(visible, MODEL_INVOCABLE)
+  assert.deepStrictEqual(skills, [...USER_ONLY, ...MODEL_INVOCABLE].sort())
+})
+
+test('a skill visible to Claude says when to use it and when not to', () => {
+  for (const skill of MODEL_INVOCABLE) {
+    const description = skillText(skill).match(/^description: (.*)$/m)?.[1] ?? ''
+    assert.match(description, /Use when|Use to/, `${skill}: no trigger`)
+    assert.match(description, /Not for/, `${skill}: no exclusion`)
+  }
 })
 
 test('only the gap search of plan uses the Goldfish', () => {

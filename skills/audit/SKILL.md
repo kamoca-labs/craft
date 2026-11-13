@@ -1,8 +1,7 @@
 ---
 name: audit
-description: One-shot audit of a whole repo, folder or package. It finds bugs, security and data risks, load problems, risky untested code, slow paths and code to delete. The report changes no code. Use when asked to audit the codebase or check its health. For the diff of the branch, use craft:craft.
+description: One-shot audit of a whole repo, folder or package for bugs, security and data risks, load problems, untested risky code, slow paths and dead code. Read-only report. Use when asked to audit the codebase or check its health. Not for a branch diff or a single bug.
 argument-hint: "[folder or package]"
-disable-model-invocation: true
 ---
 
 # Audit of the repo
