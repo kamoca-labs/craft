@@ -22,7 +22,7 @@ The `test-id` hook denies the edit of a `.vue`, `.jsx` or `.tsx` file that adds 
 - Appearance name: `blue-button`, `big-card`.
 - Repeated item with the list index in the id (`item-${index}`).
 - A custom component that does not pass the parent attributes through, so the `data-testid` of the parent is lost.
-- A test that finds an element by CSS class, XPath or `nth-child`.
+- A test or a page object that finds an element by CSS class, XPath or `nth-child`.
 
 ## How to apply
 
@@ -32,7 +32,7 @@ The `test-id` hook denies the edit of a `.vue`, `.jsx` or `.tsx` file that adds 
    - Vue, with a single root: the attribute falls on the root by itself.
    - Vue, with many roots or with a wrapper: use `defineOptions({ inheritAttrs: false })` and `v-bind="$attrs"` on the interactive element.
    - React: spread the rest of the props on the element (`<button {...rest}>`).
-4. **Locator in the test**: `getByTestId` first. Use `getByRole` or `getByLabel` only when the element is not yours, such as a third-party widget without a test id.
+4. **Locator in the page object**: `getByTestId` first. The spec holds no locator: it uses the members of the page object (`e2e-structure.md`). Use `getByRole` or `getByLabel` only when the element is not yours, such as a third-party widget without a test id. Role locators are not the first choice here because the text of a role name changes with the language of the app.
 5. **Remove the attribute in the production build**, when the project wants clean HTML:
    - React with Vite: `rollup-plugin-jsx-remove-attributes`.
    - React with Babel: `babel-plugin-react-remove-properties`.

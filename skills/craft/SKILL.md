@@ -31,6 +31,7 @@ An item that changes behavior follows `references/atdd.md`: test first, one scen
 - `references/acceptance-criteria.md` and `references/real-world-edges.md`: step 1, the specification.
 - `references/filtered-tests.md`: every test run, with a filter.
 - `references/e2e-container.md`: the E2E test, after the feature is ready.
+- `references/e2e-structure.md`: the E2E code, with the page object model.
 
 The refactor of the code you touched follows the rest of this skill.
 
@@ -88,6 +89,7 @@ The tests are green. If you are in the ATDD loop and a scenario remains, go back
 | `references/unit-tests.md` | Unit and integration | Does any test verify a private method, a mock of a mock, a getter, the library or the appearance? |
 | `references/test-ids.md` | Test id | Is any interactive element without `data-testid`, with a generic or position-based id, or does a component not pass the parent attributes through? |
 | `references/e2e-tests.md` | E2E | Does any E2E test verify something that does not stop the user from reaching the goal (appearance, exact text, field by field)? |
+| `references/e2e-structure.md` | E2E structure | Does a spec hold a locator or a login, does a screen lack a page object, or does a test leave its data behind when it fails? |
 | `design:review` (design plugin) | Interface | Does the change alter the UI (component, CSS, template)? |
 
 The `design:review` row does not load a skill. If the answer is yes, suggest `/design:review` over the touched files to the user. Never run it as a side effect of the refactor. The design plugin owns visual work and includes Impeccable; a separate Impeccable installation is not required. If design is unavailable, report the missing plugin and the unverified visual review.

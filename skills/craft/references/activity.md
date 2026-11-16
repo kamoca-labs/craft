@@ -51,6 +51,7 @@ Spend tokens only where the proof needs them.
 
 - **API.** A `command` check with a known input. The command prints status and the key part of the response, and fails (exit code) when a limit is broken, for example a time over the budget. To keep the full request and response, write them to `$ACTIVITY_EVIDENCE_DIR`.
 - **Screen.** A `review` check. Capture only the viewports named in `accept` (default 1280 and 390 wide, long edge up to 1000 px). Prefer a capture command of the project that writes to `$ACTIVITY_EVIDENCE_DIR`, so the image never enters your context. Check `npx playwright --help` for the screenshot command first. Without such a command, use the browser tool with one capture per viewport. Look at each capture once, then approve with `--attach`. Do not capture again unless the files under `watch` changed. Compare with the Figma frame when the request has one, and say what you could not verify.
+- **E2E.** A `command` check that runs the `e2e` service with the output in `$ACTIVITY_EVIDENCE_DIR`, so the videos and the traces become evidence that the user opens without a token cost. The command is in `e2e-structure.md`, section Video. You cannot watch a video: read the trace and the screenshot of a failure.
 - **Refactor.** A `command` check on the tests of the affected behavior, plus a command that proves the structural change.
 - Files in `$ACTIVITY_EVIDENCE_DIR` and `--attach` files are sealed, and `index.md` shows them (images inline). The user can open them without a token cost to the session.
 

@@ -2,6 +2,22 @@
 
 Notes reconstructed from repository commits and manifest versions. Historical dates identify version changes in Git, not previously published releases. Versions absent from the recorded history are not invented. Categories without changes are omitted.
 
+## 1.3.0 (2026-11-16)
+
+### Added
+
+- `e2e-structure` reference: the E2E code follows the page object model from the first test. A spec holds the journey, a page object holds the locators of one screen, and a fixture holds the session, the data with its teardown, the page objects and the stubs. It also sets the layout of `e2e/`, the Playwright config (parallel, one Chromium project, trace on first retry), the video of every run (`retain-on-failure` in CI), and guides: videos for manuals recorded with `page.screencast`, outside the specs.
+- `e2e-spec` hook (`PreToolUse`, `Edit`/`Write`/`MultiEdit` on a script inside `e2e/`): denies a locator, a position, `new XPage(...)`, `page.route` or a value import from `@playwright/test` in a spec or a guide, CSS or XPath, `extends` and `screencast` in a page object, and, in every E2E script, `waitForTimeout`, `force: true`, `mode: 'serial'` and a non-waiting assert.
+- `craft:setup` prepares Playwright E2E when the project has it or wants it: exact version of `@playwright/test`, the `e2e/` folder, the `e2e` service and the `test:e2e` script, `.gitignore` entries, `eslint-plugin-playwright` and `no-floating-promises`.
+- The E2E evidence of an activity item: the suite runs with its output in `$ACTIVITY_EVIDENCE_DIR`, so the videos and traces are sealed evidence that the user opens without a token cost.
+
+### Changed
+
+- `e2e-tests`: more signs of violation (a non-waiting assert, a position, `force: true`, `mode: 'serial'`, a locator in a spec), `expect.poll` for what is outside the page, a unique name in the data with a teardown, and the example uses a page object and a fixture.
+- `e2e-container`: `init: true`, `ipc: host`, `BASE_URL` and the mounted output folders for the Playwright service.
+- `test-ids`: the locator lives in the page object. The reference says why the test id comes before the role locator (the role name changes with the language).
+- `deny` in `hooks/lib.ts` accepts a `found` text, so a hook can say what it found.
+
 ## 1.2.0 (2026-11-13)
 
 ### Changed

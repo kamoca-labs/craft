@@ -69,8 +69,11 @@ Only in a container. Follow the e2e-container reference.
 - Name that describes the screen, not the goal: `'products page'`, `'edit modal'`.
 - Asserts in the middle of the journey that do not prove the goal.
 - `waitForTimeout`, `cy.wait(2000)`, `sleep`.
-- Locator by CSS, XPath, `nth-child` or generated class.
-- Test that depends on another test having run before.
+- `expect(await locator.isVisible()).toBe(true)`: it does not wait. Use `await expect(locator).toBeVisible()`.
+- Locator by CSS, XPath, `nth-child` or generated class, or by position (`.first()`, `.nth()`).
+- A locator written in the spec, not in a page object (`e2e-structure.md`).
+- `force: true` on a click: if the element is not ready for the test, it is not ready for the user.
+- Test that depends on another test having run before, or `mode: 'serial'`.
 - E2E written before the feature is ready, or used as the red test of ATDD.
 
 ## Cut question
@@ -87,11 +90,12 @@ Ask this question for **each assert**:
 
 1. **Name** = the goal of the user, as a sentence: `'user creates a request and sees it in the list'`.
 2. **One test per journey**, on the happy path. Add an error path only by the rule in [What goes in](#what-goes-in).
-3. **Locator by test id**: `getByTestId` first (`test-ids.md`). Use `getByRole` or `getByLabel` only for an element that is not yours. Never use CSS, XPath or position.
-4. **Waiting assert**: `toBeVisible`, `toHaveURL`, `toHaveCount`. Never use a fixed wait.
-5. **Setup outside the UI**: create the data and the login session through API, seed or `storageState`. Use the UI only in the steps that are the journey.
-6. **Isolated test**: each test creates its own data and does not depend on the order.
-7. **Real system**: the backend and the database are the test ones of the project. Mock only third-party services (payment, email, SMS).
+3. **Locator by test id**: `getByTestId` first (`test-ids.md`), always inside a page object. Use `getByRole` or `getByLabel` only for an element that is not yours. Never use CSS, XPath or position.
+4. **Waiting assert**: `toBeVisible`, `toHaveURL`, `toHaveCount`. Never use a fixed wait. For a condition outside the page (a job, the state of an API), use `expect.poll`.
+5. **Setup outside the UI**: create the data and the login session through API, seed or `storageState`, in a fixture. Use the UI only in the steps that are the journey.
+6. **Isolated test**: each test creates its own data with a unique name, deletes it in the teardown of a fixture, and does not depend on the order.
+7. **Structure**: spec, page object and fixture, as `e2e-structure.md` says. The steps of the journey go in `test.step`, named for the person who reads the report or watches the video.
+8. **Real system**: the backend and the database are the test ones of the project. Mock only third-party services (payment, email, SMS).
 
 ## Example
 
@@ -102,17 +106,14 @@ test('name with 256 characters shows error', async ({ page }) => { /* ... */ })
 test('spinner appears when saving', async ({ page }) => { /* ... */ })
 
 // after: 1 test, 1 journey, 1 result
-test('user creates an item and sees it in the list', async ({ page }) => {
-  await page.goto('/items/new')
+test('user creates an item and sees it in the list', async ({ itemsPage, itemName }) => {
+  await test.step('create the item', () => itemsPage.create(itemName))
 
-  await page.getByTestId('item-name-input').fill('Chair')
-  await page.getByTestId('item-save-button').click()
-
-  await expect(page.getByTestId('items-table')).toContainText('Chair')
+  await expect(itemsPage.table).toContainText(itemName)
 })
 ```
 
-The validation of the name (empty, too long) goes to the unit test of the rule. The spinner leaves the suite.
+The validation of the name (empty, too long) goes to the unit test of the rule. The spinner leaves the suite. The page object `itemsPage` and the fixture `itemName` (a unique name, deleted after the test) are in the example of `e2e-structure.md`.
 
 ## Limits
 

@@ -40,6 +40,18 @@ Vue or React frontend: ask whether the production build must remove `data-testid
 
 Test runner: the one the project already uses. If there is none, use the default of the stack (vitest, pest, pytest, `go test`, `cargo test`). Check that it runs filtered (`../craft/references/filtered-tests.md`).
 
+## E2E with Playwright
+
+When the project already uses Playwright, or the user wants E2E and the project has a frontend, add this to the plan of step 3. Create nothing before the ok.
+
+- **Dependency**: `@playwright/test` with an exact version (no `^`), the same as the tag of the image.
+- **Folder `e2e/`**, as in `../craft/references/e2e-structure.md`: `playwright.config.ts`, `fixtures/index.ts`, `pages/` and `specs/`. Add `auth.setup.ts` only if the app has a login, and `support/` only if the app has an API for the test data. Add `guides/` and `guides.config.ts` only if the user wants videos for manuals.
+- **Service `e2e`** in the dev compose file and the script `test:e2e`, as in `../craft/references/e2e-container.md`: the official image at the version of the package, `init: true`, `ipc: host`, `BASE_URL` and the output folders mounted.
+- **`.gitignore`**: `playwright/.auth/`, `test-results/`, `playwright-report/`, `blob-report/`.
+- **Lint**: `eslint-plugin-playwright` (`flat/recommended`) on `e2e/**`, `@typescript-eslint/no-floating-promises`, and `e2e/` inside `tsc --noEmit`. The `e2e-spec` hook cannot see a missing `await`, and the lint can.
+
+Check it: `docker compose run --rm e2e npx playwright test -c e2e --list` loads the config and lists the tests. Write no E2E test now: the first one comes with the first feature that is ready (`../craft/references/e2e-tests.md`). Never run Playwright on the host.
+
 ## CLAUDE.md
 
 Create or complete a minimal CLAUDE.md with the project context that the setup found:

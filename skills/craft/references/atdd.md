@@ -32,7 +32,7 @@ If the current code makes the change hard, refactor **before** step 2. First mak
 - A correction from the user can become a project hook: `craft:hook`.
 - A decision made on the way (library, format, business rule) goes to the repo, as `memory.md` says.
 - Follow the test runner and the environment of the project (container, `package.json` script, `artisan test`).
-- Write the E2E test only when the feature is ready: all its cycles are green and the full flow works on screen. Write one test for each new journey and run it in a container (`e2e-tests.md`, `e2e-container.md`). The `e2e-container` hook denies E2E on the host. An E2E test in the middle of the cycle fails because the screen is incomplete, creates noise and delays delivery.
+- Write the E2E test only when the feature is ready: all its cycles are green and the full flow works on screen. Write one test for each new journey and run it in a container (`e2e-tests.md`, `e2e-structure.md`, `e2e-container.md`). The `e2e-container` hook denies E2E on the host. An E2E test in the middle of the cycle fails because the screen is incomplete, creates noise and delays delivery.
 
 ## When it does not apply
 
