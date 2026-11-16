@@ -132,8 +132,8 @@ function capture(useCase: object) {
   } catch {}
 }
 
-export function deny(rule: string, input: HookInput): never {
-  const reason = message(`deny.${rule}`)
+export function deny(rule: string, input: HookInput, found = ''): never {
+  const reason = [found && `Found: ${found}.`, message(`deny.${rule}`)].filter(Boolean).join(' ')
   capture({ description: reason, tool_name: input.tool_name, tool_input: input.tool_input, deny: [rule] })
   process.stderr.write(`[craft:${rule}] ${reason}\n`)
   process.exit(2)

@@ -56,6 +56,12 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/test-skip.ts\"",
             "timeout": 10,
             "statusMessage": "craft:test-skip: test skipped or focused?"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/rules/e2e-spec.ts\"",
+            "timeout": 10,
+            "statusMessage": "craft:e2e-spec: E2E with page objects?"
           }
         ]
       },
